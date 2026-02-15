@@ -5,40 +5,40 @@ import jakarta.validation.ConstraintValidatorContext;
 import lombok.extern.slf4j.Slf4j;
 import ru.yandex.practicum.filmorate.validation.annotation.DateInRange;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 
 @Slf4j
-public class DateInRangeValidator implements ConstraintValidator<DateInRange, Date> {
+public class DateInRangeValidator implements ConstraintValidator<DateInRange, LocalDate> {
     private static final String PARSE_FORMAT_ERR_LOG_MSG = "Failed to provided date format from the annotation: {}";
     private static final String PARSE_START_DATE_ERR_LOG_MSG = "Failed to parse startDate from the annotation: {}";
     private static final String PARSE_END_DATE_ERR_LOG_MSG = "Failed to parse endDate from the annotation: {}";
 
-    private Date startDate;
-    private Date endDate;
+    private LocalDate startDate;
+    private LocalDate endDate;
 
     @Override
     public void initialize(DateInRange constraintAnnotation) {
-        SimpleDateFormat formatter;
+        DateTimeFormatter formatter;
         try {
-            formatter = new SimpleDateFormat(constraintAnnotation.dateFormat());
+            formatter = DateTimeFormatter.ofPattern(constraintAnnotation.dateFormat());
         } catch (IllegalArgumentException e) {
             log.error(PARSE_FORMAT_ERR_LOG_MSG, constraintAnnotation.dateFormat());
             throw e;
         }
         if (!constraintAnnotation.startDate().isEmpty()) {
             try {
-                startDate = formatter.parse(constraintAnnotation.startDate());
-            } catch (ParseException e) {
+                startDate = LocalDate.parse(constraintAnnotation.startDate(), formatter);
+            } catch (DateTimeParseException e) {
                 log.error(PARSE_START_DATE_ERR_LOG_MSG, constraintAnnotation.startDate());
                 throw new RuntimeException(e);
             }
         }
         if (!constraintAnnotation.endDate().isEmpty()) {
             try {
-                endDate = formatter.parse(constraintAnnotation.endDate());
-            } catch (ParseException e) {
+                endDate = LocalDate.parse(constraintAnnotation.endDate(), formatter);
+            } catch (DateTimeParseException e) {
                 log.error(PARSE_END_DATE_ERR_LOG_MSG, constraintAnnotation.endDate());
                 throw new RuntimeException(e);
             }
@@ -46,9 +46,9 @@ public class DateInRangeValidator implements ConstraintValidator<DateInRange, Da
     }
 
     @Override
-    public boolean isValid(Date value, ConstraintValidatorContext context) {
+    public boolean isValid(LocalDate value, ConstraintValidatorContext context) {
         return value != null &&
-                (startDate == null || !value.before(startDate)) && (endDate == null || !value.after(endDate));
+                (startDate == null || !value.isBefore(startDate)) && (endDate == null || !value.isAfter(endDate));
     }
 }
 
