@@ -34,7 +34,7 @@ public class UserControllerTest {
 
     @Test
     @DisplayName("Add new user (valid user)")
-    public void POST_user_validParams_Success201WithDto() throws Exception {
+    public void post_users_addValidUser_success201WithDto() throws Exception {
         mvc.perform(post(UserController.CONTROLLER_ROUTE)
                         .contentType(MediaType.APPLICATION_JSON).content(
                                 asJsonString(TestStubs.VALID_USER_1.clone())
@@ -46,8 +46,8 @@ public class UserControllerTest {
     }
 
     @Test
-    @DisplayName("Add new user (null login)")
-    public void POST_user_null_login_Fail400() throws Exception {
+    @DisplayName("Add new user with incorrect field (null login)")
+    public void post_users_addUserWithNullLogin_fail400() throws Exception {
         mvc.perform(post(UserController.CONTROLLER_ROUTE)
                         .contentType(MediaType.APPLICATION_JSON).content(
                                 asJsonString(TestStubs.INVALID_USER_NULL_LOGIN.clone())
@@ -57,7 +57,7 @@ public class UserControllerTest {
 
     @Test
     @DisplayName("Add already existing user")
-    public void POST_user_exists_Conflict409() throws Exception {
+    public void post_users_addExistingUser_conflict409() throws Exception {
         String userJson = mvc.perform(post(UserController.CONTROLLER_ROUTE)
                 .contentType(MediaType.APPLICATION_JSON).content(
                         asJsonString(TestStubs.VALID_USER_1.clone())
@@ -75,7 +75,7 @@ public class UserControllerTest {
 
     @Test
     @DisplayName("Update existing user")
-    public void PUT_user_exists_Success200() throws Exception {
+    public void put_users_updateExistingUser_success200() throws Exception {
         String userJson = mvc.perform(post(UserController.CONTROLLER_ROUTE)
                 .contentType(MediaType.APPLICATION_JSON).content(
                         asJsonString(TestStubs.VALID_USER_1.clone())
@@ -97,7 +97,7 @@ public class UserControllerTest {
 
     @Test
     @DisplayName("Update non-existing user")
-    public void PUT_user_exists_NotFound404() throws Exception {
+    public void put_users_updateNonExistingUser_notFound404() throws Exception {
         mvc.perform(put(UserController.CONTROLLER_ROUTE)
                         .contentType(MediaType.APPLICATION_JSON).content(
                                 asJsonString(TestStubs.VALID_USER_1.clone())
@@ -107,7 +107,7 @@ public class UserControllerTest {
 
     @Test
     @DisplayName("Get all users from not empty repository")
-    public void GET_users_not_empty_repository_Success200WithDto() throws Exception {
+    public void get_users_getUsersFromNotEmptyRepository_success200WithDto() throws Exception {
         mvc.perform(post(UserController.CONTROLLER_ROUTE)
                 .contentType(MediaType.APPLICATION_JSON).content(
                         asJsonString(TestStubs.VALID_USER_1.clone())

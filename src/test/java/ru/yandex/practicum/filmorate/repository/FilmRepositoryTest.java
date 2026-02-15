@@ -55,7 +55,7 @@ public class FilmRepositoryTest {
 
     @Test
     @DisplayName("Update non-existing film")
-    public void updateFilm_UpdateNonExistingFilm_throwNotFoundException() {
+    public void updateFilm_updateNonExistingFilm_throwNotFoundException() {
         Assertions.assertThrows(NotFoundException.class,
                 () -> repository.updateFilm(VALID_FILM_1.clone()),
                 "Can't update non-existing film!"
@@ -64,7 +64,7 @@ public class FilmRepositoryTest {
 
     @Test
     @DisplayName("Update existing film")
-    public void updateFilm_UpdateExistingFilm_filmUpdated() {
+    public void updateFilm_updateExistingFilm_filmUpdated() {
         Film addedFilm = repository.addFilm(VALID_FILM_1.clone());
         addedFilm.setName(VALID_FILM_NAME_2);
         Assertions.assertDoesNotThrow(

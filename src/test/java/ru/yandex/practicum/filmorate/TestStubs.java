@@ -56,7 +56,7 @@ public class TestStubs {
     public static final String VALID_EMAIL_2 = "vd@yandex.ru";
     public static final String INVALID_EMAIL_EMPTY_BEFORE_AT = "@gmail.com";
     public static final String INVALID_EMAIL_EMPTY_AFTER_AT = "gmail.com@";
-    public static final String INVALID_EMAIL_NOT_EMAIL = "fasnflaknsflkasnfksanlfk";
+    public static final String INVALID_EMAIL = "fasnflaknsflkasnfksanlfk";
     public static final LocalDate VALID_BIRTHDAY_1 = LocalDate.now().minusYears(10);
     public static final LocalDate VALID_BIRTHDAY_2 = LocalDate.now().minusYears(5);
     public static final LocalDate INVALID_FUTURE_BIRTHDAY = LocalDate.now().plusYears(10);
@@ -70,6 +70,6 @@ public class TestStubs {
     public static final User INVALID_USER_LOGIN_EMPTY = new User(null, VALID_EMAIL_1, INVALID_LOGIN_EMPTY, VALID_USER_NAME_1, VALID_BIRTHDAY_1);
     public static final User INVALID_USER_EMAIL_EMPTY_BEFORE_AT = new User(null, INVALID_EMAIL_EMPTY_BEFORE_AT, VALID_LOGIN_1, VALID_USER_NAME_1, VALID_BIRTHDAY_1);
     public static final User INVALID_USER_EMAIL_EMPTY_AFTER_AT = new User(null, INVALID_EMAIL_EMPTY_AFTER_AT, VALID_LOGIN_1, VALID_USER_NAME_1, VALID_BIRTHDAY_1);
-    public static final User INVALID_USER_EMAIL_NOT_EMAIL = new User(null, INVALID_EMAIL_NOT_EMAIL, VALID_LOGIN_1, VALID_USER_NAME_1, VALID_BIRTHDAY_1);
+    public static final User INVALID_USER_INVALID_EMAIL = new User(null, INVALID_EMAIL, VALID_LOGIN_1, VALID_USER_NAME_1, VALID_BIRTHDAY_1);
     public static final User INVALID_USER_FUTURE_BIRTHDAY = new User(null, VALID_EMAIL_1, VALID_LOGIN_1, VALID_USER_NAME_1, INVALID_FUTURE_BIRTHDAY);
 }
