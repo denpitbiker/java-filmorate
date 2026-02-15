@@ -26,13 +26,13 @@ public class TestStubs {
             Съешь ещё этих мягких французских булок, да выпей чаю
             Съешь ещё этих мягких французских булок, да выпей чаю
             """;
-    public final static LocalDate VALID_DATE_1 = LocalDate.of(1988, 8, 12);
-    public final static LocalDate VALID_DATE_2 = LocalDate.of(2009, 5, 20);
-    public final static LocalDate TOOL_OLD_DATE = LocalDate.of(1840, 5, 20);
-    public final static Long VALID_DURATION_1 = 133L;
-    public final static Long VALID_DURATION_2 = 153L;
-    public final static Long INVALID_DURATION_ZERO = 0L;
-    public final static Long INVALID_DURATION_NEGATIVE = -1240L;
+    public static final LocalDate VALID_DATE_1 = LocalDate.of(1988, 8, 12);
+    public static final LocalDate VALID_DATE_2 = LocalDate.of(2009, 5, 20);
+    public static final LocalDate TOOL_OLD_DATE = LocalDate.of(1840, 5, 20);
+    public static final Long VALID_DURATION_1 = 133L;
+    public static final Long VALID_DURATION_2 = 153L;
+    public static final Long INVALID_DURATION_ZERO = 0L;
+    public static final Long INVALID_DURATION_NEGATIVE = -1240L;
 
     public static final Film VALID_FILM_1 = new Film(null, VALID_FILM_NAME_1, VALID_FILM_DESCRIPTION_1, VALID_DATE_1, VALID_DURATION_1);
     public static final Film VALID_FILM_2 = new Film(null, VALID_FILM_NAME_2, VALID_FILM_DESCRIPTION_2, VALID_DATE_2, VALID_DURATION_2);
@@ -57,9 +57,9 @@ public class TestStubs {
     public static final String INVALID_EMAIL_EMPTY_BEFORE_AT = "@gmail.com";
     public static final String INVALID_EMAIL_EMPTY_AFTER_AT = "gmail.com@";
     public static final String INVALID_EMAIL_NOT_EMAIL = "fasnflaknsflkasnfksanlfk";
-    public final static LocalDate VALID_BIRTHDAY_1 = LocalDate.now().minusYears(10);
-    public final static LocalDate VALID_BIRTHDAY_2 = LocalDate.now().minusYears(5);
-    public final static LocalDate INVALID_FUTURE_BIRTHDAY = LocalDate.now().plusYears(10);
+    public static final LocalDate VALID_BIRTHDAY_1 = LocalDate.now().minusYears(10);
+    public static final LocalDate VALID_BIRTHDAY_2 = LocalDate.now().minusYears(5);
+    public static final LocalDate INVALID_FUTURE_BIRTHDAY = LocalDate.now().plusYears(10);
 
     public static final User VALID_USER_1 = new User(null, VALID_EMAIL_1, VALID_LOGIN_1, VALID_USER_NAME_1, VALID_BIRTHDAY_1);
     public static final User VALID_USER_2 = new User(null, VALID_EMAIL_2, VALID_LOGIN_2, VALID_USER_NAME_2, VALID_BIRTHDAY_2);
