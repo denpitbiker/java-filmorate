@@ -40,9 +40,8 @@ public class UserRepository {
         setLoginAsNameOnNull(newUser);
         newUser.setId(newUserId);
         users.put(newUserId, newUser);
-        User savedUser = users.get(newUserId);
-        log.trace(ADDED_USER_TRACE_MSG, savedUser);
-        return savedUser;
+        log.trace(ADDED_USER_TRACE_MSG, newUser);
+        return newUser;
     }
 
     public User updateUser(User updatedUser) {
@@ -54,9 +53,8 @@ public class UserRepository {
         }
         setLoginAsNameOnNull(updatedUser);
         users.put(updatedUserId, updatedUser);
-        User savedUser = users.get(updatedUserId);
-        log.trace(UPDATED_USER_TRACE_MSG, savedUser);
-        return savedUser;
+        log.trace(UPDATED_USER_TRACE_MSG, updatedUser);
+        return updatedUser;
     }
 
     private void setLoginAsNameOnNull(User user) {

@@ -39,9 +39,8 @@ public class FilmRepository {
         else idCounter = max(idCounter, newFilmId);
         newFilm.setId(newFilmId);
         films.put(newFilmId, newFilm);
-        Film savedFilm = films.get(newFilmId);
-        log.trace(ADDED_FILM_TRACE_MSG, savedFilm);
-        return savedFilm;
+        log.trace(ADDED_FILM_TRACE_MSG, newFilm);
+        return newFilm;
     }
 
     public Film updateFilm(Film updatedFilm) {
@@ -52,9 +51,8 @@ public class FilmRepository {
             throw new NotFoundException(FILM_NOT_FOUND_ERR_MSG + updatedFilmId);
         }
         films.put(updatedFilmId, updatedFilm);
-        Film savedFilm = films.get(updatedFilmId);
-        log.trace(UPDATED_FILM_TRACE_MSG, savedFilm);
-        return savedFilm;
+        log.trace(UPDATED_FILM_TRACE_MSG, updatedFilm);
+        return updatedFilm;
     }
 
     public List<Film> getAllFilms() {

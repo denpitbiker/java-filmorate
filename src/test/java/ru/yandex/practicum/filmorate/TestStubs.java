@@ -10,6 +10,7 @@ public class TestStubs {
     public static final String VALID_FILM_NAME_2 = "Бесславные ублюдки";
     public static final String VALID_FILM_DESCRIPTION_1 = "Базовый фильм";
     public static final String VALID_FILM_DESCRIPTION_2 = "Вторая мировая война. В оккупированной немцами Франции группа американских солдат-евреев наводит страх на нацистов, жестоко убивая и скальпируя солдат.";
+    public static final String INVALID_FILM_DESCRIPTION_BLANK = "       ";
     public static final String INVALID_FILM_DESCRIPTION_TOO_LONG = """
             Съешь ещё этих мягких французских булок, да выпей чаю
             Съешь ещё этих мягких французских булок, да выпей чаю
@@ -39,6 +40,7 @@ public class TestStubs {
 
     public static final Film INVALID_FILM_NULL_NAME = new Film(null, null, VALID_FILM_DESCRIPTION_2, VALID_DATE_1, VALID_DURATION_2);
     public static final Film INVALID_FILM_NULL_DESCRIPTION = new Film(null, VALID_FILM_NAME_1, null, VALID_DATE_1, VALID_DURATION_1);
+    public static final Film INVALID_FILM_BLANK_DESCRIPTION = new Film(null, VALID_FILM_NAME_1, INVALID_FILM_DESCRIPTION_BLANK, VALID_DATE_1, VALID_DURATION_1);
     public static final Film INVALID_FILM_NULL_DATE = new Film(null, VALID_FILM_NAME_1, VALID_FILM_DESCRIPTION_1, null, VALID_DURATION_1);
     public static final Film INVALID_FILM_NULL_DURATION = new Film(null, VALID_FILM_NAME_1, VALID_FILM_DESCRIPTION_1, VALID_DATE_1, null);
     public static final Film INVALID_FILM_TOO_LONG_DESCRIPTION = new Film(null, VALID_FILM_NAME_1, INVALID_FILM_DESCRIPTION_TOO_LONG, VALID_DATE_1, VALID_DURATION_2);

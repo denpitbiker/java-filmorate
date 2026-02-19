@@ -12,6 +12,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.Length;
 import ru.yandex.practicum.filmorate.validation.annotation.DateInRange;
+import ru.yandex.practicum.filmorate.validation.annotation.NullOrNotBlank;
 
 import java.time.LocalDate;
 
@@ -22,7 +23,7 @@ public class Film implements Cloneable {
     Long id;
     @NotBlank(message = "Name should not be blank!")
     String name;
-    @NotBlank(message = "Description should not be blank!")
+    @NullOrNotBlank
     @Length(max = 200, message = "Description must be <= 200 symbols!")
     String description;
     @DateInRange(startDate = "1895-12-28")

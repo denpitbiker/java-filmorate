@@ -16,7 +16,7 @@ public class FilmTest {
 
     @Test
     @DisplayName("Correct film validation")
-    public void validate_validFilm_noException() {
+    public void validate_validFilm_noViolation() {
         Set<ConstraintViolation<Film>> violations = validator.validate(VALID_FILM_1.clone());
         Assertions.assertTrue(violations.isEmpty(), "That was valid film!");
         violations = validator.validate(VALID_FILM_2.clone());
@@ -32,9 +32,16 @@ public class FilmTest {
 
     @Test
     @DisplayName("Film with null description validation")
-    public void validate_filmNullDescription_hasViolation() {
+    public void validate_filmNullDescription_noViolation() {
         Set<ConstraintViolation<Film>> violations = validator.validate(INVALID_FILM_NULL_DESCRIPTION.clone());
-        Assertions.assertFalse(violations.isEmpty(), "Expected error on null description");
+        Assertions.assertTrue(violations.isEmpty(), "That was valid film!");
+    }
+
+    @Test
+    @DisplayName("Film with blank description validation")
+    public void validate_filmNullDescription_hasViolation() {
+        Set<ConstraintViolation<Film>> violations = validator.validate(INVALID_FILM_BLANK_DESCRIPTION.clone());
+        Assertions.assertFalse(violations.isEmpty(), "Expected error on blank description");
     }
 
     @Test
