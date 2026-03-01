@@ -15,6 +15,8 @@ import ru.yandex.practicum.filmorate.validation.annotation.DateInRange;
 import ru.yandex.practicum.filmorate.validation.annotation.NullOrNotBlank;
 
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 @Data
 @AllArgsConstructor
@@ -34,9 +36,10 @@ public class Film implements Cloneable {
     @NotNull
     @JsonProperty("duration")
     Long durationMinutes;
+    Set<Long> likes = new HashSet<>();
 
     @Override
     public Film clone() {
-        return new Film(id, name, description, releaseDate, durationMinutes);
+        return new Film(id, name, description, releaseDate, durationMinutes, new HashSet<>(likes));
     }
 }

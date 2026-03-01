@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.repository;
+package ru.yandex.practicum.filmorate.storage;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -22,11 +22,11 @@ import static ru.yandex.practicum.filmorate.TestStubs.*;
         classes = FilmorateApplication.class)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 @AutoConfigureMockMvc
-public class UserRepositoryTest {
+public class InMemoryUserStorageTest {
     private static final int EXPECTED_REPOSITORY_SIZE_TWO = 2;
 
     @Autowired
-    private UserRepository repository;
+    private InMemoryUserStorage repository;
 
     @Test
     @DisplayName("Add correct user")
