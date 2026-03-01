@@ -5,7 +5,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -21,9 +20,7 @@ import static ru.yandex.practicum.filmorate.TestStubs.*;
         webEnvironment = SpringBootTest.WebEnvironment.MOCK,
         classes = FilmorateApplication.class)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
-@AutoConfigureMockMvc
 public class InMemoryUserStorageTest {
-    private static final int EXPECTED_REPOSITORY_SIZE_TWO = 2;
 
     @Autowired
     private InMemoryUserStorage repository;
@@ -40,6 +37,63 @@ public class InMemoryUserStorageTest {
                 "Second user should be added without exceptions"
         );
         Assertions.assertEquals(EXPECTED_REPOSITORY_SIZE_TWO, repository.getAllUsers().size(), "Repository size should be " + EXPECTED_REPOSITORY_SIZE_TWO);
+    }
+
+    @Test
+    @DisplayName("Get existing user by id")
+    public void getUser_getUserByExistingId_userReturnedNoExceptions() {
+        User user = repository.addUser(VALID_USER_1.clone());
+
+        Assertions.assertDoesNotThrow(
+                () -> repository.getUser(user.getId()),
+                "User should be returned for existing id"
+        );
+    }
+
+    @Test
+    @DisplayName("Get non-existing user by id")
+    public void getUser_getUserByNonExistingId_NotFoundException() {
+        repository.addUser(VALID_USER_1.clone());
+
+        Assertions.assertThrows(
+                NotFoundException.class,
+                () -> repository.getUser(NON_EXISTING_ID),
+                "Should not return user for non-existing id"
+        );
+    }
+
+    @Test
+    @DisplayName("Remove existing user by id")
+    public void removeUser_removeUserByExistingId_userRemovedAndReturnedNoExceptions() {
+        User user = repository.addUser(VALID_USER_1.clone());
+
+        Assertions.assertDoesNotThrow(
+                () -> repository.removeUser(user.getId()),
+                "User should be returned for existing id"
+        );
+        Assertions.assertEquals(
+                EXPECTED_REPOSITORY_SIZE_ZERO,
+                repository.getAllUsers().size(),
+                "User should be removed"
+        );
+    }
+
+    @Test
+    @DisplayName("Remove non-existing user by id")
+    public void removeUser_getUserByNonExistingId_NotFoundException() {
+        repository.addUser(VALID_USER_1.clone());
+
+        Assertions.assertThrows(
+                NotFoundException.class,
+                () -> repository.removeUser(NON_EXISTING_ID),
+                "Should not return user for non-existing id"
+        );
+
+        Assertions.assertEquals(
+                EXPECTED_REPOSITORY_SIZE_ONE,
+                repository.getAllUsers().size(),
+                "Other user should not be removed"
+        );
     }
 
     @Test

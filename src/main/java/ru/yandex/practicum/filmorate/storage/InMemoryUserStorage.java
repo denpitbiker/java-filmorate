@@ -7,6 +7,7 @@ import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -43,7 +44,8 @@ public class InMemoryUserStorage implements UserStorage {
         }
         if (newUserId == null) newUserId = ++idCounter;
         else idCounter = max(idCounter, newUserId);
-        setLoginAsNameOnNull(newUser);
+        setLoginAsNameIfNull(newUser);
+        initFriendsStorageIfNull(newUser);
         newUser.setId(newUserId);
         users.put(newUserId, newUser.clone());
         log.trace(ADDED_USER_TRACE_MSG, newUser);
@@ -64,14 +66,15 @@ public class InMemoryUserStorage implements UserStorage {
         log.trace(UPDATING_USER_TRACE_MSG, updatedUser);
         Long updatedUserId = updatedUser.getId();
         checkUserIdExists(updatedUserId);
-        setLoginAsNameOnNull(updatedUser);
+        setLoginAsNameIfNull(updatedUser);
+        initFriendsStorageIfNull(updatedUser);
         users.put(updatedUserId, updatedUser.clone());
         log.trace(UPDATED_USER_TRACE_MSG, updatedUser);
         return updatedUser;
     }
 
     @Override
-    public User deleteUser(Long id) {
+    public User removeUser(Long id) {
         log.trace(REMOVE_USER_TRACE_MSG, id);
         checkUserIdExists(id);
         User removed = users.remove(id);
@@ -85,7 +88,7 @@ public class InMemoryUserStorage implements UserStorage {
         return users.values().stream().map(User::clone).toList();
     }
 
-    private void setLoginAsNameOnNull(User user) {
+    private void setLoginAsNameIfNull(User user) {
         if (user.getName() == null) user.setName(user.getLogin());
     }
 
@@ -94,5 +97,9 @@ public class InMemoryUserStorage implements UserStorage {
             log.trace(USER_NOT_FOUND_TRACE_MSG, id);
             throw new NotFoundException(USER_NOT_FOUND_ERR_MSG + id);
         }
+    }
+
+    private void initFriendsStorageIfNull(User user) {
+        if (user.getFriends() == null) user.setFriends(new HashSet<>());
     }
 }

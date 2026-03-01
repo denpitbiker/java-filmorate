@@ -17,7 +17,7 @@ import java.util.Collection;
 public class FilmController {
     private static final String ID_PATH_VAR = "id";
     private static final String USER_ID_PATH_VAR = "userId";
-    private static final String COUNT_PARAM = "count";
+    public static final String COUNT_PARAM = "count";
 
     public static final String CONTROLLER_ROUTE = "/films";
     public static final String GET_FILM_SUBROUTE = "/{id}";

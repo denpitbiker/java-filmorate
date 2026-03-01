@@ -7,6 +7,7 @@ import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -43,6 +44,7 @@ public class InMemoryFilmStorage implements FilmStorage {
         }
         if (newFilmId == null) newFilmId = ++idCounter;
         else idCounter = max(idCounter, newFilmId);
+        initLikesStorageIfNull(newFilm);
         newFilm.setId(newFilmId);
         films.put(newFilmId, newFilm.clone());
         log.trace(ADDED_FILM_TRACE_MSG, newFilm);
@@ -63,13 +65,14 @@ public class InMemoryFilmStorage implements FilmStorage {
         log.trace(UPDATING_FILM_TRACE_MSG, updatedFilm);
         Long updatedFilmId = updatedFilm.getId();
         checkFilmIdExists(updatedFilmId);
+        initLikesStorageIfNull(updatedFilm);
         films.put(updatedFilmId, updatedFilm.clone());
         log.trace(UPDATED_FILM_TRACE_MSG, updatedFilm);
         return updatedFilm;
     }
 
     @Override
-    public Film deleteFilm(Long id) {
+    public Film removeFilm(Long id) {
         log.trace(REMOVE_FILM_TRACE_MSG, id);
         checkFilmIdExists(id);
         Film removed = films.remove(id);
@@ -88,5 +91,9 @@ public class InMemoryFilmStorage implements FilmStorage {
             log.trace(FILM_NOT_FOUND_TRACE_MSG, id);
             throw new NotFoundException(FILM_NOT_FOUND_ERR_MSG + id);
         }
+    }
+
+    private void initLikesStorageIfNull(Film film) {
+        if (film.getLikes() == null) film.setLikes(new HashSet<>());
     }
 }

@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.handler;
 
+import jakarta.validation.ValidationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -45,9 +46,16 @@ public class ErrorHandler {
         return new ErrorResponse(UNKNOWN_ERR_MSG);
     }
 
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleValidationException(ValidationException e) {
+        log.error(VALIDATION_ERR_LOG_MSG, e);
+        return new ErrorResponse(e.getMessage());
+    }
+
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public Map<String, String> handleValidationExceptions(MethodArgumentNotValidException e) {
+    public Map<String, String> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
         log.error(VALIDATION_ERR_LOG_MSG, e);
         Map<String, String> errors = new HashMap<>();
         e.getBindingResult().getAllErrors().forEach((error) -> {

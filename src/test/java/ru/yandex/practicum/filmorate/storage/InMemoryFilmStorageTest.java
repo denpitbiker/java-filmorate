@@ -5,7 +5,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -21,9 +20,7 @@ import static ru.yandex.practicum.filmorate.TestStubs.*;
         webEnvironment = SpringBootTest.WebEnvironment.MOCK,
         classes = FilmorateApplication.class)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
-@AutoConfigureMockMvc
 public class InMemoryFilmStorageTest {
-    private static final int EXPECTED_REPOSITORY_SIZE_TWO = 2;
 
     @Autowired
     private InMemoryFilmStorage repository;
@@ -50,6 +47,64 @@ public class InMemoryFilmStorageTest {
         Assertions.assertThrows(DuplicatedDataException.class,
                 () -> repository.addFilm(addedFilm),
                 "Duplicate films are prohibited"
+        );
+    }
+
+
+    @Test
+    @DisplayName("Get existing film by id")
+    public void getFilm_getFilmByExistingId_filmReturnedNoExceptions() {
+        Film film = repository.addFilm(VALID_FILM_1.clone());
+
+        Assertions.assertDoesNotThrow(
+                () -> repository.getFilm(film.getId()),
+                "Film should be returned for existing id"
+        );
+    }
+
+    @Test
+    @DisplayName("Get non-existing film by id")
+    public void getFilm_getFilmByNonExistingId_NotFoundException() {
+        repository.addFilm(VALID_FILM_1.clone());
+
+        Assertions.assertThrows(
+                NotFoundException.class,
+                () -> repository.getFilm(NON_EXISTING_ID),
+                "Should not return film for non-existing id"
+        );
+    }
+
+    @Test
+    @DisplayName("Remove existing film by id")
+    public void removeFilm_removeFilmByExistingId_filmRemovedAndReturnedNoExceptions() {
+        Film film = repository.addFilm(VALID_FILM_1.clone());
+
+        Assertions.assertDoesNotThrow(
+                () -> repository.removeFilm(film.getId()),
+                "Film should be returned for existing id"
+        );
+        Assertions.assertEquals(
+                EXPECTED_REPOSITORY_SIZE_ZERO,
+                repository.getAllFilms().size(),
+                "Film should be removed"
+        );
+    }
+
+    @Test
+    @DisplayName("Remove non-existing film by id")
+    public void removeFilm_getFilmByNonExistingId_NotFoundException() {
+        repository.addFilm(VALID_FILM_1.clone());
+
+        Assertions.assertThrows(
+                NotFoundException.class,
+                () -> repository.removeFilm(NON_EXISTING_ID),
+                "Should not return film for non-existing id"
+        );
+
+        Assertions.assertEquals(
+                EXPECTED_REPOSITORY_SIZE_ONE,
+                repository.getAllFilms().size(),
+                "Other film should not be removed"
         );
     }
 
