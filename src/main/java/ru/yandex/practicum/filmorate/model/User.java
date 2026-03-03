@@ -31,10 +31,12 @@ public class User implements Cloneable {
     @JsonFormat(pattern = "yyyy-MM-dd")
     @JsonSerialize(using = LocalDateSerializer.class)
     LocalDate birthday;
-    Set<Long> friends = new HashSet<>();
+    final Set<Long> friends = new HashSet<>();
 
     @Override
     public User clone() {
-        return new User(id, email, login, name, birthday, new HashSet<>(friends));
+        User cloned = new User(id, email, login, name, birthday);
+        cloned.getFriends().addAll(friends);
+        return cloned;
     }
 }

@@ -4,6 +4,8 @@ import jakarta.validation.ValidationException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.exception.DuplicatedDataException;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
@@ -22,16 +24,24 @@ public class UserService {
     private static final String GET_USERS_LOG_MSG = "Get all users";
     private static final String ADD_USER_LOG_MSG = "Add new user {}";
     private static final String UPDATE_USER_LOG_MSG = "Update user {}";
+    private static final String USER_NOT_FOUND_TRACE_MSG = "Can't find user with id: {}";
+    private static final String DUPLICATE_USER_FOUND_TRACE_MSG = "Already have user with id: {}";
 
     private static final String USER_IDS_ARE_EQUAL_ERR_MSG = "User ids should not be the same!";
+    private static final String USER_NOT_FOUND_ERR_MSG = "Can't find user with id = ";
+    private static final String DUPLICATE_USER_ERR_MSG = "User already exists with id = ";
 
     private final UserStorage userStorage;
 
     public void addFriend(Long id, Long friendId) {
         log.info(ADD_FRIEND_LOG_MSG, friendId, id);
         checkIdsAreNotTheSame(id, friendId);
-        User user = userStorage.getUser(id);
-        User friend = userStorage.getUser(friendId);
+        checkUserIdExist(id);
+        checkUserIdExist(friendId);
+        User user = userStorage.getUser(id)
+                .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND_ERR_MSG + id));
+        User friend = userStorage.getUser(friendId)
+                .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND_ERR_MSG + id));
         user.getFriends().add(friendId);
         friend.getFriends().add(id);
         userStorage.updateUser(user);
@@ -41,8 +51,12 @@ public class UserService {
     public void removeFriend(Long id, Long friendId) {
         log.info(REMOVE_FRIEND_LOG_MSG, friendId, id);
         checkIdsAreNotTheSame(id, friendId);
-        User user = userStorage.getUser(id);
-        User friend = userStorage.getUser(friendId);
+        checkUserIdExist(id);
+        checkUserIdExist(friendId);
+        User user = userStorage.getUser(id)
+                .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND_ERR_MSG + id));
+        User friend = userStorage.getUser(friendId)
+                .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND_ERR_MSG + id));
         user.getFriends().remove(friendId);
         friend.getFriends().remove(id);
         userStorage.updateUser(user);
@@ -51,21 +65,36 @@ public class UserService {
 
     public Collection<User> getUserFriends(Long id) {
         log.info(GET_USER_FRIENDS_LOG_MSG, id);
-        Set<Long> userFriendsIds = userStorage.getUser(id).getFriends();
-        return userStorage.getAllUsers().stream().filter((user -> userFriendsIds.contains(user.getId()))).toList();
+        checkUserIdExist(id);
+        Set<Long> userFriendsIds = userStorage.getUser(id)
+                .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND_ERR_MSG + id))
+                .getFriends();
+        return userStorage.getAllUsers().stream()
+                .filter((user -> userFriendsIds.contains(user.getId())))
+                .toList();
     }
 
     public Collection<User> getCommonFriends(Long id, Long otherId) {
         log.info(GET_COMMON_FRIENDS_LOG_MSG, id, otherId);
         checkIdsAreNotTheSame(id, otherId);
-        Set<Long> userFriendsIds = userStorage.getUser(id).getFriends();
-        userFriendsIds.retainAll(userStorage.getUser(otherId).getFriends());
-        return userStorage.getAllUsers().stream().filter((user -> userFriendsIds.contains(user.getId()))).toList();
+        checkUserIdExist(id);
+        checkUserIdExist(otherId);
+        Set<Long> userFriendsIds = userStorage.getUser(id)
+                .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND_ERR_MSG + id))
+                .getFriends();
+        userFriendsIds.retainAll(userStorage.getUser(otherId)
+                .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND_ERR_MSG + id))
+                .getFriends());
+        return userStorage.getAllUsers().stream()
+                .filter((user -> userFriendsIds.contains(user.getId())))
+                .toList();
     }
 
     public User getUser(Long id) {
         log.info(GET_USER_LOG_MSG, id);
-        return userStorage.getUser(id);
+        checkUserIdExist(id);
+        return userStorage.getUser(id)
+                .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND_ERR_MSG + id));
     }
 
     public Collection<User> getAllUsers() {
@@ -75,12 +104,30 @@ public class UserService {
 
     public User addUser(User newUser) {
         log.info(ADD_USER_LOG_MSG, newUser);
-        return userStorage.addUser(newUser);
+        checkUserIdNotExist(newUser.getId());
+        return userStorage.addUser(newUser)
+                .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND_ERR_MSG + newUser.getId()));
     }
 
     public User updateUser(User updatedUser) {
         log.info(UPDATE_USER_LOG_MSG, updatedUser);
-        return userStorage.updateUser(updatedUser);
+        checkUserIdExist(updatedUser.getId());
+        return userStorage.updateUser(updatedUser)
+                .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND_ERR_MSG + updatedUser.getId()));
+    }
+
+    private void checkUserIdExist(Long id) {
+        if (!userStorage.hasUserId(id)) {
+            log.trace(USER_NOT_FOUND_TRACE_MSG, id);
+            throw new NotFoundException(USER_NOT_FOUND_ERR_MSG + id);
+        }
+    }
+
+    private void checkUserIdNotExist(Long id) {
+        if (userStorage.hasUserId(id)) {
+            log.trace(DUPLICATE_USER_FOUND_TRACE_MSG, id);
+            throw new DuplicatedDataException(DUPLICATE_USER_ERR_MSG + id);
+        }
     }
 
     private void checkIdsAreNotTheSame(Long id1, Long id2) {

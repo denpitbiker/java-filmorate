@@ -9,8 +9,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import ru.yandex.practicum.filmorate.FilmorateApplication;
-import ru.yandex.practicum.filmorate.exception.DuplicatedDataException;
-import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 
 import static ru.yandex.practicum.filmorate.TestStubs.*;
@@ -27,48 +25,36 @@ public class InMemoryUserStorageTest {
 
     @Test
     @DisplayName("Add correct user")
-    public void addUser_addCorrectUser_userAddedNoExceptions() {
-        Assertions.assertDoesNotThrow(
-                () -> repository.addUser(VALID_USER_1.clone()),
-                "User should be added without exceptions"
+    public void addUser_addCorrectUser_userAddedAndReturned() {
+        Assertions.assertTrue(
+                () -> repository.addUser(VALID_USER_1.clone()).isPresent(),
+                "User should be added and returned"
         );
-        Assertions.assertDoesNotThrow(
-                () -> repository.addUser(VALID_USER_2.clone()),
-                "Second user should be added without exceptions"
+        Assertions.assertTrue(
+                () -> repository.addUser(VALID_USER_2.clone()).isPresent(),
+                "Second user should be added and returned"
         );
         Assertions.assertEquals(EXPECTED_REPOSITORY_SIZE_TWO, repository.getAllUsers().size(), "Repository size should be " + EXPECTED_REPOSITORY_SIZE_TWO);
     }
 
     @Test
     @DisplayName("Get existing user by id")
-    public void getUser_getUserByExistingId_userReturnedNoExceptions() {
-        User user = repository.addUser(VALID_USER_1.clone());
+    public void getUser_getUserByExistingId_userReturned() {
+        User user = repository.addUser(VALID_USER_1.clone()).get();
 
-        Assertions.assertDoesNotThrow(
-                () -> repository.getUser(user.getId()),
+        Assertions.assertTrue(
+                () -> repository.getUser(user.getId()).isPresent(),
                 "User should be returned for existing id"
         );
     }
 
     @Test
-    @DisplayName("Get non-existing user by id")
-    public void getUser_getUserByNonExistingId_NotFoundException() {
-        repository.addUser(VALID_USER_1.clone());
-
-        Assertions.assertThrows(
-                NotFoundException.class,
-                () -> repository.getUser(NON_EXISTING_ID),
-                "Should not return user for non-existing id"
-        );
-    }
-
-    @Test
     @DisplayName("Remove existing user by id")
-    public void removeUser_removeUserByExistingId_userRemovedAndReturnedNoExceptions() {
-        User user = repository.addUser(VALID_USER_1.clone());
+    public void removeUser_removeUserByExistingId_userRemovedAndReturned() {
+        User user = repository.addUser(VALID_USER_1.clone()).get();
 
-        Assertions.assertDoesNotThrow(
-                () -> repository.removeUser(user.getId()),
+        Assertions.assertTrue(
+                () -> repository.removeUser(user.getId()).isPresent(),
                 "User should be returned for existing id"
         );
         Assertions.assertEquals(
@@ -79,32 +65,14 @@ public class InMemoryUserStorageTest {
     }
 
     @Test
-    @DisplayName("Remove non-existing user by id")
-    public void removeUser_getUserByNonExistingId_NotFoundException() {
-        repository.addUser(VALID_USER_1.clone());
-
-        Assertions.assertThrows(
-                NotFoundException.class,
-                () -> repository.removeUser(NON_EXISTING_ID),
-                "Should not return user for non-existing id"
-        );
-
-        Assertions.assertEquals(
-                EXPECTED_REPOSITORY_SIZE_ONE,
-                repository.getAllUsers().size(),
-                "Other user should not be removed"
-        );
-    }
-
-    @Test
     @DisplayName("Add user without name set")
-    public void addUser_addUserWithoutNameSet_userAddedNoExceptionsAndLoginSetAsName() {
+    public void addUser_addUserWithoutNameSet_userAddedNAndLoginSetAsName() {
         User userWithoutNameSet = VALID_USER_1.clone();
         userWithoutNameSet.setName(null);
 
-        Assertions.assertDoesNotThrow(
-                () -> repository.addUser(userWithoutNameSet),
-                "User should be added without exceptions"
+        Assertions.assertTrue(
+                () -> repository.addUser(userWithoutNameSet).isPresent(),
+                "User should be added and returned"
         );
         Assertions.assertFalse(repository.getAllUsers().isEmpty(), "Repository should not be empty");
         User savedUser = repository.getAllUsers().getFirst();
@@ -112,33 +80,13 @@ public class InMemoryUserStorageTest {
     }
 
     @Test
-    @DisplayName("Add existing user")
-    public void addUser_addExistingUser_throwDuplicateException() {
-        User addedUser = repository.addUser(VALID_USER_1.clone());
-
-        Assertions.assertThrows(DuplicatedDataException.class,
-                () -> repository.addUser(addedUser),
-                "Duplicate users are prohibited"
-        );
-    }
-
-    @Test
-    @DisplayName("Update non-existing user")
-    public void updateUser_updateNonExistingUser_throwNotFoundException() {
-        Assertions.assertThrows(NotFoundException.class,
-                () -> repository.updateUser(VALID_USER_1.clone()),
-                "Can't update non-existing user!"
-        );
-    }
-
-    @Test
     @DisplayName("Update existing user")
-    public void updateUser_updateExistingUser_userUpdated() {
-        User addedUser = repository.addUser(VALID_USER_1.clone());
+    public void updateUser_updateExistingUser_userUpdatedAndReturned() {
+        User addedUser = repository.addUser(VALID_USER_1.clone()).get();
         addedUser.setName(VALID_USER_NAME_2);
 
-        Assertions.assertDoesNotThrow(
-                () -> repository.updateUser(addedUser),
+        Assertions.assertTrue(
+                () -> repository.updateUser(addedUser).isPresent(),
                 "User should be updated"
         );
     }
@@ -154,5 +102,18 @@ public class InMemoryUserStorageTest {
                 "Users should be returned without exceptions"
         );
         Assertions.assertEquals(EXPECTED_REPOSITORY_SIZE_TWO, repository.getAllUsers().size(), "Repository size should be " + EXPECTED_REPOSITORY_SIZE_TWO);
+    }
+
+    @Test
+    @DisplayName("Check existing user id")
+    public void hasUserId_checkExistingUserIdInStorage_returnedTrue() {
+        Long id = repository.addUser(VALID_USER_1.clone()).get().getId();
+        Assertions.assertTrue(repository.hasUserId(id), "Repository should contain added user id");
+    }
+
+    @Test
+    @DisplayName("Check non-existing user id")
+    public void hasUserId_checkNonExistingUserIdInStorage_returnedFalse() {
+        Assertions.assertFalse(repository.hasUserId(NON_EXISTING_ID), "Repository should not contain unknown user id");
     }
 }

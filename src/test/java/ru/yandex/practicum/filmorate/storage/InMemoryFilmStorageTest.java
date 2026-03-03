@@ -9,8 +9,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import ru.yandex.practicum.filmorate.FilmorateApplication;
-import ru.yandex.practicum.filmorate.exception.DuplicatedDataException;
-import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import static ru.yandex.practicum.filmorate.TestStubs.*;
@@ -27,60 +25,36 @@ public class InMemoryFilmStorageTest {
 
     @Test
     @DisplayName("Add correct film")
-    public void addFilm_addCorrectFilm_filmAddedNoExceptions() {
-        Assertions.assertDoesNotThrow(
-                () -> repository.addFilm(VALID_FILM_1.clone()),
-                "Film should be added without exceptions"
+    public void addFilm_addCorrectFilm_filmAddedAndReturned() {
+        Assertions.assertTrue(
+                () -> repository.addFilm(VALID_FILM_1.clone()).isPresent(),
+                "Film should be added and returned"
         );
-        Assertions.assertDoesNotThrow(
-                () -> repository.addFilm(VALID_FILM_2.clone()),
-                "Second film should be added without exceptions"
+        Assertions.assertTrue(
+                () -> repository.addFilm(VALID_FILM_2.clone()).isPresent(),
+                "Second film should be added and returned"
         );
         Assertions.assertEquals(EXPECTED_REPOSITORY_SIZE_TWO, repository.getAllFilms().size(), "Repository size should be " + EXPECTED_REPOSITORY_SIZE_TWO);
     }
 
     @Test
-    @DisplayName("Add existing film")
-    public void addFilm_addExistingFilm_throwDuplicateException() {
-        Film addedFilm = repository.addFilm(VALID_FILM_1.clone());
-
-        Assertions.assertThrows(DuplicatedDataException.class,
-                () -> repository.addFilm(addedFilm),
-                "Duplicate films are prohibited"
-        );
-    }
-
-
-    @Test
     @DisplayName("Get existing film by id")
-    public void getFilm_getFilmByExistingId_filmReturnedNoExceptions() {
-        Film film = repository.addFilm(VALID_FILM_1.clone());
+    public void getFilm_getFilmByExistingId_filmReturned() {
+        Film film = repository.addFilm(VALID_FILM_1.clone()).get();
 
-        Assertions.assertDoesNotThrow(
-                () -> repository.getFilm(film.getId()),
+        Assertions.assertTrue(
+                () -> repository.getFilm(film.getId()).isPresent(),
                 "Film should be returned for existing id"
         );
     }
 
     @Test
-    @DisplayName("Get non-existing film by id")
-    public void getFilm_getFilmByNonExistingId_NotFoundException() {
-        repository.addFilm(VALID_FILM_1.clone());
-
-        Assertions.assertThrows(
-                NotFoundException.class,
-                () -> repository.getFilm(NON_EXISTING_ID),
-                "Should not return film for non-existing id"
-        );
-    }
-
-    @Test
     @DisplayName("Remove existing film by id")
-    public void removeFilm_removeFilmByExistingId_filmRemovedAndReturnedNoExceptions() {
-        Film film = repository.addFilm(VALID_FILM_1.clone());
+    public void removeFilm_removeFilmByExistingId_filmRemovedAndReturned() {
+        Film film = repository.addFilm(VALID_FILM_1.clone()).get();
 
-        Assertions.assertDoesNotThrow(
-                () -> repository.removeFilm(film.getId()),
+        Assertions.assertTrue(
+                () -> repository.removeFilm(film.getId()).isPresent(),
                 "Film should be returned for existing id"
         );
         Assertions.assertEquals(
@@ -91,39 +65,12 @@ public class InMemoryFilmStorageTest {
     }
 
     @Test
-    @DisplayName("Remove non-existing film by id")
-    public void removeFilm_getFilmByNonExistingId_NotFoundException() {
-        repository.addFilm(VALID_FILM_1.clone());
-
-        Assertions.assertThrows(
-                NotFoundException.class,
-                () -> repository.removeFilm(NON_EXISTING_ID),
-                "Should not return film for non-existing id"
-        );
-
-        Assertions.assertEquals(
-                EXPECTED_REPOSITORY_SIZE_ONE,
-                repository.getAllFilms().size(),
-                "Other film should not be removed"
-        );
-    }
-
-    @Test
-    @DisplayName("Update non-existing film")
-    public void updateFilm_updateNonExistingFilm_throwNotFoundException() {
-        Assertions.assertThrows(NotFoundException.class,
-                () -> repository.updateFilm(VALID_FILM_1.clone()),
-                "Can't update non-existing film!"
-        );
-    }
-
-    @Test
     @DisplayName("Update existing film")
     public void updateFilm_updateExistingFilm_filmUpdated() {
-        Film addedFilm = repository.addFilm(VALID_FILM_1.clone());
+        Film addedFilm = repository.addFilm(VALID_FILM_1.clone()).get();
         addedFilm.setName(VALID_FILM_NAME_2);
-        Assertions.assertDoesNotThrow(
-                () -> repository.updateFilm(addedFilm),
+        Assertions.assertTrue(
+                () -> repository.updateFilm(addedFilm).isPresent(),
                 "Film should be updated"
         );
     }
@@ -139,5 +86,18 @@ public class InMemoryFilmStorageTest {
                 "Films should be returned without exceptions"
         );
         Assertions.assertEquals(EXPECTED_REPOSITORY_SIZE_TWO, repository.getAllFilms().size(), "Repository size should be " + EXPECTED_REPOSITORY_SIZE_TWO);
+    }
+
+    @Test
+    @DisplayName("Check existing film id")
+    public void hasFilmId_checkExistingFilmIdInStorage_returnedTrue() {
+        Long id = repository.addFilm(VALID_FILM_1.clone()).get().getId();
+        Assertions.assertTrue(repository.hasFilmId(id), "Repository should contain added film id");
+    }
+
+    @Test
+    @DisplayName("Check non-existing film id")
+    public void hasFilmId_checkNonExistingFilmIdInStorage_returnedFalse() {
+        Assertions.assertFalse(repository.hasFilmId(NON_EXISTING_ID), "Repository should not contain unknown film id");
     }
 }
