@@ -6,6 +6,11 @@ import ru.yandex.practicum.filmorate.model.User;
 import java.time.LocalDate;
 
 public class TestStubs {
+    public static final int EXPECTED_REPOSITORY_SIZE_TWO = 2;
+    public static final int EXPECTED_REPOSITORY_SIZE_ONE = 1;
+    public static final int EXPECTED_REPOSITORY_SIZE_ZERO = 0;
+    public static final long NON_EXISTING_ID = 314231512;
+
     public static final String VALID_FILM_NAME_1 = "Крепкий орешек";
     public static final String VALID_FILM_NAME_2 = "Бесславные ублюдки";
     public static final String VALID_FILM_DESCRIPTION_1 = "Базовый фильм";
@@ -50,21 +55,26 @@ public class TestStubs {
 
     public static final String VALID_LOGIN_1 = "vdenk";
     public static final String VALID_LOGIN_2 = "qreqwrew";
+    public static final String VALID_LOGIN_3 = "eeee";
     public static final String VALID_USER_NAME_1 = "Denis";
     public static final String VALID_USER_NAME_2 = "Lera";
+    public static final String VALID_USER_NAME_3 = "Ilnur";
     public static final String INVALID_LOGIN_BLANK = "      ";
     public static final String INVALID_LOGIN_EMPTY = "";
     public static final String VALID_EMAIL_1 = "a.bcd@gmail.com";
     public static final String VALID_EMAIL_2 = "vd@yandex.ru";
+    public static final String VALID_EMAIL_3 = "vde@yandex.ru";
     public static final String INVALID_EMAIL_EMPTY_BEFORE_AT = "@gmail.com";
     public static final String INVALID_EMAIL_EMPTY_AFTER_AT = "gmail.com@";
     public static final String INVALID_EMAIL = "fasnflaknsflkasnfksanlfk";
     public static final LocalDate VALID_BIRTHDAY_1 = LocalDate.now().minusYears(10);
     public static final LocalDate VALID_BIRTHDAY_2 = LocalDate.now().minusYears(5);
+    public static final LocalDate VALID_BIRTHDAY_3 = LocalDate.now().minusYears(7);
     public static final LocalDate INVALID_FUTURE_BIRTHDAY = LocalDate.now().plusYears(10);
 
     public static final User VALID_USER_1 = new User(null, VALID_EMAIL_1, VALID_LOGIN_1, VALID_USER_NAME_1, VALID_BIRTHDAY_1);
     public static final User VALID_USER_2 = new User(null, VALID_EMAIL_2, VALID_LOGIN_2, VALID_USER_NAME_2, VALID_BIRTHDAY_2);
+    public static final User VALID_USER_3 = new User(null, VALID_EMAIL_3, VALID_LOGIN_3, VALID_USER_NAME_3, VALID_BIRTHDAY_3);
     public static final User INVALID_USER_NULL_EMAIL = new User(null, null, VALID_LOGIN_1, VALID_USER_NAME_1, VALID_BIRTHDAY_1);
     public static final User INVALID_USER_NULL_LOGIN = new User(null, VALID_EMAIL_1, null, VALID_USER_NAME_1, VALID_BIRTHDAY_1);
     public static final User INVALID_USER_NULL_BIRTHDAY = new User(null, VALID_EMAIL_1, VALID_LOGIN_1, VALID_USER_NAME_1, null);
