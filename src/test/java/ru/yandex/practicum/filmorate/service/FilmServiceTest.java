@@ -43,8 +43,8 @@ public class FilmServiceTest {
     @Test
     @DisplayName("Like a film")
     public void likeFilm_validLike_filmIsLiked() {
-        Film film = filmStorage.addFilm(VALID_FILM_1.clone()).get();
-        User user = userStorage.addUser(VALID_USER_1.clone()).get();
+        Film film = filmStorage.addFilm(VALID_FILM_1.clone());
+        User user = userStorage.addUser(VALID_USER_1.clone());
 
         Assertions.assertDoesNotThrow(
                 () -> service.likeFilm(film.getId(), user.getId()),
@@ -58,7 +58,7 @@ public class FilmServiceTest {
     @Test
     @DisplayName("Like existing film by non-existing user")
     public void likeFilm_likeExistingFilmByNonExistingUser_throwNotFoundException() {
-        Film film = filmStorage.addFilm(VALID_FILM_1.clone()).get();
+        Film film = filmStorage.addFilm(VALID_FILM_1.clone());
         Assertions.assertThrows(
                 NotFoundException.class,
                 () -> service.likeFilm(film.getId(), NON_EXISTING_ID),
@@ -69,7 +69,7 @@ public class FilmServiceTest {
     @Test
     @DisplayName("Like non-existing film by existing user")
     public void likeFilm_likeNonExistingFilmByExistingUser_throwNotFoundException() {
-        User user = userStorage.addUser(VALID_USER_1.clone()).get();
+        User user = userStorage.addUser(VALID_USER_1.clone());
         Assertions.assertThrows(
                 NotFoundException.class,
                 () -> service.likeFilm(NON_EXISTING_ID, user.getId()),
@@ -80,8 +80,8 @@ public class FilmServiceTest {
     @Test
     @DisplayName("Unlike a film")
     public void unlikeFilm_validUnlike_filmIsUnliked() {
-        Film film = filmStorage.addFilm(VALID_FILM_1.clone()).get();
-        User user = userStorage.addUser(VALID_USER_1.clone()).get();
+        Film film = filmStorage.addFilm(VALID_FILM_1.clone());
+        User user = userStorage.addUser(VALID_USER_1.clone());
         service.likeFilm(film.getId(), user.getId());
 
         Assertions.assertDoesNotThrow(
@@ -96,7 +96,7 @@ public class FilmServiceTest {
     @Test
     @DisplayName("Unlike existing film by non-existing user")
     public void unlikeFilm_unlikeExistingFilmByNonExistingUser_throwNotFoundException() {
-        Film film = filmStorage.addFilm(VALID_FILM_1.clone()).get();
+        Film film = filmStorage.addFilm(VALID_FILM_1.clone());
         Assertions.assertThrows(
                 NotFoundException.class,
                 () -> service.unlikeFilm(film.getId(), NON_EXISTING_ID),
@@ -107,7 +107,7 @@ public class FilmServiceTest {
     @Test
     @DisplayName("Unlike non-existing film by existing user")
     public void unlikeFilm_unlikeNonExistingFilmByExistingUser_throwNotFoundException() {
-        User user = userStorage.addUser(VALID_USER_1.clone()).get();
+        User user = userStorage.addUser(VALID_USER_1.clone());
         Assertions.assertThrows(
                 NotFoundException.class,
                 () -> service.unlikeFilm(NON_EXISTING_ID, user.getId()),
@@ -128,8 +128,8 @@ public class FilmServiceTest {
     @Test
     @DisplayName("Get films top 1")
     public void getFilmsTop_getTop1Film_returnedAllFilms() {
-        Film film = filmStorage.addFilm(VALID_FILM_1.clone()).get();
-        User user = userStorage.addUser(VALID_USER_1.clone()).get();
+        Film film = filmStorage.addFilm(VALID_FILM_1.clone());
+        User user = userStorage.addUser(VALID_USER_1.clone());
         service.likeFilm(film.getId(), user.getId());
         filmStorage.addFilm(TestStubs.VALID_FILM_2.clone());
         Assertions.assertDoesNotThrow(
@@ -167,7 +167,7 @@ public class FilmServiceTest {
     @Test
     @DisplayName("Get film by id")
     public void getFilm_getExistingFilmById_returnedFilm() {
-        Film added = filmStorage.addFilm(VALID_FILM_1.clone()).get();
+        Film added = filmStorage.addFilm(VALID_FILM_1.clone());
         Assertions.assertDoesNotThrow(
                 () -> service.getFilm(added.getId()),
                 "Film should be returned without exceptions"
@@ -207,7 +207,7 @@ public class FilmServiceTest {
     @Test
     @DisplayName("Update film")
     public void updateFilm_updateExistingFilm_filmUpdatedNoExceptions() {
-        Film filmToUpdate = filmStorage.addFilm(VALID_FILM_1.clone()).get();
+        Film filmToUpdate = filmStorage.addFilm(VALID_FILM_1.clone());
         filmToUpdate.setDescription(VALID_FILM_DESCRIPTION_2);
         Assertions.assertDoesNotThrow(
                 () -> service.updateFilm(filmToUpdate),

@@ -25,7 +25,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     private Long idCounter = 0L;
 
     @Override
-    public Optional<Film> addFilm(Film newFilm) {
+    public Film addFilm(Film newFilm) {
         log.trace(ADDING_FILM_TRACE_MSG, newFilm);
         Long newFilmId = newFilm.getId();
         if (newFilmId == null) newFilmId = ++idCounter;
@@ -33,32 +33,33 @@ public class InMemoryFilmStorage implements FilmStorage {
         newFilm.setId(newFilmId);
         films.put(newFilmId, newFilm.clone());
         log.trace(ADDED_FILM_TRACE_MSG, newFilm);
-        return Optional.of(newFilm);
+        return newFilm;
     }
 
     @Override
     public Optional<Film> getFilm(Long id) {
         log.trace(GET_FILM_TRACE_MSG, id);
-        Film film = films.get(id).clone();
+        Film film = films.get(id);
+        if (film == null) return Optional.empty();
         log.trace(GOT_FILM_TRACE_MSG, film);
-        return Optional.ofNullable(film);
+        return Optional.of(film.clone());
     }
 
     @Override
-    public Optional<Film> updateFilm(Film updatedFilm) {
+    public Film updateFilm(Film updatedFilm) {
         log.trace(UPDATING_FILM_TRACE_MSG, updatedFilm);
         Long updatedFilmId = updatedFilm.getId();
         films.put(updatedFilmId, updatedFilm.clone());
         log.trace(UPDATED_FILM_TRACE_MSG, updatedFilm);
-        return Optional.of(updatedFilm);
+        return updatedFilm;
     }
 
     @Override
-    public Optional<Film> removeFilm(Long id) {
+    public Film removeFilm(Long id) {
         log.trace(REMOVE_FILM_TRACE_MSG, id);
         Film removed = films.remove(id);
         log.trace(REMOVED_FILM_TRACE_MSG, removed);
-        return Optional.ofNullable(removed);
+        return removed;
     }
 
     @Override

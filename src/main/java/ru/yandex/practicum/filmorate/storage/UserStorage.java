@@ -9,13 +9,13 @@ public interface UserStorage {
 
     boolean hasUserId(Long id);
 
-    Optional<User> addUser(User newUser);
+    User addUser(User newUser);
 
     Optional<User> getUser(Long id);
 
-    Optional<User> updateUser(User updatedUser);
+    User updateUser(User updatedUser);
 
-    Optional<User> removeUser(Long id);
+    User removeUser(Long id);
 
     List<User> getAllUsers();
 }

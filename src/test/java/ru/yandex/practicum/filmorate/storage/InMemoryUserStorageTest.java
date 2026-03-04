@@ -26,12 +26,12 @@ public class InMemoryUserStorageTest {
     @Test
     @DisplayName("Add correct user")
     public void addUser_addCorrectUser_userAddedAndReturned() {
-        Assertions.assertTrue(
-                () -> repository.addUser(VALID_USER_1.clone()).isPresent(),
+        Assertions.assertNotNull(
+                repository.addUser(VALID_USER_1.clone()),
                 "User should be added and returned"
         );
-        Assertions.assertTrue(
-                () -> repository.addUser(VALID_USER_2.clone()).isPresent(),
+        Assertions.assertNotNull(
+                repository.addUser(VALID_USER_2.clone()),
                 "Second user should be added and returned"
         );
         Assertions.assertEquals(EXPECTED_REPOSITORY_SIZE_TWO, repository.getAllUsers().size(), "Repository size should be " + EXPECTED_REPOSITORY_SIZE_TWO);
@@ -40,7 +40,7 @@ public class InMemoryUserStorageTest {
     @Test
     @DisplayName("Get existing user by id")
     public void getUser_getUserByExistingId_userReturned() {
-        User user = repository.addUser(VALID_USER_1.clone()).get();
+        User user = repository.addUser(VALID_USER_1.clone());
 
         Assertions.assertTrue(
                 () -> repository.getUser(user.getId()).isPresent(),
@@ -51,10 +51,10 @@ public class InMemoryUserStorageTest {
     @Test
     @DisplayName("Remove existing user by id")
     public void removeUser_removeUserByExistingId_userRemovedAndReturned() {
-        User user = repository.addUser(VALID_USER_1.clone()).get();
+        User user = repository.addUser(VALID_USER_1.clone());
 
-        Assertions.assertTrue(
-                () -> repository.removeUser(user.getId()).isPresent(),
+        Assertions.assertNotNull(
+                repository.removeUser(user.getId()),
                 "User should be returned for existing id"
         );
         Assertions.assertEquals(
@@ -70,8 +70,8 @@ public class InMemoryUserStorageTest {
         User userWithoutNameSet = VALID_USER_1.clone();
         userWithoutNameSet.setName(null);
 
-        Assertions.assertTrue(
-                () -> repository.addUser(userWithoutNameSet).isPresent(),
+        Assertions.assertNotNull(
+                repository.addUser(userWithoutNameSet),
                 "User should be added and returned"
         );
         Assertions.assertFalse(repository.getAllUsers().isEmpty(), "Repository should not be empty");
@@ -82,11 +82,11 @@ public class InMemoryUserStorageTest {
     @Test
     @DisplayName("Update existing user")
     public void updateUser_updateExistingUser_userUpdatedAndReturned() {
-        User addedUser = repository.addUser(VALID_USER_1.clone()).get();
+        User addedUser = repository.addUser(VALID_USER_1.clone());
         addedUser.setName(VALID_USER_NAME_2);
 
-        Assertions.assertTrue(
-                () -> repository.updateUser(addedUser).isPresent(),
+        Assertions.assertNotNull(
+                repository.updateUser(addedUser),
                 "User should be updated"
         );
     }
@@ -107,7 +107,7 @@ public class InMemoryUserStorageTest {
     @Test
     @DisplayName("Check existing user id")
     public void hasUserId_checkExistingUserIdInStorage_returnedTrue() {
-        Long id = repository.addUser(VALID_USER_1.clone()).get().getId();
+        Long id = repository.addUser(VALID_USER_1.clone()).getId();
         Assertions.assertTrue(repository.hasUserId(id), "Repository should contain added user id");
     }
 

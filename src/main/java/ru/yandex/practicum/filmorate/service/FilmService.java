@@ -38,9 +38,7 @@ public class FilmService {
     private final FilmLikesComparator filmLikesComparator = new FilmLikesComparator(true);
 
     public void likeFilm(Long id, Long userId) {
-        checkFilmIdExist(id);
-        Film film = filmStorage.getFilm(id)
-                .orElseThrow(() -> new NotFoundException(FILM_NOT_FOUND_ERR_MSG + id));
+        Film film = getFilmOrThrow(id);
         checkUserIdExist(userId);
         boolean isSuccess = film.getLikes().add(userId);
         log.info(LIKE_FILM_LOG_MSG, id, userId, isSuccess);
@@ -48,9 +46,7 @@ public class FilmService {
     }
 
     public void unlikeFilm(Long id, Long userId) {
-        checkFilmIdExist(id);
-        Film film = filmStorage.getFilm(id)
-                .orElseThrow(() -> new NotFoundException(FILM_NOT_FOUND_ERR_MSG + id));
+        Film film = getFilmOrThrow(id);
         checkUserIdExist(userId);
         boolean isSuccess = film.getLikes().remove(userId);
         log.info(UNLIKE_FILM_LOG_MSG, id, userId, isSuccess);
@@ -68,9 +64,7 @@ public class FilmService {
 
     public Film getFilm(Long id) {
         log.info(GET_FILM_LOG_MSG, id);
-        checkFilmIdExist(id);
-        return filmStorage.getFilm(id)
-                .orElseThrow(() -> new NotFoundException(FILM_NOT_FOUND_ERR_MSG + id));
+        return getFilmOrThrow(id);
     }
 
     public Collection<Film> getAllFilms() {
@@ -81,15 +75,18 @@ public class FilmService {
     public Film addFilm(Film newFilm) {
         log.info(ADD_FILM_LOG_MSG, newFilm);
         checkFilmIdNotExist(newFilm.getId());
-        return filmStorage.addFilm(newFilm)
-                .orElseThrow(() -> new NotFoundException(FILM_NOT_FOUND_ERR_MSG + newFilm.getId()));
+        return filmStorage.addFilm(newFilm);
     }
 
     public Film updateFilm(Film updatedFilm) {
         log.info(UPDATE_FILM_LOG_MSG, updatedFilm);
         checkFilmIdExist(updatedFilm.getId());
-        return filmStorage.updateFilm(updatedFilm)
-                .orElseThrow(() -> new NotFoundException(FILM_NOT_FOUND_ERR_MSG + updatedFilm.getId()));
+        return filmStorage.updateFilm(updatedFilm);
+    }
+
+    private Film getFilmOrThrow(Long id) {
+        return filmStorage.getFilm(id)
+                .orElseThrow(() -> new NotFoundException(FILM_NOT_FOUND_ERR_MSG + id));
     }
 
     private void checkUserIdExist(Long id) {

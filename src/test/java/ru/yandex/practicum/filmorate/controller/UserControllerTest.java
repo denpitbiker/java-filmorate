@@ -39,8 +39,8 @@ public class UserControllerTest {
     @Test
     @DisplayName("Get friends from existing user")
     public void get_userFriends_existingUser_success200() throws Exception {
-        Long userId1 = userStorage.addUser(TestStubs.VALID_USER_1.clone()).get().getId();
-        Long userId2 = userStorage.addUser(TestStubs.VALID_USER_2.clone()).get().getId();
+        Long userId1 = userStorage.addUser(TestStubs.VALID_USER_1.clone()).getId();
+        Long userId2 = userStorage.addUser(TestStubs.VALID_USER_2.clone()).getId();
         mvc.perform(put(UserController.CONTROLLER_ROUTE + UserController.ADD_FRIEND_SUBROUTE, userId1, userId2));
         mvc.perform(get(UserController.CONTROLLER_ROUTE + UserController.GET_FRIENDS_SUBROUTE, userId1))
                 .andExpect(status().isOk())
@@ -50,8 +50,8 @@ public class UserControllerTest {
     @Test
     @DisplayName("Get friends from non-existing user")
     public void get_userFriends_nonExistingUser_notFound404() throws Exception {
-        Long userId1 = userStorage.addUser(TestStubs.VALID_USER_1.clone()).get().getId();
-        Long userId2 = userStorage.addUser(TestStubs.VALID_USER_2.clone()).get().getId();
+        Long userId1 = userStorage.addUser(TestStubs.VALID_USER_1.clone()).getId();
+        Long userId2 = userStorage.addUser(TestStubs.VALID_USER_2.clone()).getId();
         mvc.perform(put(UserController.CONTROLLER_ROUTE + UserController.ADD_FRIEND_SUBROUTE, userId1, userId2));
         mvc.perform(get(UserController.CONTROLLER_ROUTE + UserController.GET_FRIENDS_SUBROUTE, TestStubs.NON_EXISTING_ID))
                 .andExpect(status().isNotFound());
@@ -60,9 +60,9 @@ public class UserControllerTest {
     @Test
     @DisplayName("Get common friends with both existing users")
     public void get_usersCommonFriends_existingBothUsers_success200() throws Exception {
-        Long userId1 = userStorage.addUser(TestStubs.VALID_USER_1.clone()).get().getId();
-        Long userId2 = userStorage.addUser(TestStubs.VALID_USER_2.clone()).get().getId();
-        Long userId3 = userStorage.addUser(TestStubs.VALID_USER_3.clone()).get().getId();
+        Long userId1 = userStorage.addUser(TestStubs.VALID_USER_1.clone()).getId();
+        Long userId2 = userStorage.addUser(TestStubs.VALID_USER_2.clone()).getId();
+        Long userId3 = userStorage.addUser(TestStubs.VALID_USER_3.clone()).getId();
         mvc.perform(put(UserController.CONTROLLER_ROUTE + UserController.ADD_FRIEND_SUBROUTE, userId1, userId3));
         mvc.perform(put(UserController.CONTROLLER_ROUTE + UserController.ADD_FRIEND_SUBROUTE, userId2, userId3));
         mvc.perform(get(UserController.CONTROLLER_ROUTE + UserController.GET_COMMON_FRIENDS_SUBROUTE, userId1, userId2))
@@ -73,9 +73,9 @@ public class UserControllerTest {
     @Test
     @DisplayName("Get common friends with first non-existing user")
     public void get_usersCommonFriends_onlySecondUserExists_notFound404() throws Exception {
-        Long userId1 = userStorage.addUser(TestStubs.VALID_USER_1.clone()).get().getId();
-        Long userId2 = userStorage.addUser(TestStubs.VALID_USER_2.clone()).get().getId();
-        Long userId3 = userStorage.addUser(TestStubs.VALID_USER_3.clone()).get().getId();
+        Long userId1 = userStorage.addUser(TestStubs.VALID_USER_1.clone()).getId();
+        Long userId2 = userStorage.addUser(TestStubs.VALID_USER_2.clone()).getId();
+        Long userId3 = userStorage.addUser(TestStubs.VALID_USER_3.clone()).getId();
         mvc.perform(put(UserController.CONTROLLER_ROUTE + UserController.ADD_FRIEND_SUBROUTE, userId1, userId3));
         mvc.perform(put(UserController.CONTROLLER_ROUTE + UserController.ADD_FRIEND_SUBROUTE, userId2, userId3));
         mvc.perform(get(UserController.CONTROLLER_ROUTE + UserController.GET_COMMON_FRIENDS_SUBROUTE, TestStubs.NON_EXISTING_ID, userId2))
@@ -85,9 +85,9 @@ public class UserControllerTest {
     @Test
     @DisplayName("Get common friends with second non-existing user")
     public void get_usersCommonFriends_onlyFirstUserExists_notFound404() throws Exception {
-        Long userId1 = userStorage.addUser(TestStubs.VALID_USER_1.clone()).get().getId();
-        Long userId2 = userStorage.addUser(TestStubs.VALID_USER_2.clone()).get().getId();
-        Long userId3 = userStorage.addUser(TestStubs.VALID_USER_3.clone()).get().getId();
+        Long userId1 = userStorage.addUser(TestStubs.VALID_USER_1.clone()).getId();
+        Long userId2 = userStorage.addUser(TestStubs.VALID_USER_2.clone()).getId();
+        Long userId3 = userStorage.addUser(TestStubs.VALID_USER_3.clone()).getId();
         mvc.perform(put(UserController.CONTROLLER_ROUTE + UserController.ADD_FRIEND_SUBROUTE, userId1, userId3));
         mvc.perform(put(UserController.CONTROLLER_ROUTE + UserController.ADD_FRIEND_SUBROUTE, userId2, userId3));
         mvc.perform(get(UserController.CONTROLLER_ROUTE + UserController.GET_COMMON_FRIENDS_SUBROUTE, userId1, TestStubs.NON_EXISTING_ID))
@@ -97,8 +97,8 @@ public class UserControllerTest {
     @Test
     @DisplayName("Remove friend from user, both are in storage")
     public void delete_removeFriend_existingFriendAndUser_success200() throws Exception {
-        Long userId1 = userStorage.addUser(TestStubs.VALID_USER_1.clone()).get().getId();
-        Long userId2 = userStorage.addUser(TestStubs.VALID_USER_2.clone()).get().getId();
+        Long userId1 = userStorage.addUser(TestStubs.VALID_USER_1.clone()).getId();
+        Long userId2 = userStorage.addUser(TestStubs.VALID_USER_2.clone()).getId();
         mvc.perform(put(UserController.CONTROLLER_ROUTE + UserController.ADD_FRIEND_SUBROUTE, userId1, userId2));
         mvc.perform(delete(UserController.CONTROLLER_ROUTE + UserController.REMOVE_FRIEND_SUBROUTE, userId1, userId2))
                 .andExpect(status().isOk());
@@ -107,8 +107,8 @@ public class UserControllerTest {
     @Test
     @DisplayName("Remove friend from user, only user in storage")
     public void delete_removeFriend_existingUserNonExistingFriend_notFound404() throws Exception {
-        Long userId1 = userStorage.addUser(TestStubs.VALID_USER_1.clone()).get().getId();
-        Long userId2 = userStorage.addUser(TestStubs.VALID_USER_2.clone()).get().getId();
+        Long userId1 = userStorage.addUser(TestStubs.VALID_USER_1.clone()).getId();
+        Long userId2 = userStorage.addUser(TestStubs.VALID_USER_2.clone()).getId();
         mvc.perform(put(UserController.CONTROLLER_ROUTE + UserController.ADD_FRIEND_SUBROUTE, userId1, userId2));
         mvc.perform(delete(UserController.CONTROLLER_ROUTE + UserController.REMOVE_FRIEND_SUBROUTE, userId1, TestStubs.NON_EXISTING_ID))
                 .andExpect(status().isNotFound());
@@ -117,8 +117,8 @@ public class UserControllerTest {
     @Test
     @DisplayName("Remove friend from user, only friend in storage")
     public void delete_removeFriend_existingFriendNonExistingUser_notFound404() throws Exception {
-        Long userId1 = userStorage.addUser(TestStubs.VALID_USER_1.clone()).get().getId();
-        Long userId2 = userStorage.addUser(TestStubs.VALID_USER_2.clone()).get().getId();
+        Long userId1 = userStorage.addUser(TestStubs.VALID_USER_1.clone()).getId();
+        Long userId2 = userStorage.addUser(TestStubs.VALID_USER_2.clone()).getId();
         mvc.perform(put(UserController.CONTROLLER_ROUTE + UserController.ADD_FRIEND_SUBROUTE, userId1, userId2));
         mvc.perform(delete(UserController.CONTROLLER_ROUTE + UserController.REMOVE_FRIEND_SUBROUTE, TestStubs.NON_EXISTING_ID, userId2))
                 .andExpect(status().isNotFound());
@@ -127,7 +127,7 @@ public class UserControllerTest {
     @Test
     @DisplayName("Remove user itself from friends")
     public void delete_removeFriend_userRemovedItselfFromFriends_badRequest400() throws Exception {
-        Long userId1 = userStorage.addUser(TestStubs.VALID_USER_1.clone()).get().getId();
+        Long userId1 = userStorage.addUser(TestStubs.VALID_USER_1.clone()).getId();
         mvc.perform(delete(UserController.CONTROLLER_ROUTE + UserController.REMOVE_FRIEND_SUBROUTE, userId1, userId1))
                 .andExpect(status().isBadRequest());
     }
@@ -135,8 +135,8 @@ public class UserControllerTest {
     @Test
     @DisplayName("Add friend to user, both are in storage")
     public void put_addFriend_existingFriendAndUser_success200() throws Exception {
-        Long userId1 = userStorage.addUser(TestStubs.VALID_USER_1.clone()).get().getId();
-        Long userId2 = userStorage.addUser(TestStubs.VALID_USER_2.clone()).get().getId();
+        Long userId1 = userStorage.addUser(TestStubs.VALID_USER_1.clone()).getId();
+        Long userId2 = userStorage.addUser(TestStubs.VALID_USER_2.clone()).getId();
         mvc.perform(put(UserController.CONTROLLER_ROUTE + UserController.ADD_FRIEND_SUBROUTE, userId1, userId2))
                 .andExpect(status().isOk());
     }
@@ -144,7 +144,7 @@ public class UserControllerTest {
     @Test
     @DisplayName("Add friend to user, only user in storage")
     public void put_addFriend_existingUserNonExistingFriend_notFound404() throws Exception {
-        Long userId1 = userStorage.addUser(TestStubs.VALID_USER_1.clone()).get().getId();
+        Long userId1 = userStorage.addUser(TestStubs.VALID_USER_1.clone()).getId();
         mvc.perform(put(UserController.CONTROLLER_ROUTE + UserController.ADD_FRIEND_SUBROUTE, userId1, TestStubs.NON_EXISTING_ID))
                 .andExpect(status().isNotFound());
     }
@@ -152,7 +152,7 @@ public class UserControllerTest {
     @Test
     @DisplayName("Add friend to user, only friend in storage")
     public void put_addFriend_existingFriendNonExistingUser_notFound404() throws Exception {
-        Long userId1 = userStorage.addUser(TestStubs.VALID_USER_1.clone()).get().getId();
+        Long userId1 = userStorage.addUser(TestStubs.VALID_USER_1.clone()).getId();
         mvc.perform(put(UserController.CONTROLLER_ROUTE + UserController.ADD_FRIEND_SUBROUTE, TestStubs.NON_EXISTING_ID, userId1))
                 .andExpect(status().isNotFound());
     }
@@ -160,7 +160,7 @@ public class UserControllerTest {
     @Test
     @DisplayName("Add user itself to friends")
     public void put_addFriend_userAddedItselfToFriends_badRequest400() throws Exception {
-        Long userId1 = userStorage.addUser(TestStubs.VALID_USER_1.clone()).get().getId();
+        Long userId1 = userStorage.addUser(TestStubs.VALID_USER_1.clone()).getId();
         mvc.perform(put(UserController.CONTROLLER_ROUTE + UserController.ADD_FRIEND_SUBROUTE, userId1, userId1))
                 .andExpect(status().isBadRequest());
     }
@@ -168,7 +168,7 @@ public class UserControllerTest {
     @Test
     @DisplayName("Get a specific user with valid id")
     public void get_user_validId_success200() throws Exception {
-        Long userId = userStorage.addUser(TestStubs.VALID_USER_1.clone()).get().getId();
+        Long userId = userStorage.addUser(TestStubs.VALID_USER_1.clone()).getId();
         mvc.perform(get(UserController.CONTROLLER_ROUTE + UserController.GET_USER_SUBROUTE, userId))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))

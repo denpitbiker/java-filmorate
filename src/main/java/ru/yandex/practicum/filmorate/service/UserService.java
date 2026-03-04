@@ -36,12 +36,8 @@ public class UserService {
     public void addFriend(Long id, Long friendId) {
         log.info(ADD_FRIEND_LOG_MSG, friendId, id);
         checkIdsAreNotTheSame(id, friendId);
-        checkUserIdExist(id);
-        checkUserIdExist(friendId);
-        User user = userStorage.getUser(id)
-                .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND_ERR_MSG + id));
-        User friend = userStorage.getUser(friendId)
-                .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND_ERR_MSG + id));
+        User user = getUserOrThrow(id);
+        User friend = getUserOrThrow(friendId);
         user.getFriends().add(friendId);
         friend.getFriends().add(id);
         userStorage.updateUser(user);
@@ -51,12 +47,8 @@ public class UserService {
     public void removeFriend(Long id, Long friendId) {
         log.info(REMOVE_FRIEND_LOG_MSG, friendId, id);
         checkIdsAreNotTheSame(id, friendId);
-        checkUserIdExist(id);
-        checkUserIdExist(friendId);
-        User user = userStorage.getUser(id)
-                .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND_ERR_MSG + id));
-        User friend = userStorage.getUser(friendId)
-                .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND_ERR_MSG + id));
+        User user = getUserOrThrow(id);
+        User friend = getUserOrThrow(friendId);
         user.getFriends().remove(friendId);
         friend.getFriends().remove(id);
         userStorage.updateUser(user);
@@ -65,36 +57,25 @@ public class UserService {
 
     public Collection<User> getUserFriends(Long id) {
         log.info(GET_USER_FRIENDS_LOG_MSG, id);
-        checkUserIdExist(id);
-        Set<Long> userFriendsIds = userStorage.getUser(id)
-                .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND_ERR_MSG + id))
-                .getFriends();
-        return userStorage.getAllUsers().stream()
-                .filter((user -> userFriendsIds.contains(user.getId())))
+        Set<Long> userFriendsIds = getUserOrThrow(id).getFriends();
+        return userFriendsIds.stream()
+                .map(this::getUserOrThrow)
                 .toList();
     }
 
     public Collection<User> getCommonFriends(Long id, Long otherId) {
         log.info(GET_COMMON_FRIENDS_LOG_MSG, id, otherId);
         checkIdsAreNotTheSame(id, otherId);
-        checkUserIdExist(id);
-        checkUserIdExist(otherId);
-        Set<Long> userFriendsIds = userStorage.getUser(id)
-                .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND_ERR_MSG + id))
-                .getFriends();
-        userFriendsIds.retainAll(userStorage.getUser(otherId)
-                .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND_ERR_MSG + id))
-                .getFriends());
-        return userStorage.getAllUsers().stream()
-                .filter((user -> userFriendsIds.contains(user.getId())))
+        Set<Long> userFriendsIds = getUserOrThrow(id).getFriends();
+        userFriendsIds.retainAll(getUserOrThrow(otherId).getFriends());
+        return userFriendsIds.stream()
+                .map(this::getUserOrThrow)
                 .toList();
     }
 
     public User getUser(Long id) {
         log.info(GET_USER_LOG_MSG, id);
-        checkUserIdExist(id);
-        return userStorage.getUser(id)
-                .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND_ERR_MSG + id));
+        return getUserOrThrow(id);
     }
 
     public Collection<User> getAllUsers() {
@@ -105,15 +86,18 @@ public class UserService {
     public User addUser(User newUser) {
         log.info(ADD_USER_LOG_MSG, newUser);
         checkUserIdNotExist(newUser.getId());
-        return userStorage.addUser(newUser)
-                .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND_ERR_MSG + newUser.getId()));
+        return userStorage.addUser(newUser);
     }
 
     public User updateUser(User updatedUser) {
         log.info(UPDATE_USER_LOG_MSG, updatedUser);
         checkUserIdExist(updatedUser.getId());
-        return userStorage.updateUser(updatedUser)
-                .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND_ERR_MSG + updatedUser.getId()));
+        return userStorage.updateUser(updatedUser);
+    }
+
+    private User getUserOrThrow(Long id) {
+        return userStorage.getUser(id)
+                .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND_ERR_MSG + id));
     }
 
     private void checkUserIdExist(Long id) {

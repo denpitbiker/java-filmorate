@@ -9,13 +9,13 @@ public interface FilmStorage {
 
     boolean hasFilmId(Long id);
 
-    Optional<Film> addFilm(Film newFilm);
+    Film addFilm(Film newFilm);
 
     Optional<Film> getFilm(Long id);
 
-    Optional<Film> updateFilm(Film updatedFilm);
+    Film updateFilm(Film updatedFilm);
 
-    Optional<Film> removeFilm(Long id);
+    Film removeFilm(Long id);
 
     List<Film> getAllFilms();
 }

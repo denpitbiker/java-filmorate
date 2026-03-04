@@ -40,8 +40,8 @@ public class UserServiceTest {
 
     @BeforeEach
     public void setUp() {
-        userId1 = storage.addUser(TestStubs.VALID_USER_1.clone()).get().getId();
-        userId2 = storage.addUser(TestStubs.VALID_USER_2.clone()).get().getId();
+        userId1 = storage.addUser(TestStubs.VALID_USER_1.clone()).getId();
+        userId2 = storage.addUser(TestStubs.VALID_USER_2.clone()).getId();
     }
 
     @Test
@@ -144,7 +144,7 @@ public class UserServiceTest {
     @Test
     @DisplayName("Get common friends")
     public void getCommonFriends_validUsers_commonFriendsReturned() {
-        Long userId3 = storage.addUser(VALID_USER_3).get().getId();
+        Long userId3 = storage.addUser(VALID_USER_3).getId();
         service.addFriend(userId1, userId3);
         service.addFriend(userId2, userId3);
 
@@ -161,7 +161,7 @@ public class UserServiceTest {
     @Test
     @DisplayName("Get common friends by non existing id")
     public void getCommonFriends_getCommonFriendWithNonExistingFriendById_throwNotFoundException() {
-        Long userId3 = storage.addUser(VALID_USER_3).get().getId();
+        Long userId3 = storage.addUser(VALID_USER_3).getId();
         service.addFriend(userId1, userId3);
         service.addFriend(userId2, userId3);
         Assertions.assertThrows(
@@ -189,7 +189,7 @@ public class UserServiceTest {
     @Test
     @DisplayName("Add friend by non existing id")
     public void addFriend_addNonExistingFriendById_throwNotFoundException() {
-        Long userId3 = storage.addUser(VALID_USER_3).get().getId();
+        Long userId3 = storage.addUser(VALID_USER_3).getId();
         service.addFriend(userId1, userId3);
         service.addFriend(userId2, userId3);
         Assertions.assertThrows(
@@ -217,7 +217,7 @@ public class UserServiceTest {
     @Test
     @DisplayName("Remove friend by non existing id")
     public void removeFriend_removeNonExistingFriendById_throwNotFoundException() {
-        Long userId3 = storage.addUser(VALID_USER_3).get().getId();
+        Long userId3 = storage.addUser(VALID_USER_3).getId();
         service.addFriend(userId1, userId3);
         service.addFriend(userId2, userId3);
         Assertions.assertThrows(
@@ -249,7 +249,7 @@ public class UserServiceTest {
     @Test
     @DisplayName("Get user by id")
     public void getUser_getExistingUserById_returnedUser() {
-        User added = storage.addUser(VALID_USER_1.clone()).get();
+        User added = storage.addUser(VALID_USER_1.clone());
         Assertions.assertDoesNotThrow(
                 () -> service.getUser(added.getId()),
                 "User should be returned without exceptions"
@@ -289,7 +289,7 @@ public class UserServiceTest {
     @Test
     @DisplayName("Update user")
     public void updateUser_updateExistingUser_userUpdatedNoExceptions() {
-        User userToUpdate = storage.addUser(VALID_USER_1.clone()).get();
+        User userToUpdate = storage.addUser(VALID_USER_1.clone());
         userToUpdate.setEmail(VALID_EMAIL_2);
         Assertions.assertDoesNotThrow(
                 () -> service.updateUser(userToUpdate),

@@ -28,7 +28,7 @@ public class InMemoryUserStorage implements UserStorage {
     private Long idCounter = 0L;
 
     @Override
-    public Optional<User> addUser(User newUser) {
+    public User addUser(User newUser) {
         log.trace(ADDING_USER_TRACE_MSG, newUser);
         Long newUserId = newUser.getId();
         if (newUserId == null) newUserId = ++idCounter;
@@ -37,33 +37,34 @@ public class InMemoryUserStorage implements UserStorage {
         newUser.setId(newUserId);
         users.put(newUserId, newUser.clone());
         log.trace(ADDED_USER_TRACE_MSG, newUser);
-        return Optional.of(newUser);
+        return newUser;
     }
 
     @Override
     public Optional<User> getUser(Long id) {
         log.trace(GET_USER_TRACE_MSG, id);
-        User user = users.get(id).clone();
+        User user = users.get(id);
+        if (user == null) return Optional.empty();
         log.trace(GOT_USER_TRACE_MSG, user);
-        return Optional.ofNullable(user);
+        return Optional.of(user.clone());
     }
 
     @Override
-    public Optional<User> updateUser(User updatedUser) {
+    public User updateUser(User updatedUser) {
         log.trace(UPDATING_USER_TRACE_MSG, updatedUser);
         Long updatedUserId = updatedUser.getId();
         setLoginAsNameIfNull(updatedUser);
         users.put(updatedUserId, updatedUser.clone());
         log.trace(UPDATED_USER_TRACE_MSG, updatedUser);
-        return Optional.of(updatedUser);
+        return updatedUser;
     }
 
     @Override
-    public Optional<User> removeUser(Long id) {
+    public User removeUser(Long id) {
         log.trace(REMOVE_USER_TRACE_MSG, id);
         User removed = users.remove(id);
         log.trace(REMOVED_USER_TRACE_MSG, removed);
-        return Optional.ofNullable(removed);
+        return removed;
     }
 
     @Override
