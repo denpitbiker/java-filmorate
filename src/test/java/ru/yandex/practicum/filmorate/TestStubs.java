@@ -105,7 +105,7 @@ public class TestStubs {
     public static final User VALID_USER_1 = new User(null, VALID_EMAIL_1, VALID_LOGIN_1, VALID_USER_NAME_1, VALID_BIRTHDAY_1, new HashSet<>());
     public static final User VALID_USER_2 = new User(null, VALID_EMAIL_2, VALID_LOGIN_2, VALID_USER_NAME_2, VALID_BIRTHDAY_2, new HashSet<>());
     public static final User VALID_USER_3 = new User(null, VALID_EMAIL_3, VALID_LOGIN_3, VALID_USER_NAME_3, VALID_BIRTHDAY_3, new HashSet<>());
-    
+
     public static final User INVALID_USER_NULL_EMAIL = new User(null, null, VALID_LOGIN_1, VALID_USER_NAME_1, VALID_BIRTHDAY_1, new HashSet<>());
     public static final User INVALID_USER_NULL_LOGIN = new User(null, VALID_EMAIL_1, null, VALID_USER_NAME_1, VALID_BIRTHDAY_1, new HashSet<>());
     public static final User INVALID_USER_NULL_BIRTHDAY = new User(null, VALID_EMAIL_1, VALID_LOGIN_1, VALID_USER_NAME_1, null, new HashSet<>());
