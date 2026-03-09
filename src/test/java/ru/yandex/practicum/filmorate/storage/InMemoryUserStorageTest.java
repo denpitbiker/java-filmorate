@@ -9,7 +9,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import ru.yandex.practicum.filmorate.FilmorateApplication;
-import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.data.storage.impl.inmemory.InMemoryUserStorage;
+import ru.yandex.practicum.filmorate.data.model.User;
 
 import static ru.yandex.practicum.filmorate.TestStubs.*;
 
@@ -43,7 +44,7 @@ public class InMemoryUserStorageTest {
         User user = repository.addUser(VALID_USER_1.clone());
 
         Assertions.assertTrue(
-                () -> repository.getUser(user.getId()).isPresent(),
+                () -> repository.getUser(user.id()).isPresent(),
                 "User should be returned for existing id"
         );
     }
@@ -54,7 +55,7 @@ public class InMemoryUserStorageTest {
         User user = repository.addUser(VALID_USER_1.clone());
 
         Assertions.assertNotNull(
-                repository.removeUser(user.getId()),
+                repository.removeUser(user.id()),
                 "User should be returned for existing id"
         );
         Assertions.assertEquals(
@@ -76,7 +77,7 @@ public class InMemoryUserStorageTest {
         );
         Assertions.assertFalse(repository.getAllUsers().isEmpty(), "Repository should not be empty");
         User savedUser = repository.getAllUsers().getFirst();
-        Assertions.assertEquals(VALID_LOGIN_1, savedUser.getName(), "Login should be set as name");
+        Assertions.assertEquals(VALID_LOGIN_1, savedUser.name(), "Login should be set as name");
     }
 
     @Test
@@ -107,7 +108,7 @@ public class InMemoryUserStorageTest {
     @Test
     @DisplayName("Check existing user id")
     public void hasUserId_checkExistingUserIdInStorage_returnedTrue() {
-        Long id = repository.addUser(VALID_USER_1.clone()).getId();
+        Long id = repository.addUser(VALID_USER_1.clone()).id();
         Assertions.assertTrue(repository.hasUserId(id), "Repository should contain added user id");
     }
 

@@ -14,14 +14,15 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.yandex.practicum.filmorate.FilmorateApplication;
 import ru.yandex.practicum.filmorate.TestStubs;
-import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.storage.FilmStorage;
-import ru.yandex.practicum.filmorate.storage.UserStorage;
+import ru.yandex.practicum.filmorate.data.model.Film;
+import ru.yandex.practicum.filmorate.presentation.controller.FilmController;
+import ru.yandex.practicum.filmorate.data.storage.api.FilmStorage;
+import ru.yandex.practicum.filmorate.data.storage.api.UserStorage;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static ru.yandex.practicum.filmorate.tool.StringToJsonConverter.asJsonString;
+import static ru.yandex.practicum.filmorate.domain.tool.StringToJsonConverter.asJsonString;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(
@@ -46,8 +47,8 @@ public class FilmControllerTest {
     @Test
     @DisplayName("Remove like from existing film from existing user")
     public void delete_unlikeFilm_success200() throws Exception {
-        Long filmId = filmStorage.addFilm(TestStubs.VALID_FILM_1.clone()).getId();
-        Long userId = userStorage.addUser(TestStubs.VALID_USER_1.clone()).getId();
+        Long filmId = filmStorage.addFilm(TestStubs.VALID_FILM_1.clone()).id();
+        Long userId = userStorage.addUser(TestStubs.VALID_USER_1.clone()).id();
         mvc.perform(put(FilmController.CONTROLLER_ROUTE + FilmController.LIKE_FILM_SUBROUTE, filmId, userId));
         mvc.perform(delete(FilmController.CONTROLLER_ROUTE + FilmController.UNLIKE_FILM_SUBROUTE, filmId, userId))
                 .andExpect(status().isOk());
@@ -56,8 +57,8 @@ public class FilmControllerTest {
     @Test
     @DisplayName("Remove like from existing film from non-existing user")
     public void delete_unlikeFilmNonExistingUser_notFound404() throws Exception {
-        Long filmId = filmStorage.addFilm(TestStubs.VALID_FILM_1.clone()).getId();
-        Long userId = userStorage.addUser(TestStubs.VALID_USER_1.clone()).getId();
+        Long filmId = filmStorage.addFilm(TestStubs.VALID_FILM_1.clone()).id();
+        Long userId = userStorage.addUser(TestStubs.VALID_USER_1.clone()).id();
         mvc.perform(put(FilmController.CONTROLLER_ROUTE + FilmController.LIKE_FILM_SUBROUTE, filmId, userId));
         mvc.perform(delete(FilmController.CONTROLLER_ROUTE + FilmController.UNLIKE_FILM_SUBROUTE, filmId, TestStubs.NON_EXISTING_ID))
                 .andExpect(status().isNotFound());
@@ -66,8 +67,8 @@ public class FilmControllerTest {
     @Test
     @DisplayName("Remove like from non-existing film from existing user")
     public void delete_unlikeFilmNonExistinFilm_notFound404() throws Exception {
-        Long filmId = filmStorage.addFilm(TestStubs.VALID_FILM_1.clone()).getId();
-        Long userId = userStorage.addUser(TestStubs.VALID_USER_1.clone()).getId();
+        Long filmId = filmStorage.addFilm(TestStubs.VALID_FILM_1.clone()).id();
+        Long userId = userStorage.addUser(TestStubs.VALID_USER_1.clone()).id();
         mvc.perform(put(FilmController.CONTROLLER_ROUTE + FilmController.LIKE_FILM_SUBROUTE, filmId, userId));
         mvc.perform(delete(FilmController.CONTROLLER_ROUTE + FilmController.UNLIKE_FILM_SUBROUTE, TestStubs.NON_EXISTING_ID, userId))
                 .andExpect(status().isNotFound());
@@ -76,8 +77,8 @@ public class FilmControllerTest {
     @Test
     @DisplayName("Add like to existing film from existing user")
     public void put_likeFilm_success200() throws Exception {
-        Long filmId = filmStorage.addFilm(TestStubs.VALID_FILM_1.clone()).getId();
-        Long userId = userStorage.addUser(TestStubs.VALID_USER_1.clone()).getId();
+        Long filmId = filmStorage.addFilm(TestStubs.VALID_FILM_1.clone()).id();
+        Long userId = userStorage.addUser(TestStubs.VALID_USER_1.clone()).id();
         mvc.perform(put(FilmController.CONTROLLER_ROUTE + FilmController.LIKE_FILM_SUBROUTE, filmId, userId))
                 .andExpect(status().isOk());
     }
@@ -85,7 +86,7 @@ public class FilmControllerTest {
     @Test
     @DisplayName("Add like to existing film from non-existing user")
     public void put_likeFilm_nonExistingUser_notFound404() throws Exception {
-        Long filmId = filmStorage.addFilm(TestStubs.VALID_FILM_1.clone()).getId();
+        Long filmId = filmStorage.addFilm(TestStubs.VALID_FILM_1.clone()).id();
         userStorage.addUser(TestStubs.VALID_USER_1.clone());
         mvc.perform(put(FilmController.CONTROLLER_ROUTE + FilmController.LIKE_FILM_SUBROUTE, filmId, TestStubs.NON_EXISTING_ID))
                 .andExpect(status().isNotFound());
@@ -95,7 +96,7 @@ public class FilmControllerTest {
     @DisplayName("Add like to existing film from non-existing film")
     public void put_likeFilm_nonExistingFilm_notFound404() throws Exception {
         filmStorage.addFilm(TestStubs.VALID_FILM_1.clone());
-        Long userId = userStorage.addUser(TestStubs.VALID_USER_1.clone()).getId();
+        Long userId = userStorage.addUser(TestStubs.VALID_USER_1.clone()).id();
         mvc.perform(put(FilmController.CONTROLLER_ROUTE + FilmController.LIKE_FILM_SUBROUTE, TestStubs.NON_EXISTING_ID, userId))
                 .andExpect(status().isNotFound());
     }
@@ -134,11 +135,11 @@ public class FilmControllerTest {
     @Test
     @DisplayName("Get a specific film with valid id")
     public void get_film_validId_success200() throws Exception {
-        Long filmId = filmStorage.addFilm(TestStubs.VALID_FILM_1.clone()).getId();
+        Long filmId = filmStorage.addFilm(TestStubs.VALID_FILM_1.clone()).id();
         mvc.perform(get(FilmController.CONTROLLER_ROUTE + FilmController.GET_FILM_SUBROUTE, filmId))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.name").value(TestStubs.VALID_FILM_1.getName()));
+                .andExpect(jsonPath("$.name").value(TestStubs.VALID_FILM_1.name()));
     }
 
     @Test

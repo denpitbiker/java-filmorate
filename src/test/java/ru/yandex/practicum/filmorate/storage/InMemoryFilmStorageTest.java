@@ -9,7 +9,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import ru.yandex.practicum.filmorate.FilmorateApplication;
-import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.data.storage.impl.inmemory.InMemoryFilmStorage;
+import ru.yandex.practicum.filmorate.data.model.Film;
 
 import static ru.yandex.practicum.filmorate.TestStubs.*;
 
@@ -43,7 +44,7 @@ public class InMemoryFilmStorageTest {
         Film film = repository.addFilm(VALID_FILM_1.clone());
 
         Assertions.assertTrue(
-                () -> repository.getFilm(film.getId()).isPresent(),
+                () -> repository.getFilm(film.id()).isPresent(),
                 "Film should be returned for existing id"
         );
     }
@@ -54,7 +55,7 @@ public class InMemoryFilmStorageTest {
         Film film = repository.addFilm(VALID_FILM_1.clone());
 
         Assertions.assertNotNull(
-                repository.removeFilm(film.getId()),
+                repository.removeFilm(film.id()),
                 "Film should be returned for existing id"
         );
         Assertions.assertEquals(
@@ -91,7 +92,7 @@ public class InMemoryFilmStorageTest {
     @Test
     @DisplayName("Check existing film id")
     public void hasFilmId_checkExistingFilmIdInStorage_returnedTrue() {
-        Long id = repository.addFilm(VALID_FILM_1.clone()).getId();
+        Long id = repository.addFilm(VALID_FILM_1.clone()).id();
         Assertions.assertTrue(repository.hasFilmId(id), "Repository should contain added film id");
     }
 

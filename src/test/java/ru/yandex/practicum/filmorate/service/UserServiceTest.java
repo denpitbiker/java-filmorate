@@ -12,10 +12,11 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import ru.yandex.practicum.filmorate.FilmorateApplication;
 import ru.yandex.practicum.filmorate.TestStubs;
-import ru.yandex.practicum.filmorate.exception.DuplicatedDataException;
-import ru.yandex.practicum.filmorate.exception.NotFoundException;
-import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
+import ru.yandex.practicum.filmorate.domain.service.UserService;
+import ru.yandex.practicum.filmorate.domain.exception.DuplicatedDataException;
+import ru.yandex.practicum.filmorate.domain.exception.NotFoundException;
+import ru.yandex.practicum.filmorate.data.model.User;
+import ru.yandex.practicum.filmorate.data.storage.impl.inmemory.InMemoryUserStorage;
 
 import java.util.Collection;
 
@@ -40,8 +41,8 @@ public class UserServiceTest {
 
     @BeforeEach
     public void setUp() {
-        userId1 = storage.addUser(TestStubs.VALID_USER_1.clone()).getId();
-        userId2 = storage.addUser(TestStubs.VALID_USER_2.clone()).getId();
+        userId1 = storage.addUser(TestStubs.VALID_USER_1.clone()).id();
+        userId2 = storage.addUser(TestStubs.VALID_USER_2.clone()).id();
     }
 
     @Test
@@ -53,7 +54,7 @@ public class UserServiceTest {
         );
 
         Collection<User> userFriends = service.getUserFriends(userId1);
-        Assertions.assertTrue(userFriends.stream().anyMatch(user -> user.getId().equals(userId2)),
+        Assertions.assertTrue(userFriends.stream().anyMatch(user -> user.id().equals(userId2)),
                 "User 2 should be a friend of User 1");
     }
 
@@ -90,7 +91,7 @@ public class UserServiceTest {
         );
 
         Collection<User> userFriends = service.getUserFriends(userId1);
-        Assertions.assertFalse(userFriends.stream().anyMatch(user -> user.getId().equals(userId2)),
+        Assertions.assertFalse(userFriends.stream().anyMatch(user -> user.id().equals(userId2)),
                 "User 2 should not be a friend of User 1");
     }
 
@@ -127,7 +128,7 @@ public class UserServiceTest {
         );
 
         Assertions.assertEquals(EXPECTED_REPOSITORY_SIZE_ONE, userFriends.size(), "User 1 should have one friend");
-        Assertions.assertTrue(userFriends.stream().anyMatch(user -> user.getId().equals(userId2)),
+        Assertions.assertTrue(userFriends.stream().anyMatch(user -> user.id().equals(userId2)),
                 "User 2 should be in the friends list of User 1");
     }
 
@@ -144,7 +145,7 @@ public class UserServiceTest {
     @Test
     @DisplayName("Get common friends")
     public void getCommonFriends_validUsers_commonFriendsReturned() {
-        Long userId3 = storage.addUser(VALID_USER_3).getId();
+        Long userId3 = storage.addUser(VALID_USER_3).id();
         service.addFriend(userId1, userId3);
         service.addFriend(userId2, userId3);
 
@@ -154,14 +155,14 @@ public class UserServiceTest {
         );
 
         Assertions.assertEquals(EXPECTED_REPOSITORY_SIZE_ONE, commonFriends.size(), "There should be one common friend");
-        Assertions.assertTrue(commonFriends.stream().anyMatch(user -> user.getId().equals(userId3)),
+        Assertions.assertTrue(commonFriends.stream().anyMatch(user -> user.id().equals(userId3)),
                 "User 3 should be the common friend between User 1 and User 2");
     }
 
     @Test
     @DisplayName("Get common friends by non existing id")
     public void getCommonFriends_getCommonFriendWithNonExistingFriendById_throwNotFoundException() {
-        Long userId3 = storage.addUser(VALID_USER_3).getId();
+        Long userId3 = storage.addUser(VALID_USER_3).id();
         service.addFriend(userId1, userId3);
         service.addFriend(userId2, userId3);
         Assertions.assertThrows(
@@ -189,7 +190,7 @@ public class UserServiceTest {
     @Test
     @DisplayName("Add friend by non existing id")
     public void addFriend_addNonExistingFriendById_throwNotFoundException() {
-        Long userId3 = storage.addUser(VALID_USER_3).getId();
+        Long userId3 = storage.addUser(VALID_USER_3).id();
         service.addFriend(userId1, userId3);
         service.addFriend(userId2, userId3);
         Assertions.assertThrows(
@@ -217,7 +218,7 @@ public class UserServiceTest {
     @Test
     @DisplayName("Remove friend by non existing id")
     public void removeFriend_removeNonExistingFriendById_throwNotFoundException() {
-        Long userId3 = storage.addUser(VALID_USER_3).getId();
+        Long userId3 = storage.addUser(VALID_USER_3).id();
         service.addFriend(userId1, userId3);
         service.addFriend(userId2, userId3);
         Assertions.assertThrows(
@@ -251,7 +252,7 @@ public class UserServiceTest {
     public void getUser_getExistingUserById_returnedUser() {
         User added = storage.addUser(VALID_USER_1.clone());
         Assertions.assertDoesNotThrow(
-                () -> service.getUser(added.getId()),
+                () -> service.getUser(added.id()),
                 "User should be returned without exceptions"
         );
     }
