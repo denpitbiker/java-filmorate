@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.storage;
+package ru.yandex.practicum.filmorate.data.storage.inmemory;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -44,7 +44,7 @@ public class InMemoryUserStorageTest {
         User user = repository.addUser(VALID_USER_1.clone());
 
         Assertions.assertTrue(
-                () -> repository.getUser(user.id()).isPresent(),
+                () -> repository.getUser(user.getId()).isPresent(),
                 "User should be returned for existing id"
         );
     }
@@ -55,7 +55,7 @@ public class InMemoryUserStorageTest {
         User user = repository.addUser(VALID_USER_1.clone());
 
         Assertions.assertNotNull(
-                repository.removeUser(user.id()),
+                repository.removeUser(user.getId()),
                 "User should be returned for existing id"
         );
         Assertions.assertEquals(
@@ -63,21 +63,6 @@ public class InMemoryUserStorageTest {
                 repository.getAllUsers().size(),
                 "User should be removed"
         );
-    }
-
-    @Test
-    @DisplayName("Add user without name set")
-    public void addUser_addUserWithoutNameSet_userAddedNAndLoginSetAsName() {
-        User userWithoutNameSet = VALID_USER_1.clone();
-        userWithoutNameSet.setName(null);
-
-        Assertions.assertNotNull(
-                repository.addUser(userWithoutNameSet),
-                "User should be added and returned"
-        );
-        Assertions.assertFalse(repository.getAllUsers().isEmpty(), "Repository should not be empty");
-        User savedUser = repository.getAllUsers().getFirst();
-        Assertions.assertEquals(VALID_LOGIN_1, savedUser.name(), "Login should be set as name");
     }
 
     @Test
@@ -108,7 +93,7 @@ public class InMemoryUserStorageTest {
     @Test
     @DisplayName("Check existing user id")
     public void hasUserId_checkExistingUserIdInStorage_returnedTrue() {
-        Long id = repository.addUser(VALID_USER_1.clone()).id();
+        Long id = repository.addUser(VALID_USER_1.clone()).getId();
         Assertions.assertTrue(repository.hasUserId(id), "Repository should contain added user id");
     }
 

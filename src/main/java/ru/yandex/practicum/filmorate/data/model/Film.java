@@ -24,8 +24,8 @@ public class Film implements Cloneable {
     @Override
     public Film clone() {
         Film cloned = new Film(id, name, description, releaseDate, mpaId, durationMinutes, new HashSet<>(), new HashSet<>());
-        cloned.getLikesIds().addAll(likesIds);
-        cloned.getGenresIds().addAll(genresIds);
+        if (likesIds != null) cloned.getLikesIds().addAll(likesIds);
+        if (genresIds != null) cloned.getGenresIds().addAll(genresIds);
         return cloned;
     }
 }

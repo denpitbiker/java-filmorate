@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.storage;
+package ru.yandex.practicum.filmorate.data.storage.inmemory;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -44,7 +44,7 @@ public class InMemoryFilmStorageTest {
         Film film = repository.addFilm(VALID_FILM_1.clone());
 
         Assertions.assertTrue(
-                () -> repository.getFilm(film.id()).isPresent(),
+                () -> repository.getFilm(film.getId()).isPresent(),
                 "Film should be returned for existing id"
         );
     }
@@ -55,7 +55,7 @@ public class InMemoryFilmStorageTest {
         Film film = repository.addFilm(VALID_FILM_1.clone());
 
         Assertions.assertNotNull(
-                repository.removeFilm(film.id()),
+                repository.removeFilm(film.getId()),
                 "Film should be returned for existing id"
         );
         Assertions.assertEquals(
@@ -92,7 +92,7 @@ public class InMemoryFilmStorageTest {
     @Test
     @DisplayName("Check existing film id")
     public void hasFilmId_checkExistingFilmIdInStorage_returnedTrue() {
-        Long id = repository.addFilm(VALID_FILM_1.clone()).id();
+        Long id = repository.addFilm(VALID_FILM_1.clone()).getId();
         Assertions.assertTrue(repository.hasFilmId(id), "Repository should contain added film id");
     }
 

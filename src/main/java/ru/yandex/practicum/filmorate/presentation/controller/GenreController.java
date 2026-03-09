@@ -13,9 +13,9 @@ import java.util.Collection;
 
 @Slf4j
 @RequiredArgsConstructor
-@RequestMapping(GenresController.CONTROLLER_ROUTE)
+@RequestMapping(GenreController.CONTROLLER_ROUTE)
 @RestController
-public class GenresController {
+public class GenreController {
     private static final String ID_PATH_VAR = "id";
 
     public static final String CONTROLLER_ROUTE = "/genres";

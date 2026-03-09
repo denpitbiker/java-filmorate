@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS users ( -- "user" is a keyword so it's easier to just name table as a plural
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
-    email VARCHAR(100) NOT NULL UNIQUE,
+    email VARCHAR(100) NOT NULL,
     login VARCHAR(100) NOT NULL,
     name VARCHAR(100),
     birthday DATE NOT NULL CHECK (birthday <= CURRENT_DATE)

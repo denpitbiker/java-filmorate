@@ -46,7 +46,7 @@ public class FilmDto implements Cloneable {
     public FilmDto clone() {
         FilmDto cloned = new FilmDto(id, name, description, releaseDate, mpa, durationMinutes, new LinkedHashSet<>());
         cloned.getLikesIds().addAll(likesIds);
-        cloned.getGenres().addAll(genres);
+        if (genres != null) cloned.getGenres().addAll(genres);
         return cloned;
     }
 }

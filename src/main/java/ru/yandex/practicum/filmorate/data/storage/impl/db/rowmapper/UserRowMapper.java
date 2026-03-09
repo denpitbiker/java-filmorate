@@ -20,9 +20,9 @@ public class UserRowMapper implements RowMapper<User> {
     public User mapRow(ResultSet rs, int rowNum) throws SQLException {
         return new User(
                 rs.getLong(ID_COLUMN_LABEL),
-                rs.getString(NAME_COLUMN_LABEL),
                 rs.getString(EMAIL_COLUMN_LABEL),
                 rs.getString(LOGIN_COLUMN_LABEL),
+                rs.getString(NAME_COLUMN_LABEL),
                 rs.getObject(BIRTHDAY_COLUMN_LABEL, LocalDate.class),
                 new HashSet<>()
         );
