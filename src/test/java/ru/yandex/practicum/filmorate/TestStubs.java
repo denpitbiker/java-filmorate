@@ -1,7 +1,6 @@
 package ru.yandex.practicum.filmorate;
 
 import ru.yandex.practicum.filmorate.data.model.Film;
-import ru.yandex.practicum.filmorate.data.model.Mpa;
 import ru.yandex.practicum.filmorate.data.model.User;
 import ru.yandex.practicum.filmorate.presentation.dto.FilmDto;
 import ru.yandex.practicum.filmorate.presentation.dto.MpaDto;
@@ -10,7 +9,6 @@ import ru.yandex.practicum.filmorate.presentation.dto.UserDto;
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
-import java.util.Map;
 
 public class TestStubs {
     public static final int EXPECTED_REPOSITORY_SIZE_TWO = 2;
