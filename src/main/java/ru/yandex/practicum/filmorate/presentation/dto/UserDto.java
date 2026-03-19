@@ -12,8 +12,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.Set;
 
 @Data
 @AllArgsConstructor
@@ -31,12 +29,9 @@ public class UserDto implements Cloneable {
     @JsonFormat(pattern = "yyyy-MM-dd")
     @JsonSerialize(using = LocalDateSerializer.class)
     LocalDate birthday;
-    final Set<Long> friends = new HashSet<>();
 
     @Override
     public UserDto clone() {
-        UserDto cloned = new UserDto(id, email, login, name, birthday);
-        cloned.getFriends().addAll(friends);
-        return cloned;
+        return new UserDto(id, email, login, name, birthday);
     }
 }

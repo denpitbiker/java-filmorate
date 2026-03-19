@@ -15,7 +15,6 @@ import ru.yandex.practicum.filmorate.data.storage.impl.db.rowmapper.UserRowMappe
 
 import java.sql.Date;
 import java.sql.PreparedStatement;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,7 +28,17 @@ public class UserDbStorage implements UserStorage {
     private static final String UPDATE_USER_QUERY = "UPDATE users SET name = ?, email = ?, login = ?, birthday = ? WHERE id = ?";
     private static final String GET_ALL_USERS_QUERY = "SELECT * FROM users";
     private static final String DELETE_USER_QUERY = "DELETE FROM users WHERE id=?";
-    private static final String GET_FRIENDS_FOR_USER_QUERY = "SELECT friend_id FROM user_friend WHERE user_id = ?";
+    private static final String GET_FRIENDS_FOR_USER_QUERY = """
+            SELECT u.id AS id, u.name AS name, u.email AS email, u.login AS login, u.birthday AS birthday
+            FROM user_friend AS uf
+            JOIN users AS u ON u.id = uf.friend_id AND uf.user_id = ?
+            """;
+    private static final String GET_COMMON_FRIENDS_QUERY = """
+            SELECT u.id AS id, u.name AS name, u.email AS email, u.login AS login, u.birthday AS birthday
+            FROM user_friend AS uf
+            JOIN user_friend AS of ON of.friend_id = uf.friend_id AND uf.user_id = ? AND of.user_id = ?
+            JOIN users AS u ON u.id = uf.friend_id
+            """;
 
     private static final String ID_COLUMN = "id";
 
@@ -85,7 +94,6 @@ public class UserDbStorage implements UserStorage {
         try {
             User user = jdbc.queryForObject(GET_USER_QUERY, mapper, id);
             if (user == null) return Optional.empty();
-            applyFriends(user);
             return Optional.of(user);
         } catch (EmptyResultDataAccessException e) {
             log.info(GET_USER_FAILED_LOG, id);
@@ -124,16 +132,16 @@ public class UserDbStorage implements UserStorage {
     public List<User> getAllUsers() {
         log.trace(GET_USERS_LOG);
         return jdbc.query(GET_ALL_USERS_QUERY, mapper).stream()
-                .peek(this::applyFriends)
                 .toList();
     }
 
-    private void applyFriends(User user) {
-        user.getFriends().addAll(findFriends(user.getId()));
+    @Override
+    public List<User> getFriends(Long userId) {
+        return jdbc.query(GET_FRIENDS_FOR_USER_QUERY, mapper, userId);
     }
 
-    private List<Long> findFriends(Long id) {
-        if (id == null) return new ArrayList<>();
-        return jdbc.queryForList(GET_FRIENDS_FOR_USER_QUERY, Long.class, id);
+    @Override
+    public List<User> getCommonFriends(Long userId, Long otherId) {
+        return jdbc.query(GET_COMMON_FRIENDS_QUERY, mapper, userId, otherId);
     }
 }

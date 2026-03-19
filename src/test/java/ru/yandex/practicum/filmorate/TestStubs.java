@@ -7,7 +7,6 @@ import ru.yandex.practicum.filmorate.presentation.dto.MpaDto;
 import ru.yandex.practicum.filmorate.presentation.dto.UserDto;
 
 import java.time.LocalDate;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 
 public class TestStubs {
@@ -56,8 +55,8 @@ public class TestStubs {
     public static final FilmDto VALID_FILM_DTO_1 = new FilmDto(null, VALID_FILM_NAME_1, VALID_FILM_DESCRIPTION_1, VALID_DATE_1, VALID_MPA_DTO, VALID_DURATION_1, new LinkedHashSet<>());
     public static final FilmDto VALID_FILM_DTO_2 = new FilmDto(null, VALID_FILM_NAME_2, VALID_FILM_DESCRIPTION_2, VALID_DATE_2, VALID_MPA_DTO, VALID_DURATION_2, null);
 
-    public static final Film VALID_FILM_1 = new Film(null, VALID_FILM_NAME_1, VALID_FILM_DESCRIPTION_1, VALID_DATE_1, VALID_MPA_ID, VALID_DURATION_1, new LinkedHashSet<>(), new LinkedHashSet<>());
-    public static final Film VALID_FILM_2 = new Film(null, VALID_FILM_NAME_2, VALID_FILM_DESCRIPTION_2, VALID_DATE_2, VALID_MPA_ID, VALID_DURATION_2, null, null);
+    public static final Film VALID_FILM_1 = new Film(null, VALID_FILM_NAME_1, VALID_FILM_DESCRIPTION_1, VALID_DATE_1, VALID_MPA_ID, VALID_DURATION_1);
+    public static final Film VALID_FILM_2 = new Film(null, VALID_FILM_NAME_2, VALID_FILM_DESCRIPTION_2, VALID_DATE_2, VALID_MPA_ID, VALID_DURATION_2);
 
     public static final FilmDto INVALID_FILM_DTO_NULL_NAME = new FilmDto(null, null, VALID_FILM_DESCRIPTION_2, VALID_DATE_1, VALID_MPA_DTO, VALID_DURATION_2, new LinkedHashSet<>());
     public static final FilmDto INVALID_FILM_DTO_NULL_DESCRIPTION = new FilmDto(null, VALID_FILM_NAME_1, null, VALID_DATE_1, VALID_MPA_DTO, VALID_DURATION_1, new LinkedHashSet<>());
@@ -68,16 +67,6 @@ public class TestStubs {
     public static final FilmDto INVALID_FILM_DTO_TOO_OLD_DATE = new FilmDto(null, VALID_FILM_NAME_1, VALID_FILM_DESCRIPTION_1, TOOL_OLD_DATE, VALID_MPA_DTO, VALID_DURATION_2, new LinkedHashSet<>());
     public static final FilmDto INVALID_FILM_DTO_DURATION_ZERO = new FilmDto(null, VALID_FILM_NAME_1, VALID_FILM_DESCRIPTION_1, VALID_DATE_1, VALID_MPA_DTO, INVALID_DURATION_ZERO, new LinkedHashSet<>());
     public static final FilmDto INVALID_FILM_DTO_NEGATIVE_DURATION = new FilmDto(null, VALID_FILM_NAME_1, VALID_FILM_DESCRIPTION_1, VALID_DATE_1, VALID_MPA_DTO, INVALID_DURATION_NEGATIVE, new LinkedHashSet<>());
-
-    public static final Film INVALID_FILM_NULL_NAME = new Film(null, null, VALID_FILM_DESCRIPTION_2, VALID_DATE_1, VALID_MPA_ID, VALID_DURATION_2, new LinkedHashSet<>(), new LinkedHashSet<>());
-    public static final Film INVALID_FILM_NULL_DESCRIPTION = new Film(null, VALID_FILM_NAME_1, null, VALID_DATE_1, VALID_MPA_ID, VALID_DURATION_1, new LinkedHashSet<>(), new LinkedHashSet<>());
-    public static final Film INVALID_FILM_BLANK_DESCRIPTION = new Film(null, VALID_FILM_NAME_1, INVALID_FILM_DESCRIPTION_BLANK, VALID_DATE_1, VALID_MPA_ID, VALID_DURATION_1, new LinkedHashSet<>(), new LinkedHashSet<>());
-    public static final Film INVALID_FILM_NULL_DATE = new Film(null, VALID_FILM_NAME_1, VALID_FILM_DESCRIPTION_1, null, VALID_MPA_ID, VALID_DURATION_1, new LinkedHashSet<>(), new LinkedHashSet<>());
-    public static final Film INVALID_FILM_NULL_DURATION = new Film(null, VALID_FILM_NAME_1, VALID_FILM_DESCRIPTION_1, VALID_DATE_1, VALID_MPA_ID, null, new LinkedHashSet<>(), new LinkedHashSet<>());
-    public static final Film INVALID_FILM_TOO_LONG_DESCRIPTION = new Film(null, VALID_FILM_NAME_1, INVALID_FILM_DESCRIPTION_TOO_LONG, VALID_DATE_1, VALID_MPA_ID, VALID_DURATION_2, new LinkedHashSet<>(), new LinkedHashSet<>());
-    public static final Film INVALID_FILM_TOO_OLD_DATE = new Film(null, VALID_FILM_NAME_1, VALID_FILM_DESCRIPTION_1, TOOL_OLD_DATE, VALID_MPA_ID, VALID_DURATION_2, new LinkedHashSet<>(), new LinkedHashSet<>());
-    public static final Film INVALID_FILM_DURATION_ZERO = new Film(null, VALID_FILM_NAME_1, VALID_FILM_DESCRIPTION_1, VALID_DATE_1, VALID_MPA_ID, INVALID_DURATION_ZERO, new LinkedHashSet<>(), new LinkedHashSet<>());
-    public static final Film INVALID_FILM_NEGATIVE_DURATION = new Film(null, VALID_FILM_NAME_1, VALID_FILM_DESCRIPTION_1, VALID_DATE_1, VALID_MPA_ID, INVALID_DURATION_NEGATIVE, new LinkedHashSet<>(), new LinkedHashSet<>());
 
     public static final String VALID_LOGIN_1 = "vdenk";
     public static final String VALID_LOGIN_2 = "qreqwrew";
@@ -102,19 +91,9 @@ public class TestStubs {
     public static final UserDto VALID_USER_DTO_2 = new UserDto(null, VALID_EMAIL_2, VALID_LOGIN_2, VALID_USER_NAME_2, VALID_BIRTHDAY_2);
     public static final UserDto VALID_USER_DTO_3 = new UserDto(null, VALID_EMAIL_3, VALID_LOGIN_3, VALID_USER_NAME_3, VALID_BIRTHDAY_3);
 
-    public static final User VALID_USER_1 = new User(null, VALID_EMAIL_1, VALID_LOGIN_1, VALID_USER_NAME_1, VALID_BIRTHDAY_1, new HashSet<>());
-    public static final User VALID_USER_2 = new User(null, VALID_EMAIL_2, VALID_LOGIN_2, VALID_USER_NAME_2, VALID_BIRTHDAY_2, new HashSet<>());
-    public static final User VALID_USER_3 = new User(null, VALID_EMAIL_3, VALID_LOGIN_3, VALID_USER_NAME_3, VALID_BIRTHDAY_3, new HashSet<>());
-
-    public static final User INVALID_USER_NULL_EMAIL = new User(null, null, VALID_LOGIN_1, VALID_USER_NAME_1, VALID_BIRTHDAY_1, new HashSet<>());
-    public static final User INVALID_USER_NULL_LOGIN = new User(null, VALID_EMAIL_1, null, VALID_USER_NAME_1, VALID_BIRTHDAY_1, new HashSet<>());
-    public static final User INVALID_USER_NULL_BIRTHDAY = new User(null, VALID_EMAIL_1, VALID_LOGIN_1, VALID_USER_NAME_1, null, new HashSet<>());
-    public static final User INVALID_USER_LOGIN_BLANK = new User(null, VALID_EMAIL_1, INVALID_LOGIN_BLANK, VALID_USER_NAME_1, VALID_BIRTHDAY_1, new HashSet<>());
-    public static final User INVALID_USER_LOGIN_EMPTY = new User(null, VALID_EMAIL_1, INVALID_LOGIN_EMPTY, VALID_USER_NAME_1, VALID_BIRTHDAY_1, new HashSet<>());
-    public static final User INVALID_USER_EMAIL_EMPTY_BEFORE_AT = new User(null, INVALID_EMAIL_EMPTY_BEFORE_AT, VALID_LOGIN_1, VALID_USER_NAME_1, VALID_BIRTHDAY_1, new HashSet<>());
-    public static final User INVALID_USER_EMAIL_EMPTY_AFTER_AT = new User(null, INVALID_EMAIL_EMPTY_AFTER_AT, VALID_LOGIN_1, VALID_USER_NAME_1, VALID_BIRTHDAY_1, new HashSet<>());
-    public static final User INVALID_USER_INVALID_EMAIL = new User(null, INVALID_EMAIL, VALID_LOGIN_1, VALID_USER_NAME_1, VALID_BIRTHDAY_1, new HashSet<>());
-    public static final User INVALID_USER_FUTURE_BIRTHDAY = new User(null, VALID_EMAIL_1, VALID_LOGIN_1, VALID_USER_NAME_1, INVALID_FUTURE_BIRTHDAY, new HashSet<>());
+    public static final User VALID_USER_1 = new User(null, VALID_EMAIL_1, VALID_LOGIN_1, VALID_USER_NAME_1, VALID_BIRTHDAY_1);
+    public static final User VALID_USER_2 = new User(null, VALID_EMAIL_2, VALID_LOGIN_2, VALID_USER_NAME_2, VALID_BIRTHDAY_2);
+    public static final User VALID_USER_3 = new User(null, VALID_EMAIL_3, VALID_LOGIN_3, VALID_USER_NAME_3, VALID_BIRTHDAY_3);
 
     public static final UserDto INVALID_USER_DTO_NULL_EMAIL = new UserDto(null, null, VALID_LOGIN_1, VALID_USER_NAME_1, VALID_BIRTHDAY_1);
     public static final UserDto INVALID_USER_DTO_NULL_LOGIN = new UserDto(null, VALID_EMAIL_1, null, VALID_USER_NAME_1, VALID_BIRTHDAY_1);

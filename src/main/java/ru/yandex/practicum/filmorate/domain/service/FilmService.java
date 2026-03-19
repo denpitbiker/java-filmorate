@@ -11,13 +11,14 @@ import ru.yandex.practicum.filmorate.domain.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.data.model.Film;
 import ru.yandex.practicum.filmorate.data.storage.api.FilmStorage;
 import ru.yandex.practicum.filmorate.data.storage.api.UserStorage;
-import ru.yandex.practicum.filmorate.domain.mapper.FilmDtoToFilmMapper;
 import ru.yandex.practicum.filmorate.domain.mapper.FilmToFilmDtoMapper;
-import ru.yandex.practicum.filmorate.domain.tool.comparison.FilmLikesComparator;
+import ru.yandex.practicum.filmorate.domain.model.FilmAdditionalInfo;
+import ru.yandex.practicum.filmorate.domain.model.FilmsAdditionalInfo;
 import ru.yandex.practicum.filmorate.presentation.dto.FilmDto;
 import ru.yandex.practicum.filmorate.presentation.dto.GenreDto;
 
-import java.util.Collection;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -46,16 +47,14 @@ public class FilmService {
     private final UserStorage userStorage;
     private final GenreStorage genreStorage;
     private final MpaStorage mpaStorage;
-    private static final FilmLikesComparator filmLikesComparator = new FilmLikesComparator(true);
-    private final FilmToFilmDtoMapper filmToFilmDtoMapper;
-    private static final FilmDtoToFilmMapper filmDtoToFilmMapper = new FilmDtoToFilmMapper();
 
-    public FilmService(@DbStorage FilmStorage filmStorage, @DbStorage UserStorage userStorage, GenreStorage genreStorage, MpaStorage mpaStorage, FilmToFilmDtoMapper filmToFilmDtoMapper) {
+    private static final FilmToFilmDtoMapper filmMapper = new FilmToFilmDtoMapper();
+
+    public FilmService(@DbStorage FilmStorage filmStorage, @DbStorage UserStorage userStorage, GenreStorage genreStorage, MpaStorage mpaStorage) {
         this.filmStorage = filmStorage;
         this.userStorage = userStorage;
         this.genreStorage = genreStorage;
         this.mpaStorage = mpaStorage;
-        this.filmToFilmDtoMapper = filmToFilmDtoMapper;
     }
 
     public void likeFilm(Long id, Long userId) {
@@ -75,10 +74,10 @@ public class FilmService {
     public Collection<FilmDto> getFilmsTop(Integer count) {
         log.info(GET_TOP_FILMS_LOG_MSG, count);
         if (count <= 0) throw new ValidationException(FILMS_COUNT_ERR_MSG);
-        return filmStorage.getAllFilms().stream()
-                .sorted(filmLikesComparator)
-                .limit(count)
-                .map(filmToFilmDtoMapper::map)
+        List<Film> films = filmStorage.getTopFilms(count);
+        FilmsAdditionalInfo info = getFilmsInfo(films);
+        return films.stream()
+                .map(film -> filmMapper.toPresentation(film, extractFilmInfo(info, film)))
                 .toList();
     }
 
@@ -89,8 +88,10 @@ public class FilmService {
 
     public Collection<FilmDto> getAllFilms() {
         log.info(GET_FILMS_LOG_MSG);
-        return filmStorage.getAllFilms().stream()
-                .map(filmToFilmDtoMapper::map)
+        List<Film> films = filmStorage.getAllFilms();
+        FilmsAdditionalInfo info = getFilmsInfo(films);
+        return films.stream()
+                .map(film -> filmMapper.toPresentation(film, extractFilmInfo(info, film)))
                 .toList();
     }
 
@@ -99,7 +100,9 @@ public class FilmService {
         checkFilmIdNotExist(newFilm.getId());
         checkGenresExists(newFilm.getGenres());
         checkMpaExists(newFilm.getMpa().getId());
-        return filmToFilmDtoMapper.map(filmStorage.addFilm(filmDtoToFilmMapper.map(newFilm)));
+        Film film = filmStorage.addFilm(filmMapper.toData(newFilm));
+        tryUpdateGenres(film.getId(), newFilm);
+        return filmMapper.toPresentation(film, getFilmInfo(film));
     }
 
     public FilmDto updateFilm(FilmDto updatedFilm) {
@@ -107,7 +110,14 @@ public class FilmService {
         checkFilmIdExist(updatedFilm.getId());
         checkGenresExists(updatedFilm.getGenres());
         checkMpaExists(updatedFilm.getMpa().getId());
-        return filmToFilmDtoMapper.map(filmStorage.updateFilm(filmDtoToFilmMapper.map(updatedFilm)));
+        Film film = filmStorage.updateFilm(filmMapper.toData(updatedFilm));
+        tryUpdateGenres(film.getId(), updatedFilm);
+        return filmMapper.toPresentation(film, getFilmInfo(film));
+    }
+
+    private void tryUpdateGenres(Long filmId, FilmDto film) {
+        if (film.getGenres() != null)
+            genreStorage.updateFilmGenres(filmId, film.getGenres().stream().map(GenreDto::getId).collect(Collectors.toSet()));
     }
 
     private Film getFilmOrThrow(Long id) {
@@ -116,7 +126,28 @@ public class FilmService {
     }
 
     private FilmDto getFilmDtoOrThrow(Long id) {
-        return filmToFilmDtoMapper.map(getFilmOrThrow(id));
+        Film film = getFilmOrThrow(id);
+        return filmMapper.toPresentation(film, getFilmInfo(film));
+    }
+
+    private FilmAdditionalInfo extractFilmInfo(FilmsAdditionalInfo info, Film film) {
+        return new FilmAdditionalInfo(
+                info.mpas().get(film.getMpaId()),
+                info.genres().get(film.getId()),
+                info.likes().get(film.getId())
+        );
+    }
+
+    private FilmAdditionalInfo getFilmInfo(Film film) {
+        return extractFilmInfo(getFilmsInfo(Collections.singletonList(film)), film);
+    }
+
+    private FilmsAdditionalInfo getFilmsInfo(List<Film> films) {
+        return new FilmsAdditionalInfo(
+                mpaStorage.getMpasInfo(films.stream().map(Film::getMpaId).collect(Collectors.toSet())),
+                filmStorage.getFilmsLikes(films.stream().map(Film::getId).toList()),
+                genreStorage.getGenresForFilms(films.stream().map(Film::getId).toList())
+        );
     }
 
     private void checkGenresExists(Collection<GenreDto> genres) {

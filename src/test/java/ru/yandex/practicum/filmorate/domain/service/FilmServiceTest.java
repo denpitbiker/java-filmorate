@@ -12,7 +12,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import ru.yandex.practicum.filmorate.FilmorateApplication;
-import ru.yandex.practicum.filmorate.domain.mapper.FilmToFilmDtoMapper;
 import ru.yandex.practicum.filmorate.domain.exception.DuplicatedDataException;
 import ru.yandex.practicum.filmorate.domain.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.presentation.dto.FilmDto;
@@ -31,9 +30,6 @@ import static ru.yandex.practicum.filmorate.TestStubs.*;
 public class FilmServiceTest {
     private static final int TOP_ONE_COUNT = 1;
     private static final String NOT_FOUND_FILM_FAIL_MSG = "NotFoundException should be thrown for unknown film";
-
-    @Autowired
-    private FilmToFilmDtoMapper mapper;
 
     @Autowired
     private FilmService filmService;
@@ -143,10 +139,7 @@ public class FilmServiceTest {
                 films.size(),
                 "Should return the correct number of top films"
         );
-        Assertions.assertTrue(
-                films.iterator().next().getId().equals(film.getId()),
-                "Should return correct film"
-        );
+        Assertions.assertEquals(films.iterator().next().getId(), film.getId(), "Should return correct film");
     }
 
     @Test

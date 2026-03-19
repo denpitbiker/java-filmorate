@@ -26,13 +26,13 @@ public class GenreService {
 
     public GenreDto getGenre(Long id) {
         log.info(GET_GENRE_LOG_MSG, id);
-        return mapper.map(getGenreOrThrow(id));
+        return mapper.toPresentation(getGenreOrThrow(id));
     }
 
     public Collection<GenreDto> getAllGenres() {
         log.info(GET_GENRES_LOG_MSG);
         return genreStorage.getAllGenres().stream()
-                .map(mapper::map)
+                .map(mapper::toPresentation)
                 .toList();
     }
 

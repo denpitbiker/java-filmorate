@@ -6,7 +6,6 @@ import ru.yandex.practicum.filmorate.data.model.Film;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
-import java.util.HashSet;
 
 public class FilmRowMapper implements RowMapper<Film> {
     private static final String ID_COLUMN_LABEL = "id";
@@ -24,9 +23,7 @@ public class FilmRowMapper implements RowMapper<Film> {
                 rs.getString(DESCRIPTION_COLUMN_LABEL),
                 rs.getObject(RELEASE_DATE_COLUMN_LABEL, LocalDate.class),
                 rs.getLong(MPA_ID_COLUMN_LABEL),
-                rs.getLong(DURATION_MINUTES_COLUMN_LABEL),
-                new HashSet<>(),
-                new HashSet<>()
+                rs.getLong(DURATION_MINUTES_COLUMN_LABEL)
         );
     }
 }

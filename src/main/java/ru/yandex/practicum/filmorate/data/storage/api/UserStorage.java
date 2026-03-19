@@ -22,4 +22,8 @@ public interface UserStorage {
     User removeUser(Long id);
 
     List<User> getAllUsers();
+
+    List<User> getFriends(Long userId);
+
+    List<User> getCommonFriends(Long userId, Long otherId);
 }

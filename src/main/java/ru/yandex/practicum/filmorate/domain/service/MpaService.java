@@ -26,13 +26,13 @@ public class MpaService {
 
     public MpaDto getMpa(Long id) {
         log.info(GET_MPA_LOG_MSG, id);
-        return mapper.map(getMpaOrThrow(id));
+        return mapper.toPresentation(getMpaOrThrow(id));
     }
 
     public Collection<MpaDto> getAllMpas() {
         log.info(GET_MPAS_LOG_MSG);
         return mpaStorage.getAllMpas().stream()
-                .map(mapper::map)
+                .map(mapper::toPresentation)
                 .toList();
     }
 

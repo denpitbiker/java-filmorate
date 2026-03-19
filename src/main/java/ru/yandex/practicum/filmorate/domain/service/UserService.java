@@ -8,12 +8,11 @@ import ru.yandex.practicum.filmorate.domain.exception.DuplicatedDataException;
 import ru.yandex.practicum.filmorate.domain.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.data.model.User;
 import ru.yandex.practicum.filmorate.data.storage.api.UserStorage;
-import ru.yandex.practicum.filmorate.domain.mapper.UserDtoToUserMapper;
 import ru.yandex.practicum.filmorate.domain.mapper.UserToUserDtoMapper;
 import ru.yandex.practicum.filmorate.presentation.dto.UserDto;
 
 import java.util.Collection;
-import java.util.Set;
+import java.util.List;
 
 @Slf4j
 @Service
@@ -36,9 +35,7 @@ public class UserService {
     private static final String DUPLICATE_USER_ERR_MSG = "User already exists with id = ";
 
     private final UserStorage userStorage;
-
-    private static final UserToUserDtoMapper userToUserDtoMapper = new UserToUserDtoMapper();
-    private static final UserDtoToUserMapper userDtoToUserMapper = new UserDtoToUserMapper();
+    private static final UserToUserDtoMapper userDtoToUserMapper = new UserToUserDtoMapper();
 
     public UserService(@DbStorage UserStorage userStorage) {
         this.userStorage = userStorage;
@@ -64,19 +61,21 @@ public class UserService {
 
     public Collection<UserDto> getUserFriends(Long id) {
         log.info(GET_USER_FRIENDS_LOG_MSG, id);
-        Set<Long> userFriendsIds = getUserOrThrow(id).getFriends();
-        return userFriendsIds.stream()
-                .map(this::getUserDtoOrThrow)
+        getUserOrThrow(id);
+        List<User> userFriends = userStorage.getFriends(id);
+        return userFriends.stream()
+                .map(userDtoToUserMapper::toPresentation)
                 .toList();
     }
 
     public Collection<UserDto> getCommonFriends(Long id, Long otherId) {
         log.info(GET_COMMON_FRIENDS_LOG_MSG, id, otherId);
         checkIdsAreNotTheSame(id, otherId);
-        Set<Long> userFriendsIds = getUserOrThrow(id).getFriends();
-        userFriendsIds.retainAll(getUserOrThrow(otherId).getFriends());
-        return userFriendsIds.stream()
-                .map(this::getUserDtoOrThrow)
+        getUserOrThrow(id);
+        getUserOrThrow(otherId);
+        List<User> userFriends = userStorage.getCommonFriends(id, otherId);
+        return userFriends.stream()
+                .map(userDtoToUserMapper::toPresentation)
                 .toList();
     }
 
@@ -88,20 +87,20 @@ public class UserService {
     public Collection<UserDto> getAllUsers() {
         log.info(GET_USERS_LOG_MSG);
         return userStorage.getAllUsers().stream()
-                .map(userToUserDtoMapper::map)
+                .map(userDtoToUserMapper::toPresentation)
                 .toList();
     }
 
     public UserDto addUser(UserDto newUser) {
         log.info(ADD_USER_LOG_MSG, newUser);
         checkUserIdNotExist(newUser.getId());
-        return userToUserDtoMapper.map(userStorage.addUser(userDtoToUserMapper.map(newUser)));
+        return userDtoToUserMapper.toPresentation(userStorage.addUser(userDtoToUserMapper.toData(newUser)));
     }
 
     public UserDto updateUser(UserDto updatedUser) {
         log.info(UPDATE_USER_LOG_MSG, updatedUser);
         checkUserIdExist(updatedUser.getId());
-        return userToUserDtoMapper.map(userStorage.updateUser(userDtoToUserMapper.map(updatedUser)));
+        return userDtoToUserMapper.toPresentation(userStorage.updateUser(userDtoToUserMapper.toData(updatedUser)));
     }
 
     private User getUserOrThrow(Long id) {
@@ -110,7 +109,7 @@ public class UserService {
     }
 
     private UserDto getUserDtoOrThrow(Long id) {
-        return userToUserDtoMapper.map(getUserOrThrow(id));
+        return userDtoToUserMapper.toPresentation(getUserOrThrow(id));
     }
 
     private void checkUserIdExist(Long id) {

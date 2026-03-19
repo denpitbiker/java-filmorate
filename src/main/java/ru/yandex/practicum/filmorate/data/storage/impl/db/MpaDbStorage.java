@@ -10,8 +10,7 @@ import ru.yandex.practicum.filmorate.data.model.Mpa;
 import ru.yandex.practicum.filmorate.data.storage.api.MpaStorage;
 import ru.yandex.practicum.filmorate.data.storage.impl.db.rowmapper.MpaRowMapper;
 
-import java.util.Collection;
-import java.util.Optional;
+import java.util.*;
 
 @Slf4j
 @Repository
@@ -20,6 +19,13 @@ import java.util.Optional;
 public class MpaDbStorage implements MpaStorage {
     private static final String GET_ALL_MPAS_QUERY = "SELECT * FROM mpa";
     private static final String GET_MPA_QUERY = "SELECT * FROM mpa WHERE id = ?";
+    private static final String GET_MPAS_FOR_FILMS_QUERY = """
+            SELECT id, name
+            FROM mpa WHERE id IN (%s)
+            """;
+
+    private static final String ID_COLUMN_LABEL = "id";
+    private static final String NAME_COLUMN_LABEL = "name";
 
     private static final String GET_MPAS_LOG = "Searching for mpas";
     private static final String GET_MPA_LOG = "Searching for mpa with id = {}";
@@ -44,5 +50,23 @@ public class MpaDbStorage implements MpaStorage {
             log.info(GET_MPA_FAILED_LOG, id);
             return Optional.empty();
         }
+    }
+
+    @Override
+    public Map<Long, Mpa> getMpasInfo(Set<Long> mpaIds) {
+        String inSql = String.join(",", Collections.nCopies(mpaIds.size(), "?"));
+
+        List<Mpa> entries = jdbc.query(
+                String.format(GET_MPAS_FOR_FILMS_QUERY, inSql),
+                mpaIds.toArray(),
+                (rs, rowNum) -> new Mpa(rs.getLong(ID_COLUMN_LABEL), rs.getString(NAME_COLUMN_LABEL))
+        );
+        Map<Long, Mpa> result = new HashMap<>();
+        entries.forEach(mpa -> {
+            if (!result.containsKey(mpa.id())) {
+                result.put(mpa.id(), mpa);
+            }
+        });
+        return result;
     }
 }

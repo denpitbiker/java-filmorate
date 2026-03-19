@@ -5,8 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.Set;
 
 @Data
 @AllArgsConstructor
@@ -18,14 +16,9 @@ public class Film implements Cloneable {
     LocalDate releaseDate;
     Long mpaId;
     Long durationMinutes;
-    Set<Long> likesIds;
-    Set<Long> genresIds;
 
     @Override
     public Film clone() {
-        Film cloned = new Film(id, name, description, releaseDate, mpaId, durationMinutes, new HashSet<>(), new HashSet<>());
-        if (likesIds != null) cloned.getLikesIds().addAll(likesIds);
-        if (genresIds != null) cloned.getGenresIds().addAll(genresIds);
-        return cloned;
+        return new Film(id, name, description, releaseDate, mpaId, durationMinutes);
     }
 }
