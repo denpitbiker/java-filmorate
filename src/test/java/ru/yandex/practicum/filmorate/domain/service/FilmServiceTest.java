@@ -179,6 +179,26 @@ public class FilmServiceTest {
     }
 
     @Test
+    @DisplayName("Delete film by id")
+    public void getFilm_deleteExistingFilmById_returnedFilm() {
+        FilmDto added = filmService.addFilm(VALID_FILM_DTO_2.clone());
+        Assertions.assertDoesNotThrow(
+                () -> filmService.deleteFilm(added.getId()),
+                "Film should be returned without exceptions"
+        );
+    }
+
+    @Test
+    @DisplayName("Delete non-existing film")
+    public void deleteFilm_deleteNonExistingFilm_throwNotFoundException() {
+        Assertions.assertThrows(
+                NotFoundException.class,
+                () -> filmService.deleteFilm(NON_EXISTING_ID),
+                NOT_FOUND_FILM_FAIL_MSG
+        );
+    }
+
+    @Test
     @DisplayName("Add film")
     public void addFilm_addNewFilm_filmAddedNoExceptions() {
         Assertions.assertDoesNotThrow(

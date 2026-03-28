@@ -20,7 +20,8 @@ public class FilmController {
     public static final String COUNT_PARAM = "count";
 
     public static final String CONTROLLER_ROUTE = "/films";
-    public static final String GET_FILM_SUBROUTE = "/{id}";
+    public static final String GET_FILM_SUBROUTE = "/{" + ID_PATH_VAR + "}";
+    public static final String DELETE_FILM_SUBROUTE = "/{" + ID_PATH_VAR + "}";
     public static final String LIKE_FILM_SUBROUTE = "/{" + ID_PATH_VAR + "}/like/{" + USER_ID_PATH_VAR + "}";
     public static final String UNLIKE_FILM_SUBROUTE = "/{" + ID_PATH_VAR + "}/like/{" + USER_ID_PATH_VAR + "}";
     public static final String GET_TOP_FILMS_SUBROUTE = "/popular";
@@ -34,6 +35,7 @@ public class FilmController {
     private static final String GET_FILMS_LOG_MSG = "Get all films request";
     private static final String ADD_FILM_LOG_MSG = "Add new film request {}";
     private static final String UPDATE_FILM_LOG_MSG = "Update film request {}";
+    private static final String DELETE_FILM_LOG_MSG = "Delete film with id {} request";
 
     private final FilmService filmService;
 
@@ -80,5 +82,11 @@ public class FilmController {
     public FilmDto updateFilm(@Valid @RequestBody FilmDto updatedFilm) {
         log.info(UPDATE_FILM_LOG_MSG, updatedFilm);
         return filmService.updateFilm(updatedFilm);
+    }
+
+    @DeleteMapping(DELETE_FILM_SUBROUTE)
+    public FilmDto deleteFilm(@PathVariable(ID_PATH_VAR) Long id) {
+        log.info(DELETE_FILM_LOG_MSG, id);
+        return filmService.deleteFilm(id);
     }
 }

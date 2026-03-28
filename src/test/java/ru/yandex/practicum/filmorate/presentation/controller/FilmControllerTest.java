@@ -150,6 +150,24 @@ public class FilmControllerTest {
     }
 
     @Test
+    @DisplayName("Delete a specific film with valid id")
+    public void delete_film_validId_success200() throws Exception {
+        Long filmId = extractFilmDto(addFilm(VALID_FILM_DTO_1.clone())).getId();
+        mvc.perform(delete(FilmController.CONTROLLER_ROUTE + FilmController.GET_FILM_SUBROUTE, filmId))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.name").value(VALID_FILM_DTO_1.getName()));
+    }
+
+    @Test
+    @DisplayName("Delete a specific film with invalid id")
+    public void delete_film_invalidId_notFound404() throws Exception {
+        addFilm(VALID_FILM_DTO_1.clone());
+        mvc.perform(delete(FilmController.CONTROLLER_ROUTE + FilmController.GET_FILM_SUBROUTE, NON_EXISTING_ID))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
     @DisplayName("Add new film (valid film)")
     public void post_films_addValidFilm_success201WithDto() throws Exception {
         addFilm(VALID_FILM_DTO_1.clone())
