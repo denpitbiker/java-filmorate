@@ -17,7 +17,7 @@ import java.util.*;
 @DbStorage
 @RequiredArgsConstructor
 public class MpaDbStorage implements MpaStorage {
-    private static final String GET_ALL_MPAS_QUERY = "SELECT * FROM mpa";
+    private static final String GET_ALL_MPAS_QUERY = "SELECT * FROM mpa ORDER BY id";
     private static final String GET_MPA_QUERY = "SELECT * FROM mpa WHERE id = ?";
     private static final String GET_MPAS_FOR_FILMS_QUERY = """
             SELECT id, name
