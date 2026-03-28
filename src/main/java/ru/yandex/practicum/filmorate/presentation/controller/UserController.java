@@ -20,13 +20,15 @@ public class UserController {
     private static final String OTHER_ID_PATH_VAR = "otherId";
 
     public static final String CONTROLLER_ROUTE = "/users";
-    public static final String GET_USER_SUBROUTE = "/{id}";
+    public static final String GET_USER_SUBROUTE = "/{" + ID_PATH_VAR + "}";
+    public static final String DELETE_USER_SUBROUTE = "/{" + ID_PATH_VAR + "}";
     public static final String ADD_FRIEND_SUBROUTE = "/{" + ID_PATH_VAR + "}/friends/{" + FRIEND_ID_PATH_VAR + "}";
     public static final String REMOVE_FRIEND_SUBROUTE = "/{" + ID_PATH_VAR + "}/friends/{" + FRIEND_ID_PATH_VAR + "}";
     public static final String GET_FRIENDS_SUBROUTE = "/{" + ID_PATH_VAR + "}/friends";
     public static final String GET_COMMON_FRIENDS_SUBROUTE =  "/{" + ID_PATH_VAR + "}/friends/common/{" + OTHER_ID_PATH_VAR + "}";
 
     private static final String GET_USER_LOG_MSG = "Get user {} request";
+    private static final String DELETE_USER_LOG_MSG = "Delete user {} request";
     private static final String ADD_FRIEND_LOG_MSG = "Add friend {} to user {} request";
     private static final String REMOVE_FRIEND_LOG_MSG = "Remove friend {} from user {} request";
     private static final String GET_USER_FRIENDS_LOG_MSG = "Get friends for user {} request";
@@ -65,6 +67,12 @@ public class UserController {
     public UserDto getUser(@PathVariable(ID_PATH_VAR) Long id) {
         log.info(GET_USER_LOG_MSG, id);
         return userService.getUser(id);
+    }
+
+    @DeleteMapping(DELETE_USER_SUBROUTE)
+    public UserDto deleteUser(@PathVariable(ID_PATH_VAR) Long id) {
+        log.info(DELETE_USER_LOG_MSG, id);
+        return userService.deleteUser(id);
     }
 
     @GetMapping

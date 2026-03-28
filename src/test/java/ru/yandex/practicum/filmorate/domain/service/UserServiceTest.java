@@ -266,6 +266,26 @@ public class UserServiceTest {
     }
 
     @Test
+    @DisplayName("Delete user by id")
+    public void deleteUser_deleteExistingUserById_returnedUser() {
+        UserDto added = service.addUser(VALID_USER_DTO_1.clone());
+        Assertions.assertDoesNotThrow(
+                () -> service.deleteUser(added.getId()),
+                "User should be returned without exceptions"
+        );
+    }
+
+    @Test
+    @DisplayName("Delete user by non existing id")
+    public void deleteUser_deleteNonExistingUserById_throwNotFoundException() {
+        Assertions.assertThrows(
+                NotFoundException.class,
+                () -> service.deleteUser(NON_EXISTING_ID),
+                NOT_FOUND_USER_FAIL_MSG
+        );
+    }
+
+    @Test
     @DisplayName("Add user")
     public void addUser_addNewUser_userAddedNoExceptions() {
         Assertions.assertDoesNotThrow(

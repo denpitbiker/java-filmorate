@@ -187,6 +187,24 @@ public class UserControllerTest {
     }
 
     @Test
+    @DisplayName("Delete a specific user with valid id")
+    public void delete_user_validId_success200() throws Exception {
+        Long userId = extractUserDto(addUser(TestStubs.VALID_USER_DTO_1.clone())).getId();
+        mvc.perform(delete(UserController.CONTROLLER_ROUTE + UserController.GET_USER_SUBROUTE, userId))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.name").value(TestStubs.VALID_USER_DTO_1.getName()));
+    }
+
+    @Test
+    @DisplayName("Delete a specific user with invalid id")
+    public void delete_user_invalidId_notFound404() throws Exception {
+        addUser(TestStubs.VALID_USER_DTO_1.clone());
+        mvc.perform(delete(UserController.CONTROLLER_ROUTE + UserController.GET_USER_SUBROUTE, TestStubs.NON_EXISTING_ID))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
     @DisplayName("Add new user (valid user)")
     public void post_users_addValidUser_success201WithDto() throws Exception {
         addUser(TestStubs.VALID_USER_DTO_1.clone())

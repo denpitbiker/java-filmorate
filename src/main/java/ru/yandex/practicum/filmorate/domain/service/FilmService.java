@@ -30,6 +30,7 @@ public class FilmService {
     private static final String GET_FILMS_LOG_MSG = "Get all films";
     private static final String ADD_FILM_LOG_MSG = "Add new film {}";
     private static final String UPDATE_FILM_LOG_MSG = "Update film {}";
+    private static final String DELETE_FILM_LOG_MSG = "Delete film with id {}";
     private static final String USER_NOT_FOUND_TRACE_MSG = "Can't find user with id: {}";
     private static final String MPA_NOT_FOUND_TRACE_MSG = "Can't find mpa with id: {}";
     private static final String GENRE_NOT_FOUND_TRACE_MSG = "Can't find genre with id: {}";
@@ -113,6 +114,13 @@ public class FilmService {
         Film film = filmStorage.updateFilm(filmMapper.toData(updatedFilm));
         tryUpdateGenres(film.getId(), updatedFilm);
         return filmMapper.toPresentation(film, getFilmInfo(film));
+    }
+
+    public FilmDto deleteFilm(Long id) {
+        log.info(DELETE_FILM_LOG_MSG, id);
+        Film removed = filmStorage.removeFilm(id);
+        if (removed == null) throw new NotFoundException(FILM_NOT_FOUND_ERR_MSG + id);
+        return filmMapper.toPresentation(removed, getFilmInfo(removed));
     }
 
     private void tryUpdateGenres(Long filmId, FilmDto film) {
