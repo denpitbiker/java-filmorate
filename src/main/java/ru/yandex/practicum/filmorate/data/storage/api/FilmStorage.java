@@ -27,5 +27,5 @@ public interface FilmStorage {
 
     List<Film> getAllFilms();
 
-    List<Film> getTopFilms(Integer limit);
+    List<Film> getPopularFilms(Integer limit, Long genreId, Integer year);
 }

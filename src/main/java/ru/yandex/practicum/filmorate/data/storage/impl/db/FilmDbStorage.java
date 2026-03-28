@@ -27,14 +27,20 @@ public class FilmDbStorage implements FilmStorage {
     private static final String ADD_FILM_QUERY = "INSERT INTO film (name, description, release_date, mpa_id, duration_minutes) VALUES (?, ?, ?, ?, ?)";
     private static final String UPDATE_FILM_QUERY = "UPDATE film SET name = ?, description = ?, release_date = ?, mpa_id = ?, duration_minutes = ? WHERE id = ?";
     private static final String GET_ALL_FILMS_QUERY = "SELECT * FROM film";
-    private static final String GET_FILMS_TOP_QUERY = """
-            SELECT f.id, f.name, f.description, f.release_date, f.mpa_id, f.duration_minutes, COALESCE(fl.likes, 0) AS likes
-            FROM film f
-            LEFT JOIN (
-                SELECT film_id, COUNT(user_id) AS likes
-                FROM film_like
-                GROUP BY film_id
-            ) fl ON f.id = fl.film_id
+    private static final String GET_POPULAR_FILMS_QUERY = """
+            SELECT f.id,
+                   f.name,
+                   f.description,
+                   f.release_date,
+                   f.mpa_id,
+                   f.duration_minutes,
+                   COUNT(DISTINCT fl.user_id) AS likes
+            FROM film AS f
+            LEFT JOIN film_like AS fl ON f.id = fl.film_id
+            LEFT JOIN film_genre AS fg ON f.id = fg.film_id
+            WHERE (? IS NULL OR fg.genre_id = ?)
+              AND (? IS NULL OR EXTRACT(YEAR FROM f.release_date) = ?)
+            GROUP BY f.id, f.name, f.description, f.release_date, f.mpa_id, f.duration_minutes
             ORDER BY likes DESC
             LIMIT ?
             """;
@@ -163,7 +169,13 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     @Override
-    public List<Film> getTopFilms(Integer limit) {
-        return jdbc.query(GET_FILMS_TOP_QUERY, mapper, limit);
+    public List<Film> getPopularFilms(Integer limit, Long genreId, Integer year) {
+        return jdbc.query(
+                GET_POPULAR_FILMS_QUERY,
+                mapper,
+                genreId, genreId,
+                year, year,
+                limit
+        );
     }
 }
