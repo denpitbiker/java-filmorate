@@ -28,16 +28,15 @@ public class FilmDbStorage implements FilmStorage {
     private static final String UPDATE_FILM_QUERY = "UPDATE film SET name = ?, description = ?, release_date = ?, mpa_id = ?, duration_minutes = ? WHERE id = ?";
     private static final String GET_ALL_FILMS_QUERY = "SELECT * FROM film";
     private static final String GET_FILMS_TOP_QUERY = """
-            SELECT id, name, description, release_date, mpa_id, duration_minutes, likes
-            FROM film
-            JOIN (
+            SELECT f.id, f.name, f.description, f.release_date, f.mpa_id, f.duration_minutes, COALESCE(fl.likes, 0) AS likes
+            FROM film f
+            LEFT JOIN (
                 SELECT film_id, COUNT(user_id) AS likes
                 FROM film_like
                 GROUP BY film_id
-                ORDER BY likes DESC
-                LIMIT ?
-            ) AS pf ON film.id = pf.film_id
+            ) fl ON f.id = fl.film_id
             ORDER BY likes DESC
+            LIMIT ?
             """;
     private static final String GET_LIKES_FOR_FILMS_QUERY = """
             SELECT film_id, user_id
