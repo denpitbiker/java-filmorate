@@ -27,7 +27,7 @@ public class FilmService {
     private static final String LIKE_FILM_LOG_MSG = "Is success like film {} by user {}: {}";
     private static final String UNLIKE_FILM_LOG_MSG = "Is success unlike film {} by user {}: {}";
     private static final String GET_TOP_FILMS_LOG_MSG = "Get top {} films";
-    private static final String GET_POPULAR_FILMS_LOG_MSG = "Get popular {} films in genre {} {} year";
+    private static final String GET_POPULAR_FILMS_LOG_MSG = "Get popular {} films in genreId {} {} year";
     private static final String GET_FILMS_LOG_MSG = "Get all films";
     private static final String ADD_FILM_LOG_MSG = "Add new film {}";
     private static final String UPDATE_FILM_LOG_MSG = "Update film {}";

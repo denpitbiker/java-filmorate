@@ -90,7 +90,7 @@ public class FilmDbStorage implements FilmStorage {
                 String.format(GET_LIKES_FOR_FILMS_QUERY, inSql),
                 filmIds.toArray(),
                 (rs, rowNum) ->
-                        new Pair<>(rs.getLong(FILM_ID_COLUMN_LABEL), rs.getLong(USER_ID_COLUMN_LABEL))
+                        new Pair<>(rs.getLong(FILM_ID_COLUMN_LABEL),rs.getLong(USER_ID_COLUMN_LABEL))
         );
         Map<Long, Set<Long>> result = new HashMap<>();
         entries.forEach(entry -> {
