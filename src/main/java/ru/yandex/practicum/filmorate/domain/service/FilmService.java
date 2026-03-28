@@ -27,6 +27,7 @@ public class FilmService {
     private static final String LIKE_FILM_LOG_MSG = "Is success like film {} by user {}: {}";
     private static final String UNLIKE_FILM_LOG_MSG = "Is success unlike film {} by user {}: {}";
     private static final String GET_TOP_FILMS_LOG_MSG = "Get top {} films";
+    private static final String GET_POPULAR_FILMS_LOG_MSG = "Get popular {} films in genre {} {} year";
     private static final String GET_FILMS_LOG_MSG = "Get all films";
     private static final String ADD_FILM_LOG_MSG = "Add new film {}";
     private static final String UPDATE_FILM_LOG_MSG = "Update film {}";
@@ -71,11 +72,21 @@ public class FilmService {
         log.info(UNLIKE_FILM_LOG_MSG, id, userId, isSuccess);
     }
 
-    public Collection<FilmDto> getFilmsTop(Integer count) {
+    public Collection<FilmDto> getFilmsPopulars(Integer count) {
         log.info(GET_TOP_FILMS_LOG_MSG, count);
-        if (count <= 0) throw new ValidationException(FILMS_COUNT_ERR_MSG);
-        List<Film> films = filmStorage.getTopFilms(count);
+        return getFilmsPopulars(count, null, null);
+    }
+
+    public Collection<FilmDto> getFilmsPopulars(Integer count, Long genreId, Integer year) {
+        log.info(GET_POPULAR_FILMS_LOG_MSG, count, genreId, year);
+
+        if (count == null || count <= 0) {
+            throw new ValidationException(FILMS_COUNT_ERR_MSG);
+        }
+
+        List<Film> films = filmStorage.getPopularFilms(count, genreId, year);
         FilmsAdditionalInfo info = getFilmsInfo(films);
+
         return films.stream()
                 .map(film -> filmMapper.toPresentation(film, extractFilmInfo(info, film)))
                 .toList();
@@ -143,6 +154,14 @@ public class FilmService {
     }
 
     private FilmsAdditionalInfo getFilmsInfo(List<Film> films) {
+        if (films.isEmpty()) {
+            return new FilmsAdditionalInfo(
+                    Collections.emptyMap(),
+                    Collections.emptyMap(),
+                    Collections.emptyMap()
+            );
+        }
+
         return new FilmsAdditionalInfo(
                 mpaStorage.getMpasInfo(films.stream().map(Film::getMpaId).collect(Collectors.toSet())),
                 filmStorage.getFilmsLikes(films.stream().map(Film::getId).toList()),

@@ -15,9 +15,12 @@ import ru.yandex.practicum.filmorate.FilmorateApplication;
 import ru.yandex.practicum.filmorate.domain.exception.DuplicatedDataException;
 import ru.yandex.practicum.filmorate.domain.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.presentation.dto.FilmDto;
+import ru.yandex.practicum.filmorate.presentation.dto.GenreDto;
 import ru.yandex.practicum.filmorate.presentation.dto.UserDto;
 
+import java.time.LocalDate;
 import java.util.Collection;
+import java.util.Set;
 
 import static ru.yandex.practicum.filmorate.TestStubs.*;
 
@@ -117,7 +120,7 @@ public class FilmServiceTest {
     public void getFilmsTop_negativeCount_throwsValidationException() {
         Assertions.assertThrows(
                 ValidationException.class,
-                () -> filmService.getFilmsTop(-1),
+                () -> filmService.getFilmsPopulars(-1),
                 "Negative count should throw ValidationException"
         );
     }
@@ -130,16 +133,102 @@ public class FilmServiceTest {
         filmService.likeFilm(film.getId(), user.getId());
         filmService.addFilm(VALID_FILM_DTO_2.clone());
         Assertions.assertDoesNotThrow(
-                () -> filmService.getFilmsTop(TOP_ONE_COUNT),
+                () -> filmService.getFilmsPopulars(TOP_ONE_COUNT),
                 "Top 1 film should be returned without exceptions"
         );
-        Collection<FilmDto> films = filmService.getFilmsTop(TOP_ONE_COUNT);
+        Collection<FilmDto> films = filmService.getFilmsPopulars(TOP_ONE_COUNT);
         Assertions.assertEquals(
                 TOP_ONE_COUNT,
                 films.size(),
                 "Should return the correct number of top films"
         );
         Assertions.assertEquals(films.iterator().next().getId(), film.getId(), "Should return correct film");
+    }
+
+    @Test
+    @DisplayName("Get popular films by genre only")
+    public void getFilmsPopulars_byGenreOnly_returnsOnlyGenreFilms() {
+        FilmDto film1 = VALID_FILM_DTO_1.clone();
+        film1.setGenres(Set.of(genre(1L)));
+
+        FilmDto film2 = VALID_FILM_DTO_2.clone();
+        film2.setGenres(Set.of(genre(2L)));
+
+        FilmDto addedFilm1 = filmService.addFilm(film1);
+        FilmDto addedFilm2 = filmService.addFilm(film2);
+
+        UserDto user1 = userService.addUser(VALID_USER_DTO_1.clone());
+        UserDto user2 = userService.addUser(VALID_USER_DTO_2.clone());
+
+        filmService.likeFilm(addedFilm1.getId(), user1.getId());
+        filmService.likeFilm(addedFilm2.getId(), user2.getId());
+
+        Collection<FilmDto> films = filmService.getFilmsPopulars(10, 1L, null);
+
+        Assertions.assertEquals(1, films.size(), "Should return only one film of requested genre");
+        Assertions.assertEquals(
+                addedFilm1.getId(),
+                films.iterator().next().getId(),
+                "Should return film with requested genre"
+        );
+    }
+
+    @Test
+    @DisplayName("Get popular films by genre and year")
+    public void getFilmsPopulars_byGenreAndYear_returnsOnlyMatchedFilms() {
+        FilmDto film1 = VALID_FILM_DTO_1.clone();
+        film1.setGenres(Set.of(genre(1L)));
+        film1.setReleaseDate(LocalDate.of(2020, 1, 1));
+
+        FilmDto film2 = VALID_FILM_DTO_2.clone();
+        film2.setGenres(Set.of(genre(1L)));
+        film2.setReleaseDate(LocalDate.of(2021, 1, 1));
+
+        FilmDto addedFilm1 = filmService.addFilm(film1);
+        FilmDto addedFilm2 = filmService.addFilm(film2);
+
+        UserDto user1 = userService.addUser(VALID_USER_DTO_1.clone());
+        UserDto user2 = userService.addUser(VALID_USER_DTO_2.clone());
+
+        filmService.likeFilm(addedFilm1.getId(), user1.getId());
+        filmService.likeFilm(addedFilm2.getId(), user2.getId());
+
+        Collection<FilmDto> films = filmService.getFilmsPopulars(10, 1L, 2020);
+
+        Assertions.assertEquals(1, films.size(), "Should return only one film of requested genre and year");
+        Assertions.assertEquals(
+                addedFilm1.getId(),
+                films.iterator().next().getId(),
+                "Should return film with requested genre and year"
+        );
+    }
+
+    @Test
+    @DisplayName("Get popular films by year only")
+    public void getFilmsPopulars_byYearOnly_returnsOnlyYearFilms() {
+        FilmDto film1 = VALID_FILM_DTO_1.clone();
+        film1.setReleaseDate(LocalDate.of(2020, 1, 1));
+
+        FilmDto film2 = VALID_FILM_DTO_2.clone();
+        film2.setReleaseDate(LocalDate.of(2021, 1, 1));
+
+        FilmDto addedFilm1 = filmService.addFilm(film1);
+        FilmDto addedFilm2 = filmService.addFilm(film2);
+
+        UserDto user1 = userService.addUser(VALID_USER_DTO_1.clone());
+        UserDto user2 = userService.addUser(VALID_USER_DTO_2.clone());
+
+        filmService.likeFilm(addedFilm1.getId(), user1.getId());
+        filmService.likeFilm(addedFilm2.getId(), user2.getId());
+
+        Collection<FilmDto> films = filmService.getFilmsPopulars(10, null, 2020);
+
+        Assertions.assertEquals(1, films.size(), "Should return only one film of requested year");
+        Assertions.assertEquals(
+                addedFilm1.getId(),
+                films.iterator().next().getId(),
+                "Should return film with requested year"
+        );
     }
 
     @Test
@@ -217,5 +306,9 @@ public class FilmServiceTest {
                 () -> filmService.updateFilm(VALID_FILM_DTO_1.clone()),
                 NOT_FOUND_FILM_FAIL_MSG
         );
+    }
+
+    private GenreDto genre(Long id) {
+        return new GenreDto(id, "test");
     }
 }
