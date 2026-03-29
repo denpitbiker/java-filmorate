@@ -4,6 +4,7 @@ import ru.yandex.practicum.filmorate.data.model.Film;
 import ru.yandex.practicum.filmorate.data.model.Review;
 import ru.yandex.practicum.filmorate.data.model.User;
 import ru.yandex.practicum.filmorate.presentation.dto.FilmDto;
+import ru.yandex.practicum.filmorate.presentation.dto.GenreDto;
 import ru.yandex.practicum.filmorate.presentation.dto.MpaDto;
 import ru.yandex.practicum.filmorate.presentation.dto.ReviewDto;
 import ru.yandex.practicum.filmorate.presentation.dto.UserDto;
@@ -116,4 +117,7 @@ public class TestStubs {
     public static final ReviewDto INVALID_REVIEW_DTO_NULL_FILM_ID = new ReviewDto(1L,"Nice film!",true,1L,null,10);
 
     public static final Review VALID_REVIEW = new Review(null, "dfsfsdfsd", true, 1L, 1L, 10);
+    public static GenreDto genre(Long id) {
+        return new GenreDto(id, "test");
+    }
 }

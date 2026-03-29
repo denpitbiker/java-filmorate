@@ -18,6 +18,8 @@ public class FilmController {
     private static final String ID_PATH_VAR = "id";
     private static final String USER_ID_PATH_VAR = "userId";
     public static final String COUNT_PARAM = "count";
+    public static final String GENRE_PARAM = "genreId";
+    public static final String YEAR_PARAM = "year";
 
     public static final String CONTROLLER_ROUTE = "/films";
     public static final String GET_FILM_SUBROUTE = "/{" + ID_PATH_VAR + "}";
@@ -25,6 +27,7 @@ public class FilmController {
     public static final String LIKE_FILM_SUBROUTE = "/{" + ID_PATH_VAR + "}/like/{" + USER_ID_PATH_VAR + "}";
     public static final String UNLIKE_FILM_SUBROUTE = "/{" + ID_PATH_VAR + "}/like/{" + USER_ID_PATH_VAR + "}";
     public static final String GET_TOP_FILMS_SUBROUTE = "/popular";
+
 
     private static final String DEFAULT_TOP_FILMS_RETURN_COUNT = "10";
 
@@ -51,12 +54,15 @@ public class FilmController {
         filmService.unlikeFilm(id, userId);
     }
 
+
     @GetMapping(GET_TOP_FILMS_SUBROUTE)
-    public Collection<FilmDto> getFilmsTop(
-            @RequestParam(value = COUNT_PARAM, defaultValue = DEFAULT_TOP_FILMS_RETURN_COUNT) Integer count
+    public Collection<FilmDto> getPopularFilms(
+            @RequestParam(value = COUNT_PARAM, defaultValue = DEFAULT_TOP_FILMS_RETURN_COUNT) Integer count,
+            @RequestParam(value = GENRE_PARAM, required = false) Long genreId,
+            @RequestParam(value = YEAR_PARAM, required = false) Integer year
     ) {
         log.info(GET_TOP_FILMS_LOG_MSG, count);
-        return filmService.getFilmsTop(count);
+        return filmService.getFilmsPopulars(count, genreId, year);
     }
 
     @GetMapping(GET_FILM_SUBROUTE)

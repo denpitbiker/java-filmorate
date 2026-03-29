@@ -27,17 +27,40 @@ public class FilmDbStorage implements FilmStorage {
     private static final String ADD_FILM_QUERY = "INSERT INTO film (name, description, release_date, mpa_id, duration_minutes) VALUES (?, ?, ?, ?, ?)";
     private static final String UPDATE_FILM_QUERY = "UPDATE film SET name = ?, description = ?, release_date = ?, mpa_id = ?, duration_minutes = ? WHERE id = ?";
     private static final String GET_ALL_FILMS_QUERY = "SELECT * FROM film";
-    private static final String GET_FILMS_TOP_QUERY = """
-            SELECT f.id, f.name, f.description, f.release_date, f.mpa_id, f.duration_minutes, COALESCE(fl.likes, 0) AS likes
-            FROM film f
-            LEFT JOIN (
-                SELECT film_id, COUNT(user_id) AS likes
-                FROM film_like
-                GROUP BY film_id
-            ) fl ON f.id = fl.film_id
-            ORDER BY likes DESC
-            LIMIT ?
-            """;
+    private static final String GET_POPULAR_FILMS_QUERY = """
+        SELECT ff.id,
+               ff.name,
+               ff.description,
+               ff.release_date,
+               ff.mpa_id,
+               ff.duration_minutes,
+               COALESCE(l.likes, 0) AS likes
+        FROM (
+            SELECT f.id,
+                   f.name,
+                   f.description,
+                   f.release_date,
+                   f.mpa_id,
+                   f.duration_minutes
+            FROM film AS f
+            WHERE (? IS NULL OR EXTRACT(YEAR FROM f.release_date) = ?)
+              AND (
+                  ? IS NULL OR EXISTS (
+                      SELECT 1
+                      FROM film_genre fg
+                      WHERE fg.film_id = f.id
+                        AND fg.genre_id = ?
+                  )
+              )
+        ) AS ff
+        LEFT JOIN (
+            SELECT film_id, COUNT(user_id) AS likes
+            FROM film_like
+            GROUP BY film_id
+        ) AS l ON ff.id = l.film_id
+        ORDER BY likes DESC
+        LIMIT ?
+        """;
     private static final String GET_LIKES_FOR_FILMS_QUERY = """
             SELECT film_id, user_id
             FROM film_like WHERE film_id IN (%s)
@@ -163,7 +186,13 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     @Override
-    public List<Film> getTopFilms(Integer limit) {
-        return jdbc.query(GET_FILMS_TOP_QUERY, mapper, limit);
+    public List<Film> getPopularFilms(Integer limit, Long genreId, Integer year) {
+        return jdbc.query(
+                GET_POPULAR_FILMS_QUERY,
+                mapper,
+                year, year,
+                genreId, genreId,
+                limit
+        );
     }
 }
