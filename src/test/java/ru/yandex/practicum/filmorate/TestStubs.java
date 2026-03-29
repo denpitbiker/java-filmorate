@@ -109,14 +109,15 @@ public class TestStubs {
     public static final UserDto INVALID_USER_DTO_FUTURE_BIRTHDAY = new UserDto(null, VALID_EMAIL_1, VALID_LOGIN_1, VALID_USER_NAME_1, INVALID_FUTURE_BIRTHDAY);
 
     public static final ReviewDto VALID_REVIEW_DTO = new ReviewDto(null, "Great movie!", true, 1L, 1L, 10);
-    public static final ReviewDto INVALID_REVIEW_DTO_NULL_CONTENT = new ReviewDto(1L,null,true,1L,1L,10);
-    public static final ReviewDto INVALID_REVIEW_DTO_BLANK_CONTENT = new ReviewDto(1L,"   ",true,1L,1L,10);
-    public static final ReviewDto INVALID_REVIEW_DTO_TOO_LONG_CONTENT = new ReviewDto(1L,"a".repeat(2001),true,1L,1L,10);
-    public static final ReviewDto INVALID_REVIEW_DTO_NULL_IS_POSITIVE = new ReviewDto(1L,"Nice film!",null,1L,1L,10);
-    public static final ReviewDto INVALID_REVIEW_DTO_NULL_USER_ID = new ReviewDto(1L,"Nice film!",true,null,1L,10);
-    public static final ReviewDto INVALID_REVIEW_DTO_NULL_FILM_ID = new ReviewDto(1L,"Nice film!",true,1L,null,10);
+    public static final ReviewDto INVALID_REVIEW_DTO_NULL_CONTENT = new ReviewDto(1L, null, true, 1L, 1L, 10);
+    public static final ReviewDto INVALID_REVIEW_DTO_BLANK_CONTENT = new ReviewDto(1L, "   ", true, 1L, 1L, 10);
+    public static final ReviewDto INVALID_REVIEW_DTO_TOO_LONG_CONTENT = new ReviewDto(1L, "a".repeat(2001), true, 1L, 1L, 10);
+    public static final ReviewDto INVALID_REVIEW_DTO_NULL_IS_POSITIVE = new ReviewDto(1L, "Nice film!", null, 1L, 1L, 10);
+    public static final ReviewDto INVALID_REVIEW_DTO_NULL_USER_ID = new ReviewDto(1L, "Nice film!", true, null, 1L, 10);
+    public static final ReviewDto INVALID_REVIEW_DTO_NULL_FILM_ID = new ReviewDto(1L, "Nice film!", true, 1L, null, 10);
 
     public static final Review VALID_REVIEW = new Review(null, "dfsfsdfsd", true, 1L, 1L, 10);
+
     public static GenreDto genre(Long id) {
         return new GenreDto(id, "test");
     }
