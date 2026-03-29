@@ -68,3 +68,13 @@ CREATE TABLE IF NOT EXISTS user_friend (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (friend_id) REFERENCES users(id) ON DELETE CASCADE
 );
+
+CREATE TABLE IF NOT EXISTS events (
+    event_id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    user_id BIGINT,
+    entity_id BIGINT,
+    event_type INT,
+    operation INT,
+    timestamp TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);

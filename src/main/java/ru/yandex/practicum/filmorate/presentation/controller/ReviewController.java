@@ -1,14 +1,17 @@
 package ru.yandex.practicum.filmorate.presentation.controller;
 
+import java.util.Collection;
+
 import jakarta.validation.Valid;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+
+import ru.yandex.practicum.filmorate.domain.service.EventService;
 import ru.yandex.practicum.filmorate.domain.service.ReviewService;
 import ru.yandex.practicum.filmorate.presentation.dto.ReviewDto;
-
-import java.util.Collection;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -42,24 +45,31 @@ public class ReviewController {
     private static final String UPDATE_REVIEW_LOG_MSG = "Update review request {}";
 
     private final ReviewService reviewService;
+    private final EventService eventService;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public ReviewDto createReview(@Valid @RequestBody ReviewDto newReview) {
         log.info(ADD_REVIEW_LOG_MSG, newReview);
-        return reviewService.addReview(newReview);
+        ReviewDto review = reviewService.addReview(newReview);
+        eventService.createAddReviewEvent(review.getUserId(), review.getId());
+        return review;
     }
 
     @PutMapping
     public ReviewDto updateReview(@Valid @RequestBody ReviewDto updatedReview) {
         log.info(UPDATE_REVIEW_LOG_MSG, updatedReview);
-        return reviewService.updateReview(updatedReview);
+        ReviewDto review = reviewService.updateReview(updatedReview);
+        eventService.createUpdateReviewEvent(review.getUserId(), review.getId());
+        return review;
     }
 
     @DeleteMapping(DELETE_REVIEW_SUBROUTE)
     public ReviewDto deleteReview(@PathVariable(REVIEW_ID_PATH_VAR) Long id) {
         log.info(DELETE_REVIEW_LOG_MSG, id);
-        return reviewService.deleteReview(id);
+        ReviewDto review = reviewService.deleteReview(id);
+        eventService.createRemoveReviewEvent(review.getUserId(), review.getId());
+        return review;
     }
 
     @GetMapping(GET_REVIEW_SUBROUTE)

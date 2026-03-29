@@ -1,14 +1,16 @@
 package ru.yandex.practicum.filmorate.presentation.controller;
 
+import java.util.Collection;
+
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+
+import ru.yandex.practicum.filmorate.domain.service.EventService;
 import ru.yandex.practicum.filmorate.domain.service.FilmService;
 import ru.yandex.practicum.filmorate.presentation.dto.FilmDto;
-
-import java.util.Collection;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -41,17 +43,20 @@ public class FilmController {
     private static final String DELETE_FILM_LOG_MSG = "Delete film with id {} request";
 
     private final FilmService filmService;
+    private final EventService eventService;
 
     @PutMapping(LIKE_FILM_SUBROUTE)
     public void likeFilm(@PathVariable(ID_PATH_VAR) Long id, @PathVariable(USER_ID_PATH_VAR) Long userId) {
         log.info(LIKE_FILM_LOG_MSG, id, userId);
         filmService.likeFilm(id, userId);
+        eventService.createLikeFilmEvent(userId, id);
     }
 
     @DeleteMapping(UNLIKE_FILM_SUBROUTE)
     public void unlikeFilm(@PathVariable(ID_PATH_VAR) Long id, @PathVariable(USER_ID_PATH_VAR) Long userId) {
         log.info(UNLIKE_FILM_LOG_MSG, id, userId);
         filmService.unlikeFilm(id, userId);
+        eventService.createUnlikeFilmEvent(userId, id);
     }
 
 
