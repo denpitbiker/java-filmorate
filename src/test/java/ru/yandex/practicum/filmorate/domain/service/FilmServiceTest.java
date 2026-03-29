@@ -15,7 +15,6 @@ import ru.yandex.practicum.filmorate.FilmorateApplication;
 import ru.yandex.practicum.filmorate.domain.exception.DuplicatedDataException;
 import ru.yandex.practicum.filmorate.domain.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.presentation.dto.FilmDto;
-import ru.yandex.practicum.filmorate.presentation.dto.GenreDto;
 import ru.yandex.practicum.filmorate.presentation.dto.UserDto;
 
 import java.time.LocalDate;
@@ -120,7 +119,7 @@ public class FilmServiceTest {
     public void getFilmsTop_negativeCount_throwsValidationException() {
         Assertions.assertThrows(
                 ValidationException.class,
-                () -> filmService.getFilmsPopulars(-1),
+                () -> filmService.getFilmsPopulars(-1, null, null),
                 "Negative count should throw ValidationException"
         );
     }
@@ -133,10 +132,10 @@ public class FilmServiceTest {
         filmService.likeFilm(film.getId(), user.getId());
         filmService.addFilm(VALID_FILM_DTO_2.clone());
         Assertions.assertDoesNotThrow(
-                () -> filmService.getFilmsPopulars(TOP_ONE_COUNT),
+                () -> filmService.getFilmsPopulars(TOP_ONE_COUNT, null, null),
                 "Top 1 film should be returned without exceptions"
         );
-        Collection<FilmDto> films = filmService.getFilmsPopulars(TOP_ONE_COUNT);
+        Collection<FilmDto> films = filmService.getFilmsPopulars(TOP_ONE_COUNT, null, null);
         Assertions.assertEquals(
                 TOP_ONE_COUNT,
                 films.size(),
@@ -328,7 +327,5 @@ public class FilmServiceTest {
         );
     }
 
-    private GenreDto genre(Long id) {
-        return new GenreDto(id, "test");
-    }
+
 }

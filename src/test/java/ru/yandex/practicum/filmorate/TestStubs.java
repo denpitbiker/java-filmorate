@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate;
 import ru.yandex.practicum.filmorate.data.model.Film;
 import ru.yandex.practicum.filmorate.data.model.User;
 import ru.yandex.practicum.filmorate.presentation.dto.FilmDto;
+import ru.yandex.practicum.filmorate.presentation.dto.GenreDto;
 import ru.yandex.practicum.filmorate.presentation.dto.MpaDto;
 import ru.yandex.practicum.filmorate.presentation.dto.UserDto;
 
@@ -104,4 +105,8 @@ public class TestStubs {
     public static final UserDto INVALID_USER_DTO_EMAIL_EMPTY_AFTER_AT = new UserDto(null, INVALID_EMAIL_EMPTY_AFTER_AT, VALID_LOGIN_1, VALID_USER_NAME_1, VALID_BIRTHDAY_1);
     public static final UserDto INVALID_USER_DTO_INVALID_EMAIL = new UserDto(null, INVALID_EMAIL, VALID_LOGIN_1, VALID_USER_NAME_1, VALID_BIRTHDAY_1);
     public static final UserDto INVALID_USER_DTO_FUTURE_BIRTHDAY = new UserDto(null, VALID_EMAIL_1, VALID_LOGIN_1, VALID_USER_NAME_1, INVALID_FUTURE_BIRTHDAY);
+
+    public static GenreDto genre(Long id) {
+        return new GenreDto(id, "test");
+    }
 }
