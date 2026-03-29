@@ -26,6 +26,25 @@ CREATE TABLE IF NOT EXISTS film (
     FOREIGN KEY (mpa_id) REFERENCES mpa(id)
 );
 
+CREATE TABLE IF NOT EXISTS review (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    content VARCHAR(2000) NOT NULL,
+    is_positive BOOLEAN NOT NULL,
+    user_id BIGINT,
+    film_id BIGINT,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (film_id) REFERENCES film(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS review_rate (
+    review_id BIGINT,
+    user_id BIGINT,
+    is_useful BOOLEAN,
+    PRIMARY KEY (review_id, user_id),
+    FOREIGN KEY (review_id) REFERENCES review(id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
 CREATE TABLE IF NOT EXISTS film_like (
     film_id BIGINT,
     user_id BIGINT,
