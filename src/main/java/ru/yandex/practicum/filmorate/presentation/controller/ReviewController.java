@@ -94,8 +94,8 @@ public class ReviewController {
 
     @GetMapping
     public Collection<ReviewDto> getAllReviews(
-            @RequestParam(value = FILM_ID_PARAM, required = false) Long filmId,
-            @RequestParam(value = COUNT_PARAM, defaultValue = DEFAULT_REVIEWS_RETURN_COUNT) Integer count
+            @RequestParam(value = COUNT_PARAM, defaultValue = DEFAULT_REVIEWS_RETURN_COUNT) Integer count,
+            @RequestParam(value = FILM_ID_PARAM, required = false) Long filmId
     ) {
         log.info(GET_REVIEWS_LOG_MSG, filmId, count);
         return reviewService.getAllReviews(filmId, count);

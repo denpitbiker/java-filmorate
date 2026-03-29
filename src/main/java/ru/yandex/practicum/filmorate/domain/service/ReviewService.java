@@ -57,8 +57,10 @@ public class ReviewService {
         boolean isSuccess;
         if (checkDislikeExist(id, userId)) {
             isSuccess = reviewStorage.updateRate(id, userId, true);
-        } else {
+        } else if (!checkLikeExist(id, userId)) {
             isSuccess = reviewStorage.addRate(id, userId, true);
+        } else {
+            isSuccess = false;
         }
         log.info(ADDED_LIKE_LOG_MSG, id, userId, isSuccess);
     }
@@ -70,8 +72,10 @@ public class ReviewService {
         boolean isSuccess;
         if (checkLikeExist(id, userId)) {
             isSuccess = reviewStorage.updateRate(id, userId, false);
-        } else {
+        } else if (!checkDislikeExist(id, userId)) {
             isSuccess = reviewStorage.addRate(id, userId, false);
+        } else {
+            isSuccess = false;
         }
         log.info(ADDED_DISLIKE_LOG_MSG, id, userId, isSuccess);
     }
@@ -94,7 +98,6 @@ public class ReviewService {
 
     public Collection<ReviewDto> getAllReviews(Long filmId, Integer count) {
         log.info(GET_REVIEWS_LOG_MSG, filmId, count);
-        checkFilmIdExist(filmId);
         if (count <= 0) throw new ValidationException(REVIEWS_COUNT_ERR_MSG);
         return reviewStorage.getAllReviews(filmId, count).stream()
                 .map(reviewMapper::toPresentation)

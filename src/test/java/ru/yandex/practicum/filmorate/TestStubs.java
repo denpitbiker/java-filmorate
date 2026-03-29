@@ -1,9 +1,11 @@
 package ru.yandex.practicum.filmorate;
 
 import ru.yandex.practicum.filmorate.data.model.Film;
+import ru.yandex.practicum.filmorate.data.model.Review;
 import ru.yandex.practicum.filmorate.data.model.User;
 import ru.yandex.practicum.filmorate.presentation.dto.FilmDto;
 import ru.yandex.practicum.filmorate.presentation.dto.MpaDto;
+import ru.yandex.practicum.filmorate.presentation.dto.ReviewDto;
 import ru.yandex.practicum.filmorate.presentation.dto.UserDto;
 
 import java.time.LocalDate;
@@ -104,4 +106,14 @@ public class TestStubs {
     public static final UserDto INVALID_USER_DTO_EMAIL_EMPTY_AFTER_AT = new UserDto(null, INVALID_EMAIL_EMPTY_AFTER_AT, VALID_LOGIN_1, VALID_USER_NAME_1, VALID_BIRTHDAY_1);
     public static final UserDto INVALID_USER_DTO_INVALID_EMAIL = new UserDto(null, INVALID_EMAIL, VALID_LOGIN_1, VALID_USER_NAME_1, VALID_BIRTHDAY_1);
     public static final UserDto INVALID_USER_DTO_FUTURE_BIRTHDAY = new UserDto(null, VALID_EMAIL_1, VALID_LOGIN_1, VALID_USER_NAME_1, INVALID_FUTURE_BIRTHDAY);
+
+    public static final ReviewDto VALID_REVIEW_DTO = new ReviewDto(null, "Great movie!", true, 1L, 1L, 10);
+    public static final ReviewDto INVALID_REVIEW_DTO_NULL_CONTENT = new ReviewDto(1L,null,true,1L,1L,10);
+    public static final ReviewDto INVALID_REVIEW_DTO_BLANK_CONTENT = new ReviewDto(1L,"   ",true,1L,1L,10);
+    public static final ReviewDto INVALID_REVIEW_DTO_TOO_LONG_CONTENT = new ReviewDto(1L,"a".repeat(2001),true,1L,1L,10);
+    public static final ReviewDto INVALID_REVIEW_DTO_NULL_IS_POSITIVE = new ReviewDto(1L,"Nice film!",null,1L,1L,10);
+    public static final ReviewDto INVALID_REVIEW_DTO_NULL_USER_ID = new ReviewDto(1L,"Nice film!",true,null,1L,10);
+    public static final ReviewDto INVALID_REVIEW_DTO_NULL_FILM_ID = new ReviewDto(1L,"Nice film!",true,1L,null,10);
+
+    public static final Review VALID_REVIEW = new Review(null, "dfsfsdfsd", true, 1L, 1L, 10);
 }
