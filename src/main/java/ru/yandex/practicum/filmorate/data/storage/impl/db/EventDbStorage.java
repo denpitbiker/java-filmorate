@@ -78,6 +78,7 @@ public class EventDbStorage implements EventStorage {
 
         Long eventId = keyHolder.getKey().longValue();
         event.setEventId(eventId);
+
         return event;
     }
 
