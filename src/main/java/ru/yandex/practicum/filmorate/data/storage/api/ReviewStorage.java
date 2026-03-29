@@ -9,7 +9,11 @@ public interface ReviewStorage {
 
     boolean hasReviewId(Long id);
 
+    boolean hasRate(Long reviewId, Long userId, Boolean isPositive);
+
     boolean addRate(Long reviewId, Long userId, Boolean isPositive);
+
+    boolean updateRate(Long reviewId, Long userId, Boolean isUseful);
 
     boolean removeRate(Long reviewId, Long userId, Boolean isPositive);
 

@@ -23,6 +23,8 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class ReviewDbStorage implements ReviewStorage {
     private static final String ADD_RATE_QUERY = "INSERT INTO review_rate (review_id, user_id, is_useful) VALUES (?, ?, ?)";
+    private static final String UPDATE_RATE_QUERY = "UPDATE review_rate SET is_useful = ? WHERE review_id = ? AND user_id = ?";
+    private static final String GET_RATE_QUERY = "SELECT * FROM review_rate WHERE review_id = ? AND user_id = ? AND is_useful = ?";
     private static final String DELETE_RATE_QUERY = "DELETE FROM review_rate WHERE review_id = ? AND user_id = ? AND is_useful = ?";
     private static final String ADD_REVIEW_QUERY = "INSERT INTO review (content, is_positive, user_id, film_id) VALUES (?, ?, ?, ?)";
     private static final String UPDATE_REVIEW_QUERY = "UPDATE review SET content = ?, is_positive = ?, user_id = ?, film_id = ? WHERE id = ?";
@@ -33,7 +35,7 @@ public class ReviewDbStorage implements ReviewStorage {
             FROM review AS r
             LEFT JOIN (
                 SELECT
-                    film_id,
+                    review_id,
                     SUM(
                       CASE
                         WHEN is_useful = true THEN 1
@@ -42,15 +44,16 @@ public class ReviewDbStorage implements ReviewStorage {
                     ) AS rate
                 FROM review_rate
                 WHERE review_id = ?
+                GROUP BY review_id
             ) rr ON r.id = rr.review_id
-            WHERE r.review_id = ?
+            WHERE r.id = ?
             """;
     private static final String GET_ALL_REVIEWS_QUERY = """
             SELECT r.id AS id, r.content AS content, r.is_positive AS is_positive, r.user_id AS user_id, r.film_id AS film_id, COALESCE(rr.rate, 0) AS rate
             FROM review AS r
             LEFT JOIN (
                 SELECT
-                    film_id,
+                    review_id,
                     SUM(
                       CASE
                         WHEN is_useful = true THEN 1
@@ -58,6 +61,7 @@ public class ReviewDbStorage implements ReviewStorage {
                       END
                     ) AS rate
                 FROM review_rate
+                GROUP BY review_id
             ) rr ON r.id = rr.review_id
             WHERE ? IS NULL OR r.film_id = ?
             ORDER BY rate DESC
@@ -76,12 +80,24 @@ public class ReviewDbStorage implements ReviewStorage {
     @Override
     public boolean hasReviewId(Long id) {
         if (id == null) return false;
-        return !jdbc.queryForList(GET_REVIEW_QUERY, id).isEmpty();
+        return !jdbc.queryForList(GET_REVIEW_QUERY, id, id).isEmpty();
+    }
+
+    @Override
+    public boolean hasRate(Long reviewId, Long userId, Boolean isPositive) {
+        if (reviewId == null || userId == null) return false;
+        return !jdbc.queryForList(GET_RATE_QUERY, reviewId, userId, isPositive).isEmpty();
     }
 
     @Override
     public boolean addRate(Long reviewId, Long userId, Boolean isUseful) {
         int rowsAffected = jdbc.update(ADD_RATE_QUERY, reviewId, userId, isUseful);
+        return rowsAffected > 0;
+    }
+
+    @Override
+    public boolean updateRate(Long reviewId, Long userId, Boolean isUseful) {
+        int rowsAffected = jdbc.update(UPDATE_RATE_QUERY, isUseful, reviewId, userId);
         return rowsAffected > 0;
     }
 
@@ -106,6 +122,7 @@ public class ReviewDbStorage implements ReviewStorage {
         if (keyHolder.getKey() == null) return null;
         long userId = keyHolder.getKey().longValue();
         newReview.setId(userId);
+        newReview.setUseful(0);
         return newReview;
     }
 
@@ -135,7 +152,7 @@ public class ReviewDbStorage implements ReviewStorage {
             ps.setLong(5, userId);
             return ps;
         });
-        return updatedReview;
+        return jdbc.queryForObject(GET_REVIEW_QUERY, mapper, updatedReview.getId(), updatedReview.getId());
     }
 
     @Override

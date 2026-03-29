@@ -54,7 +54,12 @@ public class ReviewService {
         log.info(ADD_LIKE_LOG_MSG, userId, id);
         checkReviewIdExist(id);
         checkUserIdExist(userId);
-        boolean isSuccess = reviewStorage.addRate(id, userId, true);
+        boolean isSuccess;
+        if (checkDislikeExist(id, userId)) {
+            isSuccess = reviewStorage.updateRate(id, userId, true);
+        } else {
+            isSuccess = reviewStorage.addRate(id, userId, true);
+        }
         log.info(ADDED_LIKE_LOG_MSG, id, userId, isSuccess);
     }
 
@@ -62,7 +67,12 @@ public class ReviewService {
         log.info(ADD_DISLIKE_LOG_MSG, userId, id);
         checkReviewIdExist(id);
         checkUserIdExist(userId);
-        boolean isSuccess = reviewStorage.addRate(id, userId, false);
+        boolean isSuccess;
+        if (checkLikeExist(id, userId)) {
+            isSuccess = reviewStorage.updateRate(id, userId, false);
+        } else {
+            isSuccess = reviewStorage.addRate(id, userId, false);
+        }
         log.info(ADDED_DISLIKE_LOG_MSG, id, userId, isSuccess);
     }
 
@@ -106,12 +116,16 @@ public class ReviewService {
     public ReviewDto addReview(ReviewDto newReview) {
         log.info(ADD_REVIEW_LOG_MSG, newReview);
         checkReviewIdNotExist(newReview.getId());
+        checkFilmIdExist(newReview.getFilmId());
+        checkUserIdExist(newReview.getUserId());
         return reviewMapper.toPresentation(reviewStorage.addReview(reviewMapper.toData(newReview)));
     }
 
     public ReviewDto updateReview(ReviewDto updatedReview) {
         log.info(UPDATE_REVIEW_LOG_MSG, updatedReview);
         checkReviewIdExist(updatedReview.getId());
+        checkFilmIdExist(updatedReview.getFilmId());
+        checkUserIdExist(updatedReview.getUserId());
         return reviewMapper.toPresentation(reviewStorage.updateReview(reviewMapper.toData(updatedReview)));
     }
 
@@ -122,6 +136,14 @@ public class ReviewService {
 
     private ReviewDto getReviewDtoOrThrow(Long id) {
         return reviewMapper.toPresentation(getReviewOrThrow(id));
+    }
+
+    private boolean checkLikeExist(Long reviewId, Long userId) {
+        return reviewStorage.hasRate(reviewId, userId, true);
+    }
+
+    private boolean checkDislikeExist(Long reviewId, Long userId) {
+        return reviewStorage.hasRate(reviewId, userId, false);
     }
 
     private void checkUserIdExist(Long id) {
