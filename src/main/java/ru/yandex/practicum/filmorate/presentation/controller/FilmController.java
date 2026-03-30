@@ -19,9 +19,11 @@ import ru.yandex.practicum.filmorate.presentation.dto.FilmDto;
 public class FilmController {
     private static final String ID_PATH_VAR = "id";
     private static final String USER_ID_PATH_VAR = "userId";
+    public static final String DIRECTOR_ID_VAR = "directorId";
     public static final String COUNT_PARAM = "count";
     public static final String GENRE_PARAM = "genreId";
     public static final String YEAR_PARAM = "year";
+    public static final String SORT_BY_PARAM = "sortBy";
 
     public static final String CONTROLLER_ROUTE = "/films";
     public static final String GET_FILM_SUBROUTE = "/{" + ID_PATH_VAR + "}";
@@ -29,6 +31,7 @@ public class FilmController {
     public static final String LIKE_FILM_SUBROUTE = "/{" + ID_PATH_VAR + "}/like/{" + USER_ID_PATH_VAR + "}";
     public static final String UNLIKE_FILM_SUBROUTE = "/{" + ID_PATH_VAR + "}/like/{" + USER_ID_PATH_VAR + "}";
     public static final String GET_TOP_FILMS_SUBROUTE = "/popular";
+    public static final String GET_DIRECTOR_FILMS_SUBROUTE = "/director/{" + DIRECTOR_ID_VAR + "}";
 
 
     private static final String DEFAULT_TOP_FILMS_RETURN_COUNT = "10";
@@ -41,6 +44,7 @@ public class FilmController {
     private static final String ADD_FILM_LOG_MSG = "Add new film request {}";
     private static final String UPDATE_FILM_LOG_MSG = "Update film request {}";
     private static final String DELETE_FILM_LOG_MSG = "Delete film with id {} request";
+    private static final String GET_DIRECTOR_FILMS_MSG = "Get films of director with id {}";
 
     private final FilmService filmService;
     private final EventService eventService;
@@ -80,6 +84,15 @@ public class FilmController {
     public Collection<FilmDto> getAllFilms() {
         log.info(GET_FILMS_LOG_MSG);
         return filmService.getAllFilms();
+    }
+
+    @GetMapping(GET_DIRECTOR_FILMS_SUBROUTE)
+    public Collection<FilmDto> getDirectorFilms(
+            @PathVariable(DIRECTOR_ID_VAR) Long id,
+            @RequestParam(value = SORT_BY_PARAM, defaultValue = "year") String sortBy
+    ) {
+        log.info(GET_DIRECTOR_FILMS_MSG, id);
+        return filmService.getDirectorFilms(id, sortBy);
     }
 
     @PostMapping

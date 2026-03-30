@@ -66,6 +66,10 @@ public class FilmDbStorage implements FilmStorage {
             FROM film_like WHERE film_id IN (%s)
             """;
     private static final String DELETE_FILM_QUERY = "DELETE FROM film WHERE id=?";
+//    private static final String GET_DIRECTOR_FILMS_QUERY = """
+//            SELECT * FROM film
+//            WHERE
+//            """
 
     private static final String ID_COLUMN_LABEL = "id";
     private static final String FILM_ID_COLUMN_LABEL = "film_id";
@@ -194,5 +198,10 @@ public class FilmDbStorage implements FilmStorage {
                 genreId, genreId,
                 limit
         );
+    }
+
+    @Override
+    public List<Film> getDirectorFilms(Long id, String sortBy) {
+        return null;
     }
 }

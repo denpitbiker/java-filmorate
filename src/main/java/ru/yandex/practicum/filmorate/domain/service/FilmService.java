@@ -36,6 +36,7 @@ public class FilmService {
     private static final String GENRE_NOT_FOUND_TRACE_MSG = "Can't find genre with id: {}";
     private static final String DUPLICATE_FILM_FOUND_TRACE_MSG = "Already have film with id: {}";
     private static final String FILM_NOT_FOUND_TRACE_MSG = "Can't find film with id: {}";
+    private static final String GET_DIRECTOR_FILMS_MSG = "Get films of director with id: {}";
 
     private static final String GENRE_NOT_FOUND_ERR_MSG = "Can't find genre with id = ";
     private static final String MPA_NOT_FOUND_ERR_MSG = "Can't find mpa with id = ";
@@ -126,6 +127,11 @@ public class FilmService {
         Film removed = filmStorage.removeFilm(id);
         if (removed == null) throw new NotFoundException(FILM_NOT_FOUND_ERR_MSG + id);
         return filmMapper.toPresentation(removed, getFilmInfo(removed));
+    }
+
+    public Collection<FilmDto> getDirectorFilms(Long id, String sortBy) {
+        log.info(GET_DIRECTOR_FILMS_MSG, id);
+        List<Film> films = filmStorage.getDirectorFilms(id, sortBy);
     }
 
     private void tryUpdateGenres(Long filmId, FilmDto film) {
