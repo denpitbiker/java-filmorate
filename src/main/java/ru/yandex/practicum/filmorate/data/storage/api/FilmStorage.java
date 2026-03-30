@@ -28,4 +28,6 @@ public interface FilmStorage {
     List<Film> getAllFilms();
 
     List<Film> getPopularFilms(Integer limit, Long genreId, Integer year);
+
+    List<Film> getDirectorFilms(Long id, String sortBy);
 }
