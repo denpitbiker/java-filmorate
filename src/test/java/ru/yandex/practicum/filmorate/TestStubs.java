@@ -1,16 +1,20 @@
 package ru.yandex.practicum.filmorate;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.LinkedHashSet;
+
+import ru.yandex.practicum.filmorate.data.model.Event;
 import ru.yandex.practicum.filmorate.data.model.Film;
 import ru.yandex.practicum.filmorate.data.model.Review;
 import ru.yandex.practicum.filmorate.data.model.User;
+import ru.yandex.practicum.filmorate.data.model.enums.EventOperation;
+import ru.yandex.practicum.filmorate.data.model.enums.EventType;
 import ru.yandex.practicum.filmorate.presentation.dto.FilmDto;
 import ru.yandex.practicum.filmorate.presentation.dto.GenreDto;
 import ru.yandex.practicum.filmorate.presentation.dto.MpaDto;
 import ru.yandex.practicum.filmorate.presentation.dto.ReviewDto;
 import ru.yandex.practicum.filmorate.presentation.dto.UserDto;
-
-import java.time.LocalDate;
-import java.util.LinkedHashSet;
 
 public class TestStubs {
     public static final int EXPECTED_REPOSITORY_SIZE_TWO = 2;
@@ -117,6 +121,9 @@ public class TestStubs {
     public static final ReviewDto INVALID_REVIEW_DTO_NULL_FILM_ID = new ReviewDto(1L, "Nice film!", true, 1L, null, 10);
 
     public static final Review VALID_REVIEW = new Review(null, "dfsfsdfsd", true, 1L, 1L, 10);
+
+    public static final Event VALID_EVENT_ADD_FRIEND = new Event(null, 1L, 2L, EventType.FRIEND, EventOperation.ADD, LocalDateTime.now());
+    public static final Event VALID_EVENT_LIKE_FILM = new Event(null, 1L, 1L, EventType.LIKE, EventOperation.ADD, LocalDateTime.now());
 
     public static GenreDto genre(Long id) {
         return new GenreDto(id, "test");
