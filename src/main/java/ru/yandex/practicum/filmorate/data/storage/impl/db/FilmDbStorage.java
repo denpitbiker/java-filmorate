@@ -70,6 +70,13 @@ public class FilmDbStorage implements FilmStorage {
 //            SELECT * FROM film
 //            WHERE
 //            """
+    private static final String GET_DIRECTOR_FILMS_QUERY = """
+        SELECT f.id AS id, f.name AS name, f.description AS description, m.name AS mpa, f.duration_minutes AS duration_minutes
+        FROM film_director AS fd
+        JOIN film AS f ON f.id = fd.film_id
+        JOIN mpa AS m ON f.mpa_id = m.id
+        WHERE fd.director_id = ?
+        """;
 
     private static final String ID_COLUMN_LABEL = "id";
     private static final String FILM_ID_COLUMN_LABEL = "film_id";
