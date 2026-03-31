@@ -41,12 +41,14 @@ public class FilmDto implements Cloneable {
     Long durationMinutes;
     Set<GenreDto> genres;
     final Set<Long> likesIds = new HashSet<>();
+    Set<DirectorDto> directors;
 
     @Override
     public FilmDto clone() {
-        FilmDto cloned = new FilmDto(id, name, description, releaseDate, mpa, durationMinutes, new LinkedHashSet<>());
+        FilmDto cloned = new FilmDto(id, name, description, releaseDate, mpa, durationMinutes, new LinkedHashSet<>(), new LinkedHashSet<>());
         cloned.getLikesIds().addAll(likesIds);
         if (genres != null) cloned.getGenres().addAll(genres);
+        if (directors != null) cloned.getDirectors().addAll(directors);
         return cloned;
     }
 }
