@@ -19,9 +19,10 @@ public class DirectorService {
     private static final String GET_DIRECTOR_LOG_MSG = "Get director with id: {}";
 
     private static final String DUPLICATE_DIRECTOR_FOUND_TRACE_MSG = "Direct already exists with id: {}";
+    private static final String DIRECTOR_NOT_FOUND_TRACE_MSG = "Can't find director with id: {}";
 
     private static final String DUPLICATE_DIRECTOR_FOUND_EXCEPTION_MSG = "Direct already exists with id = ";
-    private static final String NOT_FOUND_EXCEPTION_MSG = "Can't find director with id = ";
+    private static final String DIRECTOR_NOT_FOUND_EXCEPTION_MSG = "Can't find director with id = ";
 
 
     private final DirectorStorage directorStorage;
@@ -51,7 +52,7 @@ public class DirectorService {
     }
 
     public DirectorDto updateDirector(DirectorDto updatedDirector) {
-        checkDirectorIdNotExist(updatedDirector.getId());
+        checkDirectorIdExists(updatedDirector.getId());
         Director director = directorStorage.updateDirector(directorMapper.toData(updatedDirector));
         return directorMapper.toPresentation(director);
     }
@@ -59,7 +60,7 @@ public class DirectorService {
     public DirectorDto deleteDirector(Long id) {
         Director removedDirector = directorStorage.deleteDirector(id);
         if (removedDirector == null) {
-            throw new NotFoundException(NOT_FOUND_EXCEPTION_MSG + id);
+            throw new NotFoundException(DIRECTOR_NOT_FOUND_TRACE_MSG + id);
         }
         return directorMapper.toPresentation(removedDirector);
     }
@@ -67,13 +68,20 @@ public class DirectorService {
     private Director getDirectorOrThrow(Long id) {
         return directorStorage
                 .getDirector(id)
-                .orElseThrow(() -> new NotFoundException(NOT_FOUND_EXCEPTION_MSG + id));
+                .orElseThrow(() -> new NotFoundException(DIRECTOR_NOT_FOUND_TRACE_MSG + id));
     }
 
     private void checkDirectorIdNotExist(Long id) {
         if (directorStorage.hasDirectorId(id)) {
             log.trace(DUPLICATE_DIRECTOR_FOUND_TRACE_MSG, id);
             throw new DuplicatedDataException(DUPLICATE_DIRECTOR_FOUND_EXCEPTION_MSG + id);
+        }
+    }
+
+    private void checkDirectorIdExists(Long id) {
+        if (!directorStorage.hasDirectorId(id)) {
+            log.trace(DIRECTOR_NOT_FOUND_TRACE_MSG, id);
+            throw new NotFoundException(DIRECTOR_NOT_FOUND_EXCEPTION_MSG + id);
         }
     }
 }
