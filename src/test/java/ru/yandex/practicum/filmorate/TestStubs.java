@@ -135,6 +135,7 @@ public class TestStubs {
 
     public static final DirectorDto VALID_DIRECTOR_DTO_1 = new DirectorDto(1L, VALID_DIRECTOR_NAME_1);
     public static final DirectorDto VALID_DIRECTOR_DTO_2 = new DirectorDto(2L, VALID_DIRECTOR_NAME_2);
+    public static final DirectorDto INVALID_DIRECTOR_DTO = new DirectorDto(3L, null);
 
     public static final Event VALID_EVENT_ADD_FRIEND = new Event(null, 1L, 2L, EventType.FRIEND, EventOperation.ADD, LocalDateTime.now());
     public static final Event VALID_EVENT_LIKE_FILM = new Event(null, 1L, 1L, EventType.LIKE, EventOperation.ADD, LocalDateTime.now());
