@@ -5,7 +5,12 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class DirectorDto {
+public class DirectorDto implements Cloneable {
     private Long id;
     private String name;
+
+    @Override
+    public DirectorDto clone() {
+        return new DirectorDto(id, name);
+    }
 }
