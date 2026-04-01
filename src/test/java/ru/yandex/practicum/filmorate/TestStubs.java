@@ -123,6 +123,7 @@ public class TestStubs {
 
     public static final DirectorDto VALID_DIRECTOR_DTO_1 = new DirectorDto(1L, VALID_DIRECTOR_NAME_1);
     public static final DirectorDto VALID_DIRECTOR_DTO_2 = new DirectorDto(2L, VALID_DIRECTOR_NAME_2);
+    public static final DirectorDto INVALID_DIRECTOR_DTO = new DirectorDto(3L, null);
 
     public static GenreDto genre(Long id) {
         return new GenreDto(id, "test");

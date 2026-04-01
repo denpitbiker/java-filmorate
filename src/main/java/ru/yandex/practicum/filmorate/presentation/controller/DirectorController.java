@@ -43,7 +43,7 @@ public class DirectorController {
         return directorService.updateDirector(director);
     }
 
-    @DeleteMapping
+    @DeleteMapping(GET_DIRECTOR_SUBROUTE)
     public DirectorDto deleteDirector(@PathVariable(DIRECTOR_ID_VAR) Long id) {
         return directorService.deleteDirector(id);
     };
