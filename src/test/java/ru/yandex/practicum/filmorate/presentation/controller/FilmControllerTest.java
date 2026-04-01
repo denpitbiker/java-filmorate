@@ -17,6 +17,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import ru.yandex.practicum.filmorate.FilmorateApplication;
+import ru.yandex.practicum.filmorate.presentation.dto.DirectorDto;
 import ru.yandex.practicum.filmorate.presentation.dto.FilmDto;
 import ru.yandex.practicum.filmorate.presentation.dto.UserDto;
 
@@ -238,6 +239,19 @@ public class FilmControllerTest {
                         .contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
     }
 
+    @Test
+    @DisplayName("Get all films of a specific director")
+    public void get_films_getDirectorFilms_success200WithCollectionOfDtos() throws Exception {
+        addDirector(VALID_DIRECTOR_DTO_1.clone());
+        addDirector(VALID_DIRECTOR_DTO_2.clone());
+        addFilm(VALID_FILM_DTO_1.clone());
+        addFilm(VALID_FILM_DTO_3.clone());
+        mvc.perform(get(FilmController.CONTROLLER_ROUTE + FilmController.GET_DIRECTOR_FILMS_SUBROUTE, VALID_DIRECTOR_DTO_1.getId()))
+                .andExpect(status().isOk())
+                .andExpect(content()
+                        .contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
+    }
+
     private ResultActions addFilm(FilmDto film) throws Exception {
         return mvc.perform(post(FilmController.CONTROLLER_ROUTE)
                 .contentType(MediaType.APPLICATION_JSON).content(
@@ -257,6 +271,13 @@ public class FilmControllerTest {
         return mvc.perform(post(UserController.CONTROLLER_ROUTE)
                 .contentType(MediaType.APPLICATION_JSON).content(
                         asJsonString(user)
+                ));
+    }
+
+    private ResultActions addDirector(DirectorDto director) throws Exception {
+        return mvc.perform(post(DirectorController.CONTROLLER_ROUTE)
+                .contentType(MediaType.APPLICATION_JSON).content(
+                        asJsonString(director)
                 ));
     }
 

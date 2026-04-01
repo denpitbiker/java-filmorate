@@ -39,6 +39,9 @@ public class FilmServiceTest {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private DirectorService directorService;
+
     @Test
     @DisplayName("Like a film")
     public void likeFilm_validLike_filmIsLiked() {
@@ -327,5 +330,25 @@ public class FilmServiceTest {
         );
     }
 
+    @Test
+    @DisplayName("Get films of an existing director")
+    public void getDirectorFilms_getFilmsOfExistingDirector_filmsReturned() {
+        directorService.addDirector(VALID_DIRECTOR_DTO_1.clone());
+        directorService.addDirector(VALID_DIRECTOR_DTO_2.clone());
+        filmService.addFilm(VALID_FILM_DTO_1.clone());
+        FilmDto filmWithDirector = filmService.addFilm(VALID_FILM_DTO_3.clone());
 
+        Collection<FilmDto> films = filmService.getDirectorFilms(VALID_DIRECTOR_DTO_1.getId(), "year");
+        Assertions.assertEquals(EXPECTED_REPOSITORY_SIZE_ONE, films.size());
+        Assertions.assertEquals(filmWithDirector.getId(), films.iterator().next().getId());
+    }
+
+    @Test
+    @DisplayName("Get films of a non-existing director")
+    public void getDirectorFilms_getFilmsOfNonExistingDirector_throwNotFoundException() {
+        Assertions.assertThrows(
+                NotFoundException.class,
+                () -> filmService.getDirectorFilms(VALID_DIRECTOR_DTO_1.getId(), "year")
+        );
+    }
 }
