@@ -19,5 +19,5 @@ public interface DirectorStorage {
 
     boolean hasDirectorId(Long id);
 
-    public void updateFilmDirectors(Long filmId, Set<Long> directorsIds);
+    void updateFilmDirectors(Long filmId, Set<Long> directorsIds);
 }
