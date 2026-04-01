@@ -138,6 +138,7 @@ public class FilmService {
 
     public Collection<FilmDto> getDirectorFilms(Long id, String sortBy) {
         log.info(GET_DIRECTOR_FILMS_MSG, id);
+        checkDirectorExists(id);
         List<Film> films = filmStorage.getAllFilms();
         FilmsAdditionalInfo info = getFilmsInfo(films);
         Comparator<FilmDto> comparator = sortBy.equals("year") ?
@@ -237,10 +238,18 @@ public class FilmService {
     private void checkDirectorsExist(Collection<DirectorDto> directors) {
         if (directors == null) return;
         directors.forEach((director) -> {
-            if (genreStorage.getGenre(director.getId()).isEmpty()) {
+            if (directorStorage.getDirector(director.getId()).isEmpty()) {
                 log.trace(DIRECTOR_NOT_FOUND_TRACE_MSG, director.getId());
                 throw new NotFoundException(DIRECTOR_NOT_FOUND_ERR_MSG + director.getId());
             }
         });
+    }
+
+    private void checkDirectorExists(Long directorId) {
+        if (directorId == null) return;
+        if (!directorStorage.hasDirectorId(directorId)) {
+            log.trace(DIRECTOR_NOT_FOUND_TRACE_MSG, directorId);
+            throw new NotFoundException(DIRECTOR_NOT_FOUND_ERR_MSG + directorId);
+        }
     }
 }
