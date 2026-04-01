@@ -4,6 +4,7 @@ import jakarta.validation.ValidationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.data.annotation.DbStorage;
+import ru.yandex.practicum.filmorate.data.model.enums.SortFilmsFactorType;
 import ru.yandex.practicum.filmorate.data.storage.api.*;
 import ru.yandex.practicum.filmorate.domain.exception.DuplicatedDataException;
 import ru.yandex.practicum.filmorate.domain.exception.NotFoundException;
@@ -136,13 +137,13 @@ public class FilmService {
         return filmMapper.toPresentation(removed, getFilmInfo(removed));
     }
 
-    public Collection<FilmDto> getDirectorFilms(Long id, String sortBy) {
+    public Collection<FilmDto> getDirectorFilms(Long id, SortFilmsFactorType sortBy) {
         log.info(GET_DIRECTOR_FILMS_MSG, id);
         checkDirectorExists(id);
         List<Film> films = filmStorage.getAllFilms();
         FilmsAdditionalInfo info = getFilmsInfo(films);
-        Comparator<FilmDto> comparator = sortBy.equals("year") ?
-                Comparator.comparing(FilmDto::getReleaseDate) :
+        Comparator<FilmDto> comparator = sortBy.equals(SortFilmsFactorType.YEAR) ?
+                Comparator.comparing(FilmDto::getReleaseDate).reversed() :
                 Comparator.comparingInt((FilmDto f) -> f.getLikesIds().size())
                         .reversed();
 
