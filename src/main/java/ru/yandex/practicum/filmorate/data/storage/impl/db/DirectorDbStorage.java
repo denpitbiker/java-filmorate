@@ -24,11 +24,11 @@ import java.util.*;
 public class DirectorDbStorage implements DirectorStorage {
     private final static String ID_COLUMN_LABEL = "id";
 
-    private final static String GET_ALL_DIRECTORS_QUERY = "SELECT * FROM director";
-    private final static String GET_DIRECTOR_QUERY = "SELECT * FROM director WHERE id = ?";
-    private final static String ADD_DIRECTOR_QUERY = "INSERT INTO director (name) VALUES (?)";
-    private final static String UPDATE_DIRECTOR_QUERY = "UPDATE director SET name = ? WHERE id = ?";
-    private final static String DELETE_DIRECTOR_QUERY = "DELETE FROM director WHERE id = ?";
+    private static final String GET_ALL_DIRECTORS_QUERY = "SELECT * FROM director";
+    private static final String GET_DIRECTOR_QUERY = "SELECT * FROM director WHERE id = ?";
+    private static final String ADD_DIRECTOR_QUERY = "INSERT INTO director (name) VALUES (?)";
+    private static final String UPDATE_DIRECTOR_QUERY = "UPDATE director SET name = ? WHERE id = ?";
+    private static final String DELETE_DIRECTOR_QUERY = "DELETE FROM director WHERE id = ?";
     private static final String GET_DIRECTORS_FOR_FILMS_QUERY = """
             SELECT fd.film_id AS film_id, fd.director_id AS director_id, d.name AS director_name
             FROM film_director AS fd
