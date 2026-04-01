@@ -22,7 +22,7 @@ import java.util.*;
 @Repository
 @DbStorage
 public class DirectorDbStorage implements DirectorStorage {
-    private final static String ID_COLUMN_LABEL = "id";
+    private static final String ID_COLUMN_LABEL = "id";
 
     private static final String GET_ALL_DIRECTORS_QUERY = "SELECT * FROM director";
     private static final String GET_DIRECTOR_QUERY = "SELECT * FROM director WHERE id = ?";
