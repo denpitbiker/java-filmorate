@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.data.storage.impl.db;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -52,7 +53,11 @@ public class DirectorDbStorage implements DirectorStorage {
 
     @Override
     public Optional<Director> getDirector(Long id) {
-        return Optional.ofNullable(jdbc.queryForObject(GET_DIRECTOR_QUERY, mapper, id));
+        try {
+            return Optional.ofNullable(jdbc.queryForObject(GET_DIRECTOR_QUERY, mapper, id));
+        } catch (EmptyResultDataAccessException e) {
+            return Optional.empty();
+        }
     }
 
     @Override

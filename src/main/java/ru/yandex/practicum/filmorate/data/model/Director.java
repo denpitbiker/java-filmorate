@@ -5,8 +5,13 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class Director {
+public class Director implements Cloneable {
     private Long id;
 
     private String name;
+
+    @Override
+    public Director clone() {
+        return new Director(id, name);
+    }
 }

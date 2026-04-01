@@ -1,13 +1,10 @@
 package ru.yandex.practicum.filmorate;
 
+import ru.yandex.practicum.filmorate.data.model.Director;
 import ru.yandex.practicum.filmorate.data.model.Film;
 import ru.yandex.practicum.filmorate.data.model.Review;
 import ru.yandex.practicum.filmorate.data.model.User;
-import ru.yandex.practicum.filmorate.presentation.dto.FilmDto;
-import ru.yandex.practicum.filmorate.presentation.dto.GenreDto;
-import ru.yandex.practicum.filmorate.presentation.dto.MpaDto;
-import ru.yandex.practicum.filmorate.presentation.dto.ReviewDto;
-import ru.yandex.practicum.filmorate.presentation.dto.UserDto;
+import ru.yandex.practicum.filmorate.presentation.dto.*;
 
 import java.time.LocalDate;
 import java.util.LinkedHashSet;
@@ -55,21 +52,21 @@ public class TestStubs {
 
     public static final MpaDto VALID_MPA_DTO = new MpaDto(VALID_MPA_ID, VALID_MPA_VALUE);
 
-    public static final FilmDto VALID_FILM_DTO_1 = new FilmDto(null, VALID_FILM_NAME_1, VALID_FILM_DESCRIPTION_1, VALID_DATE_1, VALID_MPA_DTO, VALID_DURATION_1, new LinkedHashSet<>());
-    public static final FilmDto VALID_FILM_DTO_2 = new FilmDto(null, VALID_FILM_NAME_2, VALID_FILM_DESCRIPTION_2, VALID_DATE_2, VALID_MPA_DTO, VALID_DURATION_2, null);
+    public static final FilmDto VALID_FILM_DTO_1 = new FilmDto(null, VALID_FILM_NAME_1, VALID_FILM_DESCRIPTION_1, VALID_DATE_1, VALID_MPA_DTO, VALID_DURATION_1, new LinkedHashSet<>(), null);
+    public static final FilmDto VALID_FILM_DTO_2 = new FilmDto(null, VALID_FILM_NAME_2, VALID_FILM_DESCRIPTION_2, VALID_DATE_2, VALID_MPA_DTO, VALID_DURATION_2, null, null);
 
     public static final Film VALID_FILM_1 = new Film(null, VALID_FILM_NAME_1, VALID_FILM_DESCRIPTION_1, VALID_DATE_1, VALID_MPA_ID, VALID_DURATION_1);
     public static final Film VALID_FILM_2 = new Film(null, VALID_FILM_NAME_2, VALID_FILM_DESCRIPTION_2, VALID_DATE_2, VALID_MPA_ID, VALID_DURATION_2);
 
-    public static final FilmDto INVALID_FILM_DTO_NULL_NAME = new FilmDto(null, null, VALID_FILM_DESCRIPTION_2, VALID_DATE_1, VALID_MPA_DTO, VALID_DURATION_2, new LinkedHashSet<>());
-    public static final FilmDto INVALID_FILM_DTO_NULL_DESCRIPTION = new FilmDto(null, VALID_FILM_NAME_1, null, VALID_DATE_1, VALID_MPA_DTO, VALID_DURATION_1, new LinkedHashSet<>());
-    public static final FilmDto INVALID_FILM_DTO_BLANK_DESCRIPTION = new FilmDto(null, VALID_FILM_NAME_1, INVALID_FILM_DESCRIPTION_BLANK, VALID_DATE_1, VALID_MPA_DTO, VALID_DURATION_1, new LinkedHashSet<>());
-    public static final FilmDto INVALID_FILM_DTO_NULL_DATE = new FilmDto(null, VALID_FILM_NAME_1, VALID_FILM_DESCRIPTION_1, null, VALID_MPA_DTO, VALID_DURATION_1, new LinkedHashSet<>());
-    public static final FilmDto INVALID_FILM_DTO_NULL_DURATION = new FilmDto(null, VALID_FILM_NAME_1, VALID_FILM_DESCRIPTION_1, VALID_DATE_1, VALID_MPA_DTO, null, new LinkedHashSet<>());
-    public static final FilmDto INVALID_FILM_DTO_TOO_LONG_DESCRIPTION = new FilmDto(null, VALID_FILM_NAME_1, INVALID_FILM_DESCRIPTION_TOO_LONG, VALID_DATE_1, VALID_MPA_DTO, VALID_DURATION_2, new LinkedHashSet<>());
-    public static final FilmDto INVALID_FILM_DTO_TOO_OLD_DATE = new FilmDto(null, VALID_FILM_NAME_1, VALID_FILM_DESCRIPTION_1, TOOL_OLD_DATE, VALID_MPA_DTO, VALID_DURATION_2, new LinkedHashSet<>());
-    public static final FilmDto INVALID_FILM_DTO_DURATION_ZERO = new FilmDto(null, VALID_FILM_NAME_1, VALID_FILM_DESCRIPTION_1, VALID_DATE_1, VALID_MPA_DTO, INVALID_DURATION_ZERO, new LinkedHashSet<>());
-    public static final FilmDto INVALID_FILM_DTO_NEGATIVE_DURATION = new FilmDto(null, VALID_FILM_NAME_1, VALID_FILM_DESCRIPTION_1, VALID_DATE_1, VALID_MPA_DTO, INVALID_DURATION_NEGATIVE, new LinkedHashSet<>());
+    public static final FilmDto INVALID_FILM_DTO_NULL_NAME = new FilmDto(null, null, VALID_FILM_DESCRIPTION_2, VALID_DATE_1, VALID_MPA_DTO, VALID_DURATION_2, new LinkedHashSet<>(), null);
+    public static final FilmDto INVALID_FILM_DTO_NULL_DESCRIPTION = new FilmDto(null, VALID_FILM_NAME_1, null, VALID_DATE_1, VALID_MPA_DTO, VALID_DURATION_1, new LinkedHashSet<>(), null);
+    public static final FilmDto INVALID_FILM_DTO_BLANK_DESCRIPTION = new FilmDto(null, VALID_FILM_NAME_1, INVALID_FILM_DESCRIPTION_BLANK, VALID_DATE_1, VALID_MPA_DTO, VALID_DURATION_1, new LinkedHashSet<>(), null);
+    public static final FilmDto INVALID_FILM_DTO_NULL_DATE = new FilmDto(null, VALID_FILM_NAME_1, VALID_FILM_DESCRIPTION_1, null, VALID_MPA_DTO, VALID_DURATION_1, new LinkedHashSet<>(), null);
+    public static final FilmDto INVALID_FILM_DTO_NULL_DURATION = new FilmDto(null, VALID_FILM_NAME_1, VALID_FILM_DESCRIPTION_1, VALID_DATE_1, VALID_MPA_DTO, null, new LinkedHashSet<>(), null);
+    public static final FilmDto INVALID_FILM_DTO_TOO_LONG_DESCRIPTION = new FilmDto(null, VALID_FILM_NAME_1, INVALID_FILM_DESCRIPTION_TOO_LONG, VALID_DATE_1, VALID_MPA_DTO, VALID_DURATION_2, new LinkedHashSet<>(), null);
+    public static final FilmDto INVALID_FILM_DTO_TOO_OLD_DATE = new FilmDto(null, VALID_FILM_NAME_1, VALID_FILM_DESCRIPTION_1, TOOL_OLD_DATE, VALID_MPA_DTO, VALID_DURATION_2, new LinkedHashSet<>(), null);
+    public static final FilmDto INVALID_FILM_DTO_DURATION_ZERO = new FilmDto(null, VALID_FILM_NAME_1, VALID_FILM_DESCRIPTION_1, VALID_DATE_1, VALID_MPA_DTO, INVALID_DURATION_ZERO, new LinkedHashSet<>(), null);
+    public static final FilmDto INVALID_FILM_DTO_NEGATIVE_DURATION = new FilmDto(null, VALID_FILM_NAME_1, VALID_FILM_DESCRIPTION_1, VALID_DATE_1, VALID_MPA_DTO, INVALID_DURATION_NEGATIVE, new LinkedHashSet<>(), null);
 
     public static final String VALID_LOGIN_1 = "vdenk";
     public static final String VALID_LOGIN_2 = "qreqwrew";
@@ -117,6 +114,15 @@ public class TestStubs {
     public static final ReviewDto INVALID_REVIEW_DTO_NULL_FILM_ID = new ReviewDto(1L, "Nice film!", true, 1L, null, 10);
 
     public static final Review VALID_REVIEW = new Review(null, "dfsfsdfsd", true, 1L, 1L, 10);
+
+    public static final String VALID_DIRECTOR_NAME_1 = "Quentin Tarantino";
+    public static final String VALID_DIRECTOR_NAME_2 = "Woody Allen";
+
+    public static final Director VALID_DIRECTOR_1 = new Director(1L, VALID_DIRECTOR_NAME_1);
+    public static final Director VALID_DIRECTOR_2 = new Director(2L, VALID_DIRECTOR_NAME_2);
+
+    public static final DirectorDto VALID_DIRECTOR_DTO_1 = new DirectorDto(1L, VALID_DIRECTOR_NAME_1);
+    public static final DirectorDto VALID_DIRECTOR_DTO_2 = new DirectorDto(2L, VALID_DIRECTOR_NAME_2);
 
     public static GenreDto genre(Long id) {
         return new GenreDto(id, "test");
