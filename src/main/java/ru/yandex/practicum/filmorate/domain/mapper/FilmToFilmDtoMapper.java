@@ -33,7 +33,7 @@ public class FilmToFilmDtoMapper {
                 info.genres() != null ?
                         new LinkedHashSet<>(info.genres().stream().map(genreMapper::toPresentation).toList()) : null,
                 info.directors() != null ?
-                        new LinkedHashSet<>(info.directors().stream().map(directorMapper::toPresentation).toList()) : null
+                        new LinkedHashSet<>(info.directors().stream().map(directorMapper::toPresentation).toList()) : new HashSet<>()
         );
         if (info.likesIds() != null) filmDto.getLikesIds().addAll(info.likesIds());
         return filmDto;

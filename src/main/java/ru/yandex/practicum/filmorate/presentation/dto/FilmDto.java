@@ -41,6 +41,7 @@ public class FilmDto implements Cloneable {
     Long durationMinutes;
     Set<GenreDto> genres;
     final Set<Long> likesIds = new HashSet<>();
+    @NotNull
     Set<DirectorDto> directors = new HashSet<>();
 
     @Override
