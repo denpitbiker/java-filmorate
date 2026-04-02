@@ -246,6 +246,7 @@ public class FilmControllerTest {
         addDirector(VALID_DIRECTOR_DTO_2.clone());
         addFilm(VALID_FILM_DTO_1.clone());
         addFilm(VALID_FILM_DTO_3.clone());
+
         mvc.perform(get(FilmController.CONTROLLER_ROUTE + FilmController.GET_DIRECTOR_FILMS_SUBROUTE, VALID_DIRECTOR_DTO_1.getId()))
                 .andExpect(status().isOk())
                 .andExpect(content()
