@@ -356,8 +356,24 @@ public class FilmServiceTest {
 
         List<FilmDto> films = new ArrayList<>(filmService.getDirectorFilms(VALID_DIRECTOR_DTO_2.getId(), SortBy.YEAR));
         Assertions.assertEquals(EXPECTED_REPOSITORY_SIZE_TWO, films.size());
-        Assertions.assertEquals(filmWithDirector2.getId(), films.getFirst().getId());
-        Assertions.assertEquals(filmWithDirector1.getId(), films.get(1).getId());
+        Assertions.assertEquals(filmWithDirector1.getId(), films.getFirst().getId());
+        Assertions.assertEquals(filmWithDirector2.getId(), films.get(1).getId());
+    }
+
+    @Test
+    @DisplayName("Get films of an existing director by likes")
+    public void getDirectorFilms_getFilmsOfExistingDirector_filmsReturnedInLikesOrder() {
+        UserDto user = userService.addUser(VALID_USER_DTO_1);
+        directorService.addDirector(VALID_DIRECTOR_DTO_1.clone());
+        directorService.addDirector(VALID_DIRECTOR_DTO_2.clone());
+        FilmDto filmWithDirector1 = filmService.addFilm(VALID_FILM_DTO_3.clone());
+        FilmDto filmWithDirector2 = filmService.addFilm(VALID_FILM_DTO_4.clone());
+        filmService.likeFilm(user.getId(), filmWithDirector1.getId());
+
+        List<FilmDto> films = new ArrayList<>(filmService.getDirectorFilms(VALID_DIRECTOR_DTO_2.getId(), SortBy.LIKES));
+        Assertions.assertEquals(EXPECTED_REPOSITORY_SIZE_TWO, films.size());
+        Assertions.assertEquals(filmWithDirector1.getId(), films.getFirst().getId());
+        Assertions.assertEquals(filmWithDirector2.getId(), films.get(1).getId());
     }
 
     @Test

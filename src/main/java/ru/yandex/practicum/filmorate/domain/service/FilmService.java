@@ -142,9 +142,11 @@ public class FilmService {
         checkDirectorExists(id);
         List<Film> films = filmStorage.getAllFilms();
         FilmsAdditionalInfo info = getFilmsInfo(films);
-        Comparator<FilmDto> comparator = sortBy.equals(SortBy.YEAR) ?
-                Comparator.comparing(FilmDto::getReleaseDate).reversed() :
-                Comparator.comparingInt((FilmDto f) -> f.getLikesIds().size())
+        Comparator<FilmDto> comparator = sortBy.equals(SortBy.YEAR)
+                ? Comparator
+                        .comparing(FilmDto::getReleaseDate)
+                : Comparator
+                        .comparingInt((FilmDto f) -> f.getLikesIds().size())
                         .reversed();
 
         return films.stream()
