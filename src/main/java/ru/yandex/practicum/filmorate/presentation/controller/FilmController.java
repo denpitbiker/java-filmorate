@@ -45,7 +45,7 @@ public class FilmController {
     private static final String ADD_FILM_LOG_MSG = "Add new film request {}";
     private static final String UPDATE_FILM_LOG_MSG = "Update film request {}";
     private static final String DELETE_FILM_LOG_MSG = "Delete film with id {} request";
-    private static final String GET_DIRECTOR_FILMS_MSG = "Get films of director with id {}";
+    private static final String GET_DIRECTOR_FILMS_MSG = "Get films of director with id {} request";
 
     private final FilmService filmService;
     private final EventService eventService;

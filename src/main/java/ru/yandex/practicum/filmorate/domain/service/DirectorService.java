@@ -17,6 +17,9 @@ import java.util.Collection;
 public class DirectorService {
     private static final String GET_ALL_DIRECTORS_LOG_MSG = "Get all directors started";
     private static final String GET_DIRECTOR_LOG_MSG = "Get director with id: {}";
+    private static final String ADD_DIRECTOR_LOG_MSG = "Add director started";
+    private static final String UPDATE_DIRECTOR_LOG_MSG = "Update director with id: {}";
+    private static final String DELETE_DIRECTOR_LOG_MSG = "Delete director with id: {}";
 
     private static final String DUPLICATE_DIRECTOR_FOUND_TRACE_MSG = "Direct already exists with id: {}";
     private static final String DIRECTOR_NOT_FOUND_TRACE_MSG = "Can't find director with id: {}";
@@ -34,6 +37,7 @@ public class DirectorService {
     }
 
     public Collection<DirectorDto> getAllDirectors() {
+        log.info(GET_ALL_DIRECTORS_LOG_MSG);
         return directorStorage
                 .getAllDirectors()
                 .stream()
@@ -42,22 +46,26 @@ public class DirectorService {
     }
 
     public DirectorDto getDirector(Long id) {
+        log.info(GET_DIRECTOR_LOG_MSG, id);
         return directorMapper.toPresentation(getDirectorOrThrow(id));
     }
 
     public DirectorDto addDirector(DirectorDto newDirector) {
+        log.info(ADD_DIRECTOR_LOG_MSG);
         checkDirectorIdNotExist(newDirector.getId());
         Director director = directorStorage.addDirector(directorMapper.toData(newDirector));
         return directorMapper.toPresentation(director);
     }
 
     public DirectorDto updateDirector(DirectorDto updatedDirector) {
+        log.info(UPDATE_DIRECTOR_LOG_MSG, updatedDirector.getId());
         checkDirectorIdExists(updatedDirector.getId());
         Director director = directorStorage.updateDirector(directorMapper.toData(updatedDirector));
         return directorMapper.toPresentation(director);
     }
 
     public DirectorDto deleteDirector(Long id) {
+        log.info(DELETE_DIRECTOR_LOG_MSG, id);
         Director removedDirector = directorStorage.deleteDirector(id);
         if (removedDirector == null) {
             throw new NotFoundException(DIRECTOR_NOT_FOUND_TRACE_MSG + id);
