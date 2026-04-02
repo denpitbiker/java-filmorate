@@ -8,7 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-import ru.yandex.practicum.filmorate.data.model.enums.SortFilmsFactorType;
+import ru.yandex.practicum.filmorate.data.model.enums.SortBy;
 import ru.yandex.practicum.filmorate.domain.service.EventService;
 import ru.yandex.practicum.filmorate.domain.service.FilmService;
 import ru.yandex.practicum.filmorate.presentation.dto.FilmDto;
@@ -90,7 +90,7 @@ public class FilmController {
     @GetMapping(GET_DIRECTOR_FILMS_SUBROUTE)
     public Collection<FilmDto> getDirectorFilms(
             @PathVariable(DIRECTOR_ID_VAR) Long id,
-            @RequestParam(value = SORT_BY_PARAM, defaultValue = "year") SortFilmsFactorType sortBy
+            @RequestParam(value = SORT_BY_PARAM, defaultValue = "year") SortBy sortBy
     ) {
         log.info(GET_DIRECTOR_FILMS_MSG, id);
         return filmService.getDirectorFilms(id, sortBy);
