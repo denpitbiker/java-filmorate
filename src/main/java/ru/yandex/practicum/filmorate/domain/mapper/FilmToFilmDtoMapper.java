@@ -9,6 +9,7 @@ import java.util.*;
 public class FilmToFilmDtoMapper {
     private static final MpaToMpaDtoMapper mpaMapper = new MpaToMpaDtoMapper();
     private static final GenreToGenreDtoMapper genreMapper = new GenreToGenreDtoMapper();
+    private static final DirectorToDirectorDtoMapper directorMapper = new DirectorToDirectorDtoMapper();
 
     public Film toData(FilmDto value) {
         return new Film(
@@ -30,7 +31,9 @@ public class FilmToFilmDtoMapper {
                 mpaMapper.toPresentation(info.mpa()),
                 value.getDurationMinutes(),
                 info.genres() != null ?
-                        new LinkedHashSet<>(info.genres().stream().map(genreMapper::toPresentation).toList()) : null
+                        new LinkedHashSet<>(info.genres().stream().map(genreMapper::toPresentation).toList()) : null,
+                info.directors() != null ?
+                        new LinkedHashSet<>(info.directors().stream().map(directorMapper::toPresentation).toList()) : new HashSet<>()
         );
         if (info.likesIds() != null) filmDto.getLikesIds().addAll(info.likesIds());
         return filmDto;

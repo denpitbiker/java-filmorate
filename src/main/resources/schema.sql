@@ -16,6 +16,11 @@ CREATE TABLE IF NOT EXISTS genre (
     name VARCHAR(30) NOT NULL UNIQUE
 );
 
+CREATE TABLE IF NOT EXISTS director (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(50) NOT NULL UNIQUE
+);
+
 CREATE TABLE IF NOT EXISTS film (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
     name VARCHAR(100) NOT NULL,
@@ -59,6 +64,14 @@ CREATE TABLE IF NOT EXISTS film_genre (
     PRIMARY KEY (film_id, genre_id),
     FOREIGN KEY (film_id) REFERENCES film(id) ON DELETE CASCADE,
     FOREIGN KEY (genre_id) REFERENCES genre(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS film_director (
+    film_id BIGINT,
+    director_id BIGINT,
+    PRIMARY KEY (film_id, director_id),
+    FOREIGN KEY (film_id) REFERENCES film(id) ON DELETE CASCADE,
+    FOREIGN KEY (director_id) REFERENCES director(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS user_friend (

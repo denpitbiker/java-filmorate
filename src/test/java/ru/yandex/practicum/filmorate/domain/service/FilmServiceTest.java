@@ -12,13 +12,16 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import ru.yandex.practicum.filmorate.FilmorateApplication;
+import ru.yandex.practicum.filmorate.data.model.enums.SortBy;
 import ru.yandex.practicum.filmorate.domain.exception.DuplicatedDataException;
 import ru.yandex.practicum.filmorate.domain.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.presentation.dto.FilmDto;
 import ru.yandex.practicum.filmorate.presentation.dto.UserDto;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 
 import static ru.yandex.practicum.filmorate.TestStubs.*;
@@ -38,6 +41,9 @@ public class FilmServiceTest {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private DirectorService directorService;
 
     @Test
     @DisplayName("Like a film")
@@ -327,5 +333,55 @@ public class FilmServiceTest {
         );
     }
 
+    @Test
+    @DisplayName("Get films of an existing director")
+    public void getDirectorFilms_getFilmsOfExistingDirector_filmsReturned() {
+        directorService.addDirector(VALID_DIRECTOR_DTO_1.clone());
+        directorService.addDirector(VALID_DIRECTOR_DTO_2.clone());
+        filmService.addFilm(VALID_FILM_DTO_1.clone());
+        FilmDto filmWithDirector = filmService.addFilm(VALID_FILM_DTO_3.clone());
 
+        Collection<FilmDto> films = filmService.getDirectorFilms(VALID_DIRECTOR_DTO_1.getId(), SortBy.YEAR);
+        Assertions.assertEquals(EXPECTED_REPOSITORY_SIZE_ONE, films.size());
+        Assertions.assertEquals(filmWithDirector.getId(), films.iterator().next().getId());
+    }
+
+    @Test
+    @DisplayName("Get films of an existing director by year")
+    public void getDirectorFilms_getFilmsOfExistingDirector_filmsReturnedInYearOrder() {
+        directorService.addDirector(VALID_DIRECTOR_DTO_1.clone());
+        directorService.addDirector(VALID_DIRECTOR_DTO_2.clone());
+        FilmDto filmWithDirector1 = filmService.addFilm(VALID_FILM_DTO_3.clone());
+        FilmDto filmWithDirector2 = filmService.addFilm(VALID_FILM_DTO_4.clone());
+
+        List<FilmDto> films = new ArrayList<>(filmService.getDirectorFilms(VALID_DIRECTOR_DTO_2.getId(), SortBy.YEAR));
+        Assertions.assertEquals(EXPECTED_REPOSITORY_SIZE_TWO, films.size());
+        Assertions.assertEquals(filmWithDirector1.getId(), films.getFirst().getId());
+        Assertions.assertEquals(filmWithDirector2.getId(), films.get(1).getId());
+    }
+
+    @Test
+    @DisplayName("Get films of an existing director by likes")
+    public void getDirectorFilms_getFilmsOfExistingDirector_filmsReturnedInLikesOrder() {
+        UserDto user = userService.addUser(VALID_USER_DTO_1);
+        directorService.addDirector(VALID_DIRECTOR_DTO_1.clone());
+        directorService.addDirector(VALID_DIRECTOR_DTO_2.clone());
+        FilmDto filmWithDirector1 = filmService.addFilm(VALID_FILM_DTO_3.clone());
+        FilmDto filmWithDirector2 = filmService.addFilm(VALID_FILM_DTO_4.clone());
+        filmService.likeFilm(user.getId(), filmWithDirector1.getId());
+
+        List<FilmDto> films = new ArrayList<>(filmService.getDirectorFilms(VALID_DIRECTOR_DTO_2.getId(), SortBy.LIKES));
+        Assertions.assertEquals(EXPECTED_REPOSITORY_SIZE_TWO, films.size());
+        Assertions.assertEquals(filmWithDirector1.getId(), films.getFirst().getId());
+        Assertions.assertEquals(filmWithDirector2.getId(), films.get(1).getId());
+    }
+
+    @Test
+    @DisplayName("Get films of a non-existing director")
+    public void getDirectorFilms_getFilmsOfNonExistingDirector_throwNotFoundException() {
+        Assertions.assertThrows(
+                NotFoundException.class,
+                () -> filmService.getDirectorFilms(VALID_DIRECTOR_DTO_1.getId(), SortBy.YEAR)
+        );
+    }
 }
