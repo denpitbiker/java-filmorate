@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.yandex.practicum.filmorate.common.model.Pair;
 import ru.yandex.practicum.filmorate.data.annotation.DbStorage;
 import ru.yandex.practicum.filmorate.data.model.Film;
+import ru.yandex.practicum.filmorate.data.model.enums.By;
 import ru.yandex.practicum.filmorate.data.storage.api.FilmStorage;
 import ru.yandex.practicum.filmorate.data.storage.impl.db.rowmapper.FilmRowMapper;
 
@@ -27,56 +28,72 @@ public class FilmDbStorage implements FilmStorage {
     private static final String ADD_FILM_QUERY = "INSERT INTO film (name, description, release_date, mpa_id, duration_minutes) VALUES (?, ?, ?, ?, ?)";
     private static final String UPDATE_FILM_QUERY = "UPDATE film SET name = ?, description = ?, release_date = ?, mpa_id = ?, duration_minutes = ? WHERE id = ?";
     private static final String GET_ALL_FILMS_QUERY = "SELECT * FROM film";
-    private static final String GET_POPULAR_FILMS_QUERY = """
-        SELECT ff.id,
-               ff.name,
-               ff.description,
-               ff.release_date,
-               ff.mpa_id,
-               ff.duration_minutes,
-               COALESCE(l.likes, 0) AS likes
-        FROM (
-            SELECT f.id,
+    private static final String GET_FILMS_SEARCH_QUERY = """
+            SELECT DISTINCT f.id,
                    f.name,
                    f.description,
                    f.release_date,
                    f.mpa_id,
-                   f.duration_minutes
-            FROM film AS f
-            WHERE (? IS NULL OR EXTRACT(YEAR FROM f.release_date) = ?)
-              AND (
-                  ? IS NULL OR EXISTS (
-                      SELECT 1
-                      FROM film_genre fg
-                      WHERE fg.film_id = f.id
-                        AND fg.genre_id = ?
+                   f.duration_minutes,
+                   COALESCE(l.likes, 0) AS likes
+            FROM film f
+            LEFT JOIN film_director fd ON f.id = fd.film_id
+            LEFT JOIN director d ON fd.director_id = d.id
+            LEFT JOIN (
+                SELECT film_id, COUNT(user_id) AS likes
+                FROM film_like
+                GROUP BY film_id
+            ) l ON f.id = l.film_id
+            WHERE %s
+            ORDER BY likes DESC
+            """;
+    private static final String GET_POPULAR_FILMS_QUERY = """
+            SELECT ff.id,
+                   ff.name,
+                   ff.description,
+                   ff.release_date,
+                   ff.mpa_id,
+                   ff.duration_minutes,
+                   COALESCE(l.likes, 0) AS likes
+            FROM (
+                SELECT f.id,
+                       f.name,
+                       f.description,
+                       f.release_date,
+                       f.mpa_id,
+                       f.duration_minutes
+                FROM film AS f
+                WHERE (? IS NULL OR EXTRACT(YEAR FROM f.release_date) = ?)
+                  AND (
+                      ? IS NULL OR EXISTS (
+                          SELECT 1
+                          FROM film_genre fg
+                          WHERE fg.film_id = f.id
+                            AND fg.genre_id = ?
+                      )
                   )
-              )
-        ) AS ff
-        LEFT JOIN (
-            SELECT film_id, COUNT(user_id) AS likes
-            FROM film_like
-            GROUP BY film_id
-        ) AS l ON ff.id = l.film_id
-        ORDER BY likes DESC
-        LIMIT ?
-        """;
+            ) AS ff
+            LEFT JOIN (
+                SELECT film_id, COUNT(user_id) AS likes
+                FROM film_like
+                GROUP BY film_id
+            ) AS l ON ff.id = l.film_id
+            ORDER BY likes DESC
+            LIMIT ?
+            """;
     private static final String GET_LIKES_FOR_FILMS_QUERY = """
             SELECT film_id, user_id
             FROM film_like WHERE film_id IN (%s)
             """;
     private static final String DELETE_FILM_QUERY = "DELETE FROM film WHERE id=?";
-//    private static final String GET_DIRECTOR_FILMS_QUERY = """
-//            SELECT * FROM film
-//            WHERE
-//            """
+
     private static final String GET_DIRECTOR_FILMS_QUERY = """
-        SELECT f.id AS id, f.name AS name, f.description AS description, m.name AS mpa, f.duration_minutes AS duration_minutes
-        FROM film_director AS fd
-        JOIN film AS f ON f.id = fd.film_id
-        JOIN mpa AS m ON f.mpa_id = m.id
-        WHERE fd.director_id = ?
-        """;
+            SELECT f.id AS id, f.name AS name, f.description AS description, m.name AS mpa, f.duration_minutes AS duration_minutes
+            FROM film_director AS fd
+            JOIN film AS f ON f.id = fd.film_id
+            JOIN mpa AS m ON f.mpa_id = m.id
+            WHERE fd.director_id = ?
+            """;
 
     private static final String ID_COLUMN_LABEL = "id";
     private static final String FILM_ID_COLUMN_LABEL = "film_id";
@@ -118,7 +135,7 @@ public class FilmDbStorage implements FilmStorage {
                 String.format(GET_LIKES_FOR_FILMS_QUERY, inSql),
                 filmIds.toArray(),
                 (rs, rowNum) ->
-                        new Pair<>(rs.getLong(FILM_ID_COLUMN_LABEL),rs.getLong(USER_ID_COLUMN_LABEL))
+                        new Pair<>(rs.getLong(FILM_ID_COLUMN_LABEL), rs.getLong(USER_ID_COLUMN_LABEL))
         );
         Map<Long, Set<Long>> result = new HashMap<>();
         entries.forEach(entry -> {
@@ -210,5 +227,33 @@ public class FilmDbStorage implements FilmStorage {
     @Override
     public List<Film> getDirectorFilms(Long id, String sortBy) {
         return null;
+    }
+
+    @Override
+    public List<Film> getFilmsSearch(String query, Set<By> by) {
+        List<String> conditions = new ArrayList<>();
+        List<Object> params = new ArrayList<>();
+
+        String likeQuery = "%" + query.toLowerCase() + "%";
+
+        if (by.contains(By.TITLE)) {
+            conditions.add("LOWER(f.name) LIKE ?");
+            params.add(likeQuery);
+        }
+
+        if (by.contains(By.DIRECTOR)) {
+            conditions.add("LOWER(d.name) LIKE ?");
+            params.add(likeQuery);
+        }
+
+        if (conditions.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        String whereClause = String.join(" OR ", conditions);
+
+        String sql = String.format(GET_FILMS_SEARCH_QUERY, whereClause);
+
+        return jdbc.query(sql, mapper, params.toArray());
     }
 }

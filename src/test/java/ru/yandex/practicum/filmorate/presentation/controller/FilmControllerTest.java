@@ -22,6 +22,7 @@ import ru.yandex.practicum.filmorate.presentation.dto.FilmDto;
 import ru.yandex.practicum.filmorate.presentation.dto.UserDto;
 
 import java.io.UnsupportedEncodingException;
+import java.util.Set;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 
@@ -252,6 +253,47 @@ public class FilmControllerTest {
                 .andExpect(content()
                         .contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
     }
+
+    @Test
+    @DisplayName("Search films by substring in title and director returns matching films")
+    public void get_films_searchByTitleAndDirectorSubstring_success200() throws Exception {
+        DirectorDto director1 = VALID_DIRECTOR_DTO_1.clone();
+        director1.setName(VALID_DIRECTOR_NAME_1);
+
+        DirectorDto director2 = VALID_DIRECTOR_DTO_2.clone();
+        director2.setName(VALID_DIRECTOR_NAME_2);
+
+        DirectorDto director3 = VALID_DIRECTOR_DTO_3.clone();
+        director3.setName(VALID_DIRECTOR_NAME_3);
+
+        addDirector(director1);
+        addDirector(director2);
+        addDirector(director3);
+
+        FilmDto film1 = VALID_FILM_DTO_5.clone();
+        film1.setDirectors(Set.of(director2));
+
+        FilmDto film2 = VALID_FILM_DTO_6.clone();
+        film2.setDirectors(Set.of(director1));
+
+        FilmDto film3 = VALID_FILM_DTO_7.clone();
+        film3.setDirectors(Set.of(director3));
+
+        FilmDto film4 = VALID_FILM_DTO_8.clone();
+        film4.setDirectors(Set.of(director1));
+
+        addFilm(film1);
+        addFilm(film2);
+        addFilm(film3);
+        addFilm(film4);
+
+        mvc.perform(get(FilmController.CONTROLLER_ROUTE + FilmController.GET_FILMS_SEARCH_SUBROUTE)
+                        .param(FilmController.QUERY_VAR, "крад")
+                        .param(FilmController.BY_PARAM, "director,title"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
+    }
+
 
     private ResultActions addFilm(FilmDto film) throws Exception {
         return mvc.perform(post(FilmController.CONTROLLER_ROUTE)

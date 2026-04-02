@@ -15,6 +15,7 @@ import ru.yandex.practicum.filmorate.FilmorateApplication;
 import ru.yandex.practicum.filmorate.data.model.enums.SortBy;
 import ru.yandex.practicum.filmorate.domain.exception.DuplicatedDataException;
 import ru.yandex.practicum.filmorate.domain.exception.NotFoundException;
+import ru.yandex.practicum.filmorate.presentation.dto.DirectorDto;
 import ru.yandex.practicum.filmorate.presentation.dto.FilmDto;
 import ru.yandex.practicum.filmorate.presentation.dto.UserDto;
 
@@ -383,5 +384,162 @@ public class FilmServiceTest {
                 NotFoundException.class,
                 () -> filmService.getDirectorFilms(VALID_DIRECTOR_DTO_1.getId(), SortBy.YEAR)
         );
+    }
+
+    @Test
+    @DisplayName("Search films by substring in title and director")
+    public void getFilmsSearch_searchByTitleAndDirectorSubstring_filmsReturned() {
+        DirectorDto director1 = VALID_DIRECTOR_DTO_1.clone();
+        director1.setName(VALID_DIRECTOR_NAME_1);
+        DirectorDto addedDirector1 = directorService.addDirector(director1);
+
+        DirectorDto director2 = VALID_DIRECTOR_DTO_2.clone();
+        director2.setName(VALID_DIRECTOR_NAME_2);
+        DirectorDto addedDirector2 = directorService.addDirector(director2);
+
+        DirectorDto director3 = VALID_DIRECTOR_DTO_3.clone();
+        director3.setName(VALID_DIRECTOR_NAME_3);
+        DirectorDto addedDirector3 = directorService.addDirector(director3);
+
+        FilmDto film1 = VALID_FILM_DTO_5.clone();
+        film1.setDirectors(Set.of(addedDirector2));
+
+        FilmDto film2 = VALID_FILM_DTO_6.clone();
+        film2.setDirectors(Set.of(addedDirector1));
+
+        FilmDto film3 = VALID_FILM_DTO_7.clone();
+        film3.setDirectors(Set.of(addedDirector3));
+
+        FilmDto film4 = VALID_FILM_DTO_8.clone();
+        film4.setDirectors(Set.of(addedDirector1));
+
+        filmService.addFilm(film1);
+        filmService.addFilm(film2);
+        filmService.addFilm(film3);
+        filmService.addFilm(film4);
+
+        Collection<FilmDto> films = filmService.getFilmsSearch("крад", "director,title");
+
+        Assertions.assertEquals(3, films.size(), "Should return three matching films");
+    }
+
+    @Test
+    @DisplayName("Search films with no matches returns empty collection")
+    public void getFilmsSearch_noMatches_returnsEmptyCollection() {
+        DirectorDto director1 = VALID_DIRECTOR_DTO_1.clone();
+        director1.setName(VALID_DIRECTOR_NAME_1);
+        DirectorDto addedDirector1 = directorService.addDirector(director1);
+
+        DirectorDto director2 = VALID_DIRECTOR_DTO_2.clone();
+        director2.setName(VALID_DIRECTOR_NAME_2);
+        DirectorDto addedDirector2 = directorService.addDirector(director2);
+
+        FilmDto film1 = VALID_FILM_DTO_1.clone();
+        film1.setDirectors(Set.of(addedDirector1));
+
+        FilmDto film2 = VALID_FILM_DTO_2.clone();
+        film2.setDirectors(Set.of(addedDirector2));
+
+        filmService.addFilm(film1);
+        filmService.addFilm(film2);
+
+        Collection<FilmDto> films = filmService.getFilmsSearch("крад", "director,title");
+
+        Assertions.assertEquals(0, films.size(), "Should return no films");
+    }
+
+    @Test
+    @DisplayName("Search films by director only does not return films matched by title")
+    public void getFilmsSearch_searchByDirectorOnly_noMatchesReturned() {
+        DirectorDto director1 = VALID_DIRECTOR_DTO_1.clone();
+        director1.setName(VALID_DIRECTOR_NAME_1);
+        DirectorDto addedDirector1 = directorService.addDirector(director1);
+
+        DirectorDto director2 = VALID_DIRECTOR_DTO_2.clone();
+        director2.setName(VALID_DIRECTOR_NAME_2);
+        DirectorDto addedDirector2 = directorService.addDirector(director2);
+
+        FilmDto film1 = VALID_FILM_DTO_5.clone();
+        film1.setDirectors(Set.of(addedDirector2));
+
+        FilmDto film2 = VALID_FILM_DTO_6.clone();
+        film2.setDirectors(Set.of(addedDirector1));
+
+        filmService.addFilm(film1);
+        filmService.addFilm(film2);
+
+        Collection<FilmDto> films = filmService.getFilmsSearch("крад", "director");
+
+        Assertions.assertEquals(0, films.size(), "Should return no films when only director search is used");
+    }
+
+    @Test
+    @DisplayName("Search films by title only does not return films matched by director")
+    public void getFilmsSearch_searchByTitleOnly_noMatchesReturned() {
+        DirectorDto director = VALID_DIRECTOR_DTO_3.clone();
+        DirectorDto addedDirector = directorService.addDirector(director);
+
+        FilmDto film1 = VALID_FILM_DTO_1.clone();
+        film1.setDirectors(Set.of(addedDirector));
+
+        FilmDto film2 = VALID_FILM_DTO_2.clone();
+        film2.setDirectors(Set.of(addedDirector));
+
+        filmService.addFilm(film1);
+        filmService.addFilm(film2);
+
+        Collection<FilmDto> films = filmService.getFilmsSearch("крад", "title");
+
+        Assertions.assertEquals(0, films.size(), "Should return no films when only title search is used");
+    }
+
+    @Test
+    @DisplayName("Search films by director only returns films matched by director")
+    public void getFilmsSearch_searchByDirectorOnly_oneMatchReturned() {
+        DirectorDto director1 = VALID_DIRECTOR_DTO_1.clone();
+        director1.setName(VALID_DIRECTOR_NAME_1);
+        DirectorDto addedDirector1 = directorService.addDirector(director1);
+
+        DirectorDto director3 = VALID_DIRECTOR_DTO_3.clone();
+        DirectorDto addedDirector3 = directorService.addDirector(director3);
+
+        FilmDto film1 = VALID_FILM_DTO_5.clone();
+        film1.setDirectors(Set.of(addedDirector1));
+
+        FilmDto film2 = VALID_FILM_DTO_6.clone();
+        film2.setDirectors(Set.of(addedDirector3));
+
+        film1 = filmService.addFilm(film1);
+        film2 = filmService.addFilm(film2);
+
+        Collection<FilmDto> films = filmService.getFilmsSearch("крад", "director");
+
+        Assertions.assertEquals(1, films.size());
+        Assertions.assertEquals(film2.getId(), films.iterator().next().getId());
+    }
+
+    @Test
+    @DisplayName("Search films by title only returns films matched by title")
+    public void getFilmsSearch_searchByTitleOnly_oneMatchReturned() {
+        DirectorDto director3 = VALID_DIRECTOR_DTO_3.clone();
+        DirectorDto addedDirector3 = directorService.addDirector(director3);
+
+        DirectorDto director2 = VALID_DIRECTOR_DTO_2.clone();
+        director2.setName(VALID_DIRECTOR_NAME_2);
+        DirectorDto addedDirector2 = directorService.addDirector(director2);
+
+        FilmDto film1 = VALID_FILM_DTO_5.clone();
+        film1.setDirectors(Set.of(addedDirector2));
+
+        FilmDto film2 = VALID_FILM_DTO_1.clone();
+        film2.setDirectors(Set.of(addedDirector3));
+
+        film1 = filmService.addFilm(film1);
+        film2 = filmService.addFilm(film2);
+
+        Collection<FilmDto> films = filmService.getFilmsSearch("крад", "title");
+
+        Assertions.assertEquals(1, films.size());
+        Assertions.assertEquals(film1.getId(), films.iterator().next().getId());
     }
 }

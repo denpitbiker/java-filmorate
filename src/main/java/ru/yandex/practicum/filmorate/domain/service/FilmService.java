@@ -4,6 +4,7 @@ import jakarta.validation.ValidationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.data.annotation.DbStorage;
+import ru.yandex.practicum.filmorate.data.model.enums.By;
 import ru.yandex.practicum.filmorate.data.model.enums.SortBy;
 import ru.yandex.practicum.filmorate.data.storage.api.*;
 import ru.yandex.practicum.filmorate.domain.exception.DuplicatedDataException;
@@ -36,6 +37,7 @@ public class FilmService {
     private static final String DUPLICATE_FILM_FOUND_TRACE_MSG = "Already have film with id: {}";
     private static final String FILM_NOT_FOUND_TRACE_MSG = "Can't find film with id: {}";
     private static final String GET_DIRECTOR_FILMS_MSG = "Get films of director with id: {}";
+    private static final String SEARCH_FILMS_MSG = "Search films with query {} and by {} request";
     private static final String DIRECTOR_NOT_FOUND_TRACE_MSG = "Can't find director with id: {}";
 
     private static final String GENRE_NOT_FOUND_ERR_MSG = "Can't find genre with id = ";
@@ -45,6 +47,8 @@ public class FilmService {
     private static final String FILM_NOT_FOUND_ERR_MSG = "Can't find film with id = ";
     private static final String FILMS_COUNT_ERR_MSG = "Films count must be positive number!";
     private static final String DIRECTOR_NOT_FOUND_ERR_MSG = "Can't find director with id = ";
+    private static final String QUERY_SEARCH_ERR_MSG = "There isn't query search param";
+    private static final String BY_SEARCH_ERR_MSG = "There isn't by search param";
 
 
     private final FilmStorage filmStorage;
@@ -144,16 +148,29 @@ public class FilmService {
         FilmsAdditionalInfo info = getFilmsInfo(films);
         Comparator<FilmDto> comparator = sortBy.equals(SortBy.YEAR)
                 ? Comparator
-                        .comparing(FilmDto::getReleaseDate)
+                .comparing(FilmDto::getReleaseDate)
                 : Comparator
-                        .comparingInt((FilmDto f) -> f.getLikesIds().size())
-                        .reversed();
+                .comparingInt((FilmDto f) -> f.getLikesIds().size())
+                .reversed();
 
         return films.stream()
                 .map(film -> filmMapper.toPresentation(film, extractFilmInfo(info, film)))
                 .filter(f -> f.getDirectors() != null)
                 .filter(f -> f.getDirectors().stream().map(DirectorDto::getId).toList().contains(id))
                 .sorted(comparator)
+                .toList();
+    }
+
+    public Collection<FilmDto> getFilmsSearch(String query, String by) {
+        log.info(SEARCH_FILMS_MSG, query, by);
+
+        Set<By> byParams = checkSearchParams(query, by);
+
+        List<Film> films = filmStorage.getFilmsSearch(query, byParams);
+        FilmsAdditionalInfo info = getFilmsInfo(films);
+
+        return films.stream()
+                .map(film -> filmMapper.toPresentation(film, extractFilmInfo(info, film)))
                 .toList();
     }
 
@@ -253,6 +270,29 @@ public class FilmService {
         if (!directorStorage.hasDirectorId(directorId)) {
             log.trace(DIRECTOR_NOT_FOUND_TRACE_MSG, directorId);
             throw new NotFoundException(DIRECTOR_NOT_FOUND_ERR_MSG + directorId);
+        }
+    }
+
+    private Set<By> checkSearchParams(String query, String by) {
+        if (query == null || query.isBlank()) {
+            log.trace(QUERY_SEARCH_ERR_MSG);
+            throw new IllegalArgumentException("Parameter 'query' must not be blank");
+        }
+
+        if (by == null || by.isBlank()) {
+            log.trace(BY_SEARCH_ERR_MSG);
+            throw new IllegalArgumentException("Parameter 'by' must not be blank");
+        }
+
+        try {
+            return Arrays.stream(by.split(","))
+                    .map(String::trim)
+                    .map(String::toUpperCase)
+                    .map(By::valueOf)
+                    .collect(Collectors.toSet());
+        } catch (IllegalArgumentException e) {
+            log.trace(BY_SEARCH_ERR_MSG);
+            throw new IllegalArgumentException("Parameter 'by' is invalid");
         }
     }
 }
