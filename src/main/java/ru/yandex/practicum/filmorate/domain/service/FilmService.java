@@ -276,12 +276,12 @@ public class FilmService {
     private Set<By> checkSearchParams(String query, String by) {
         if (query == null || query.isBlank()) {
             log.trace(QUERY_SEARCH_ERR_MSG);
-            throw new IllegalArgumentException("Parameter 'query' must not be blank");
+            throw new IllegalArgumentException(QUERY_SEARCH_ERR_MSG);
         }
 
         if (by == null || by.isBlank()) {
             log.trace(BY_SEARCH_ERR_MSG);
-            throw new IllegalArgumentException("Parameter 'by' must not be blank");
+            throw new IllegalArgumentException(BY_SEARCH_ERR_MSG);
         }
 
         try {
@@ -292,7 +292,7 @@ public class FilmService {
                     .collect(Collectors.toSet());
         } catch (IllegalArgumentException e) {
             log.trace(BY_SEARCH_ERR_MSG);
-            throw new IllegalArgumentException("Parameter 'by' is invalid");
+            throw new IllegalArgumentException(BY_SEARCH_ERR_MSG);
         }
     }
 }
