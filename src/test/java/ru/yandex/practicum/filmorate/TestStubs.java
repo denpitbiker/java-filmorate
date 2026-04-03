@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate;
 
 import ru.yandex.practicum.filmorate.data.model.Director;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.LinkedHashSet;
@@ -13,6 +14,7 @@ import ru.yandex.practicum.filmorate.presentation.dto.*;
 
 import java.time.LocalDate;
 import java.util.LinkedHashSet;
+
 import ru.yandex.practicum.filmorate.data.model.enums.EventOperation;
 import ru.yandex.practicum.filmorate.data.model.enums.EventType;
 import ru.yandex.practicum.filmorate.presentation.dto.FilmDto;
@@ -20,9 +22,11 @@ import ru.yandex.practicum.filmorate.presentation.dto.GenreDto;
 import ru.yandex.practicum.filmorate.presentation.dto.MpaDto;
 import ru.yandex.practicum.filmorate.presentation.dto.ReviewDto;
 import ru.yandex.practicum.filmorate.presentation.dto.UserDto;
+
 import java.util.List;
 
 public class TestStubs {
+    public static final int EXPECTED_REPOSITORY_SIZE_THREE = 3;
     public static final int EXPECTED_REPOSITORY_SIZE_TWO = 2;
     public static final int EXPECTED_REPOSITORY_SIZE_ONE = 1;
     public static final int EXPECTED_REPOSITORY_SIZE_ZERO = 0;
@@ -31,6 +35,10 @@ public class TestStubs {
     public static final String VALID_FILM_NAME_1 = "Крепкий орешек";
     public static final String VALID_FILM_NAME_2 = "Бесславные ублюдки";
     public static final String VALID_FILM_NAME_3 = "Ждун";
+    public static final String VALID_FILM_NAME_4 = "Крадущийся тигр, затаивщийся дракон";
+    public static final String VALID_FILM_NAME_5 = "Крадущийся в ночи";
+    public static final String VALID_FILM_NAME_6 = "Икра";
+    public static final String VALID_FILM_NAME_7 = "Радость";
     public static final String VALID_FILM_DESCRIPTION_1 = "Базовый фильм";
     public static final String VALID_FILM_DESCRIPTION_2 = "Вторая мировая война. В оккупированной немцами Франции группа американских солдат-евреев наводит страх на нацистов, жестоко убивая и скальпируя солдат.";
     public static final String VALID_FILM_DESCRIPTION_3 = "Внезапное детище российского кинопроизводства";
@@ -69,18 +77,25 @@ public class TestStubs {
 
     public static final String VALID_DIRECTOR_NAME_1 = "Quentin Tarantino";
     public static final String VALID_DIRECTOR_NAME_2 = "Woody Allen";
+    public static final String VALID_DIRECTOR_NAME_3 = "Казнокрадов Иван";
 
     public static final Director VALID_DIRECTOR_1 = new Director(1L, VALID_DIRECTOR_NAME_1);
     public static final Director VALID_DIRECTOR_2 = new Director(2L, VALID_DIRECTOR_NAME_2);
+    public static final Director VALID_DIRECTOR_3 = new Director(2L, VALID_DIRECTOR_NAME_3);
 
     public static final DirectorDto VALID_DIRECTOR_DTO_1 = new DirectorDto(1L, VALID_DIRECTOR_NAME_1);
     public static final DirectorDto VALID_DIRECTOR_DTO_2 = new DirectorDto(2L, VALID_DIRECTOR_NAME_2);
-    public static final DirectorDto INVALID_DIRECTOR_DTO = new DirectorDto(3L, null);
+    public static final DirectorDto VALID_DIRECTOR_DTO_3 = new DirectorDto(3L, VALID_DIRECTOR_NAME_3);
+    public static final DirectorDto INVALID_DIRECTOR_DTO = new DirectorDto(4L, null);
 
     public static final FilmDto VALID_FILM_DTO_1 = new FilmDto(null, VALID_FILM_NAME_1, VALID_FILM_DESCRIPTION_1, VALID_DATE_1, VALID_MPA_DTO, VALID_DURATION_1, new LinkedHashSet<>(), new LinkedHashSet<>());
     public static final FilmDto VALID_FILM_DTO_2 = new FilmDto(null, VALID_FILM_NAME_2, VALID_FILM_DESCRIPTION_2, VALID_DATE_2, VALID_MPA_DTO, VALID_DURATION_2, null, new LinkedHashSet<>());
     public static final FilmDto VALID_FILM_DTO_3 = new FilmDto(null, VALID_FILM_NAME_3, VALID_FILM_DESCRIPTION_3, VALID_DATE_1, VALID_MPA_DTO, VALID_DURATION_2, null, new LinkedHashSet<>(List.of(VALID_DIRECTOR_DTO_1, VALID_DIRECTOR_DTO_2)));
     public static final FilmDto VALID_FILM_DTO_4 = new FilmDto(null, VALID_FILM_NAME_3, VALID_FILM_DESCRIPTION_3, VALID_DATE_2, VALID_MPA_DTO, VALID_DURATION_2, null, new LinkedHashSet<>(List.of(VALID_DIRECTOR_DTO_2)));
+    public static final FilmDto VALID_FILM_DTO_5 = new FilmDto(null, VALID_FILM_NAME_4, VALID_FILM_DESCRIPTION_2, VALID_DATE_2, VALID_MPA_DTO, VALID_DURATION_2, null, new LinkedHashSet<>());
+    public static final FilmDto VALID_FILM_DTO_6 = new FilmDto(null, VALID_FILM_NAME_5, VALID_FILM_DESCRIPTION_2, VALID_DATE_2, VALID_MPA_DTO, VALID_DURATION_2, null, new LinkedHashSet<>());
+    public static final FilmDto VALID_FILM_DTO_7 = new FilmDto(null, VALID_FILM_NAME_6, VALID_FILM_DESCRIPTION_2, VALID_DATE_2, VALID_MPA_DTO, VALID_DURATION_2, null, new LinkedHashSet<>());
+    public static final FilmDto VALID_FILM_DTO_8 = new FilmDto(null, VALID_FILM_NAME_7, VALID_FILM_DESCRIPTION_2, VALID_DATE_2, VALID_MPA_DTO, VALID_DURATION_2, null, new LinkedHashSet<>());
 
     public static final Film VALID_FILM_1 = new Film(null, VALID_FILM_NAME_1, VALID_FILM_DESCRIPTION_1, VALID_DATE_1, VALID_MPA_ID, VALID_DURATION_1);
     public static final Film VALID_FILM_2 = new Film(null, VALID_FILM_NAME_2, VALID_FILM_DESCRIPTION_2, VALID_DATE_2, VALID_MPA_ID, VALID_DURATION_2);

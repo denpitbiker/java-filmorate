@@ -25,6 +25,8 @@ public class FilmController {
     public static final String GENRE_PARAM = "genreId";
     public static final String YEAR_PARAM = "year";
     public static final String SORT_BY_PARAM = "sortBy";
+    public static final String BY_PARAM = "by";
+    public static final String QUERY_VAR = "query";
 
     public static final String CONTROLLER_ROUTE = "/films";
     public static final String GET_FILM_SUBROUTE = "/{" + ID_PATH_VAR + "}";
@@ -32,6 +34,7 @@ public class FilmController {
     public static final String LIKE_FILM_SUBROUTE = "/{" + ID_PATH_VAR + "}/like/{" + USER_ID_PATH_VAR + "}";
     public static final String UNLIKE_FILM_SUBROUTE = "/{" + ID_PATH_VAR + "}/like/{" + USER_ID_PATH_VAR + "}";
     public static final String GET_TOP_FILMS_SUBROUTE = "/popular";
+    public static final String FILMS_SEARCH_SUBROUTE = "/search";
     public static final String GET_DIRECTOR_FILMS_SUBROUTE = "/director/{" + DIRECTOR_ID_VAR + "}";
 
 
@@ -46,6 +49,7 @@ public class FilmController {
     private static final String UPDATE_FILM_LOG_MSG = "Update film request {}";
     private static final String DELETE_FILM_LOG_MSG = "Delete film with id {} request";
     private static final String GET_DIRECTOR_FILMS_MSG = "Get films of director with id {} request";
+    private static final String SEARCH_FILMS_MSG = "Search films with query {} and by {} request";
 
     private final FilmService filmService;
     private final EventService eventService;
@@ -113,5 +117,14 @@ public class FilmController {
     public FilmDto deleteFilm(@PathVariable(ID_PATH_VAR) Long id) {
         log.info(DELETE_FILM_LOG_MSG, id);
         return filmService.deleteFilm(id);
+    }
+
+    @GetMapping(FILMS_SEARCH_SUBROUTE)
+    public Collection<FilmDto> searchFilms(
+            @RequestParam(QUERY_VAR) String query,
+            @RequestParam(BY_PARAM) String by
+    ) {
+        log.info(SEARCH_FILMS_MSG, query, by);
+        return filmService.searchFilms(query, by);
     }
 }
