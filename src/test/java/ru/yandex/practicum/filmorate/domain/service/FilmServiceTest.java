@@ -388,7 +388,7 @@ public class FilmServiceTest {
 
     @Test
     @DisplayName("Search films by substring in title and director")
-    public void getFilmsSearch_searchByTitleAndDirectorSubstring_filmsReturned() {
+    public void searchFilms_searchByTitleAndDirectorSubstring_filmsReturned() {
         DirectorDto director1 = VALID_DIRECTOR_DTO_1.clone();
         director1.setName(VALID_DIRECTOR_NAME_1);
         DirectorDto addedDirector1 = directorService.addDirector(director1);
@@ -418,14 +418,14 @@ public class FilmServiceTest {
         filmService.addFilm(film3);
         filmService.addFilm(film4);
 
-        Collection<FilmDto> films = filmService.getFilmsSearch("крад", "director,title");
+        Collection<FilmDto> films = filmService.searchFilms("крад", "director,title");
 
         Assertions.assertEquals(3, films.size(), "Should return three matching films");
     }
 
     @Test
     @DisplayName("Search films with no matches returns empty collection")
-    public void getFilmsSearch_noMatches_returnsEmptyCollection() {
+    public void searchFilms_noMatches_returnsEmptyCollection() {
         DirectorDto director1 = VALID_DIRECTOR_DTO_1.clone();
         director1.setName(VALID_DIRECTOR_NAME_1);
         DirectorDto addedDirector1 = directorService.addDirector(director1);
@@ -443,14 +443,14 @@ public class FilmServiceTest {
         filmService.addFilm(film1);
         filmService.addFilm(film2);
 
-        Collection<FilmDto> films = filmService.getFilmsSearch("крад", "director,title");
+        Collection<FilmDto> films = filmService.searchFilms("крад", "director,title");
 
         Assertions.assertEquals(0, films.size(), "Should return no films");
     }
 
     @Test
     @DisplayName("Search films by director only does not return films matched by title")
-    public void getFilmsSearch_searchByDirectorOnly_noMatchesReturned() {
+    public void searchFilms_searchByDirectorOnly_noMatchesReturned() {
         DirectorDto director1 = VALID_DIRECTOR_DTO_1.clone();
         director1.setName(VALID_DIRECTOR_NAME_1);
         DirectorDto addedDirector1 = directorService.addDirector(director1);
@@ -468,14 +468,14 @@ public class FilmServiceTest {
         filmService.addFilm(film1);
         filmService.addFilm(film2);
 
-        Collection<FilmDto> films = filmService.getFilmsSearch("крад", "director");
+        Collection<FilmDto> films = filmService.searchFilms("крад", "director");
 
         Assertions.assertEquals(0, films.size(), "Should return no films when only director search is used");
     }
 
     @Test
     @DisplayName("Search films by title only does not return films matched by director")
-    public void getFilmsSearch_searchByTitleOnly_noMatchesReturned() {
+    public void searchFilms_searchByTitleOnly_noMatchesReturned() {
         DirectorDto director = VALID_DIRECTOR_DTO_3.clone();
         DirectorDto addedDirector = directorService.addDirector(director);
 
@@ -488,14 +488,14 @@ public class FilmServiceTest {
         filmService.addFilm(film1);
         filmService.addFilm(film2);
 
-        Collection<FilmDto> films = filmService.getFilmsSearch("крад", "title");
+        Collection<FilmDto> films = filmService.searchFilms("крад", "title");
 
         Assertions.assertEquals(0, films.size(), "Should return no films when only title search is used");
     }
 
     @Test
     @DisplayName("Search films by director only returns films matched by director")
-    public void getFilmsSearch_searchByDirectorOnly_oneMatchReturned() {
+    public void searchFilms_searchByDirectorOnly_oneMatchReturned() {
         DirectorDto director1 = VALID_DIRECTOR_DTO_1.clone();
         director1.setName(VALID_DIRECTOR_NAME_1);
         DirectorDto addedDirector1 = directorService.addDirector(director1);
@@ -512,7 +512,7 @@ public class FilmServiceTest {
         film1 = filmService.addFilm(film1);
         film2 = filmService.addFilm(film2);
 
-        Collection<FilmDto> films = filmService.getFilmsSearch("крад", "director");
+        Collection<FilmDto> films = filmService.searchFilms("крад", "director");
 
         Assertions.assertEquals(1, films.size());
         Assertions.assertEquals(film2.getId(), films.iterator().next().getId());
@@ -520,7 +520,7 @@ public class FilmServiceTest {
 
     @Test
     @DisplayName("Search films by title only returns films matched by title")
-    public void getFilmsSearch_searchByTitleOnly_oneMatchReturned() {
+    public void searchFilms_searchByTitleOnly_oneMatchReturned() {
         DirectorDto director3 = VALID_DIRECTOR_DTO_3.clone();
         DirectorDto addedDirector3 = directorService.addDirector(director3);
 
@@ -537,7 +537,7 @@ public class FilmServiceTest {
         film1 = filmService.addFilm(film1);
         film2 = filmService.addFilm(film2);
 
-        Collection<FilmDto> films = filmService.getFilmsSearch("крад", "title");
+        Collection<FilmDto> films = filmService.searchFilms("крад", "title");
 
         Assertions.assertEquals(1, films.size());
         Assertions.assertEquals(film1.getId(), films.iterator().next().getId());

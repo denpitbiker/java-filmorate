@@ -1,7 +1,7 @@
 package ru.yandex.practicum.filmorate.data.storage.api;
 
 import ru.yandex.practicum.filmorate.data.model.Film;
-import ru.yandex.practicum.filmorate.data.model.enums.By;
+import ru.yandex.practicum.filmorate.data.model.enums.SearchCondition;
 
 import java.util.List;
 import java.util.Map;
@@ -30,7 +30,7 @@ public interface FilmStorage {
 
     List<Film> getPopularFilms(Integer limit, Long genreId, Integer year);
 
-    List<Film> getFilmsSearch(String query, Set<By> by);
+    List<Film> searchFilms(String query, Set<SearchCondition> by);
 
     List<Film> getDirectorFilms(Long id, String sortBy);
 }

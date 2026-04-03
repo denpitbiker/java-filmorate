@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.filmorate.data.model.Film;
-import ru.yandex.practicum.filmorate.data.model.enums.By;
+import ru.yandex.practicum.filmorate.data.model.enums.SearchCondition;
 import ru.yandex.practicum.filmorate.data.storage.api.FilmStorage;
 
 import java.util.Set;
@@ -99,7 +99,7 @@ public abstract class FilmStorageTest {
 
     @Test
     @DisplayName("Search films by substring returns all matching films")
-    public void getFilmsSearch_searchBySubstring_returnsMatchingFilms() {
+    public void searchFilms_searchBySubstring_returnsMatchingFilms() {
         Film film1 = VALID_FILM_1.clone();
         film1.setName(VALID_FILM_NAME_4);
 
@@ -117,7 +117,7 @@ public abstract class FilmStorageTest {
         repository.addFilm(film3);
         repository.addFilm(film4);
 
-        var result = repository.getFilmsSearch("крад", Set.of(By.TITLE));
+        var result = repository.searchFilms("крад", Set.of(SearchCondition.TITLE));
 
         Assertions.assertEquals(2, result.size(), "Two films should match substring 'крад'");
 

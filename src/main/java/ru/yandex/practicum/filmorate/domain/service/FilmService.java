@@ -4,7 +4,7 @@ import jakarta.validation.ValidationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.data.annotation.DbStorage;
-import ru.yandex.practicum.filmorate.data.model.enums.By;
+import ru.yandex.practicum.filmorate.data.model.enums.SearchCondition;
 import ru.yandex.practicum.filmorate.data.model.enums.SortBy;
 import ru.yandex.practicum.filmorate.data.storage.api.*;
 import ru.yandex.practicum.filmorate.domain.exception.DuplicatedDataException;
@@ -161,12 +161,12 @@ public class FilmService {
                 .toList();
     }
 
-    public Collection<FilmDto> getFilmsSearch(String query, String by) {
+    public Collection<FilmDto> searchFilms(String query, String by) {
         log.info(SEARCH_FILMS_MSG, query, by);
 
-        Set<By> byParams = checkSearchParams(query, by);
+        Set<SearchCondition> byParams = checkSearchParams(query, by);
 
-        List<Film> films = filmStorage.getFilmsSearch(query, byParams);
+        List<Film> films = filmStorage.searchFilms(query, byParams);
         FilmsAdditionalInfo info = getFilmsInfo(films);
 
         return films.stream()
@@ -273,7 +273,7 @@ public class FilmService {
         }
     }
 
-    private Set<By> checkSearchParams(String query, String by) {
+    private Set<SearchCondition> checkSearchParams(String query, String by) {
         if (query == null || query.isBlank()) {
             log.trace(QUERY_SEARCH_ERR_MSG);
             throw new IllegalArgumentException(QUERY_SEARCH_ERR_MSG);
@@ -288,7 +288,7 @@ public class FilmService {
             return Arrays.stream(by.split(","))
                     .map(String::trim)
                     .map(String::toUpperCase)
-                    .map(By::valueOf)
+                    .map(SearchCondition::valueOf)
                     .collect(Collectors.toSet());
         } catch (IllegalArgumentException e) {
             log.trace(BY_SEARCH_ERR_MSG);

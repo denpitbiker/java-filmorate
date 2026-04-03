@@ -34,7 +34,7 @@ public class FilmController {
     public static final String LIKE_FILM_SUBROUTE = "/{" + ID_PATH_VAR + "}/like/{" + USER_ID_PATH_VAR + "}";
     public static final String UNLIKE_FILM_SUBROUTE = "/{" + ID_PATH_VAR + "}/like/{" + USER_ID_PATH_VAR + "}";
     public static final String GET_TOP_FILMS_SUBROUTE = "/popular";
-    public static final String GET_FILMS_SEARCH_SUBROUTE = "/search";
+    public static final String FILMS_SEARCH_SUBROUTE = "/search";
     public static final String GET_DIRECTOR_FILMS_SUBROUTE = "/director/{" + DIRECTOR_ID_VAR + "}";
 
 
@@ -119,12 +119,12 @@ public class FilmController {
         return filmService.deleteFilm(id);
     }
 
-    @GetMapping(GET_FILMS_SEARCH_SUBROUTE)
-    public Collection<FilmDto> getFilmsSearch(
+    @GetMapping(FILMS_SEARCH_SUBROUTE)
+    public Collection<FilmDto> searchFilms(
             @RequestParam(QUERY_VAR) String query,
             @RequestParam(BY_PARAM) String by
     ) {
         log.info(SEARCH_FILMS_MSG, query, by);
-        return filmService.getFilmsSearch(query, by);
+        return filmService.searchFilms(query, by);
     }
 }

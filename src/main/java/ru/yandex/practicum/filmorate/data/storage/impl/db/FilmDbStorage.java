@@ -11,7 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.yandex.practicum.filmorate.common.model.Pair;
 import ru.yandex.practicum.filmorate.data.annotation.DbStorage;
 import ru.yandex.practicum.filmorate.data.model.Film;
-import ru.yandex.practicum.filmorate.data.model.enums.By;
+import ru.yandex.practicum.filmorate.data.model.enums.SearchCondition;
 import ru.yandex.practicum.filmorate.data.storage.api.FilmStorage;
 import ru.yandex.practicum.filmorate.data.storage.impl.db.rowmapper.FilmRowMapper;
 
@@ -28,7 +28,7 @@ public class FilmDbStorage implements FilmStorage {
     private static final String ADD_FILM_QUERY = "INSERT INTO film (name, description, release_date, mpa_id, duration_minutes) VALUES (?, ?, ?, ?, ?)";
     private static final String UPDATE_FILM_QUERY = "UPDATE film SET name = ?, description = ?, release_date = ?, mpa_id = ?, duration_minutes = ? WHERE id = ?";
     private static final String GET_ALL_FILMS_QUERY = "SELECT * FROM film";
-    private static final String GET_FILMS_SEARCH_QUERY = """
+    private static final String FILMS_SEARCH_QUERY = """
             SELECT DISTINCT f.id,
                    f.name,
                    f.description,
@@ -230,18 +230,18 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     @Override
-    public List<Film> getFilmsSearch(String query, Set<By> by) {
+    public List<Film> searchFilms(String query, Set<SearchCondition> by) {
         List<String> conditions = new ArrayList<>();
         List<Object> params = new ArrayList<>();
 
         String likeQuery = "%" + query.toLowerCase() + "%";
 
-        if (by.contains(By.TITLE)) {
+        if (by.contains(SearchCondition.TITLE)) {
             conditions.add("LOWER(f.name) LIKE ?");
             params.add(likeQuery);
         }
 
-        if (by.contains(By.DIRECTOR)) {
+        if (by.contains(SearchCondition.DIRECTOR)) {
             conditions.add("LOWER(d.name) LIKE ?");
             params.add(likeQuery);
         }
@@ -252,7 +252,7 @@ public class FilmDbStorage implements FilmStorage {
 
         String whereClause = String.join(" OR ", conditions);
 
-        String sql = String.format(GET_FILMS_SEARCH_QUERY, whereClause);
+        String sql = String.format(FILMS_SEARCH_QUERY, whereClause);
 
         return jdbc.query(sql, mapper, params.toArray());
     }

@@ -256,7 +256,7 @@ public class FilmControllerTest {
 
     @Test
     @DisplayName("Search films by substring in title and director returns matching films")
-    public void get_films_searchByTitleAndDirectorSubstring_success200() throws Exception {
+    public void films_searchByTitleAndDirectorSubstring_success200() throws Exception {
         DirectorDto director1 = VALID_DIRECTOR_DTO_1.clone();
         director1.setName(VALID_DIRECTOR_NAME_1);
 
@@ -287,7 +287,7 @@ public class FilmControllerTest {
         addFilm(film3);
         addFilm(film4);
 
-        mvc.perform(get(FilmController.CONTROLLER_ROUTE + FilmController.GET_FILMS_SEARCH_SUBROUTE)
+        mvc.perform(get(FilmController.CONTROLLER_ROUTE + FilmController.FILMS_SEARCH_SUBROUTE)
                         .param(FilmController.QUERY_VAR, "крад")
                         .param(FilmController.BY_PARAM, "director,title"))
                 .andExpect(status().isOk())
