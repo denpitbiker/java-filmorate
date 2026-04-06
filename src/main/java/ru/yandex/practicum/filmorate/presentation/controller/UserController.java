@@ -2,7 +2,6 @@ package ru.yandex.practicum.filmorate.presentation.controller;
 
 import java.util.Collection;
 import ru.yandex.practicum.filmorate.domain.service.FilmService;
-import ru.yandex.practicum.filmorate.presentation.dto.FilmDto;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
