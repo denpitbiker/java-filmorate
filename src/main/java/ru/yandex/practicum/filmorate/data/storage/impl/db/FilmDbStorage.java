@@ -289,9 +289,4 @@ public class FilmDbStorage implements FilmStorage {
     public List<Film> getCommonFilms(Long userId, Long friendId) {
         return jdbc.query(GET_COMMON_FILMS_QUERY, mapper, userId, friendId);
     }
-
-    @Override
-    public List<Film> getRecommendations(Long userId) {
-        return jdbc.query(GET_RECOMMENDATIONS_QUERY, mapper, userId, userId, userId);
-    }
 }
