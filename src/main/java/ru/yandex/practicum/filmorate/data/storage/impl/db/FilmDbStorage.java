@@ -28,6 +28,7 @@ public class FilmDbStorage implements FilmStorage {
     private static final String ADD_FILM_QUERY = "INSERT INTO film (name, description, release_date, mpa_id, duration_minutes) VALUES (?, ?, ?, ?, ?)";
     private static final String UPDATE_FILM_QUERY = "UPDATE film SET name = ?, description = ?, release_date = ?, mpa_id = ?, duration_minutes = ? WHERE id = ?";
     private static final String GET_ALL_FILMS_QUERY = "SELECT * FROM film";
+
     private static final String FILMS_SEARCH_QUERY = """
             SELECT DISTINCT f.id,
                    f.name,
@@ -47,6 +48,7 @@ public class FilmDbStorage implements FilmStorage {
             WHERE %s
             ORDER BY likes DESC
             """;
+
     private static final String GET_POPULAR_FILMS_QUERY = """
             SELECT ff.id,
                    ff.name,
@@ -81,10 +83,31 @@ public class FilmDbStorage implements FilmStorage {
             ORDER BY likes DESC
             LIMIT ?
             """;
+
     private static final String GET_LIKES_FOR_FILMS_QUERY = """
             SELECT film_id, user_id
-            FROM film_like WHERE film_id IN (%s)
+            FROM film_like
+            WHERE film_id IN (%s)
             """;
+
+    private static final String GET_COMMON_FILMS_QUERY = """
+            SELECT f.id,
+                   f.name,
+                   f.description,
+                   f.release_date,
+                   f.mpa_id,
+                   f.duration_minutes,
+                   COUNT(DISTINCT fl_all.user_id) AS likes_count
+            FROM film f
+            JOIN film_like fl1 ON f.id = fl1.film_id
+            JOIN film_like fl2 ON f.id = fl2.film_id
+            LEFT JOIN film_like fl_all ON f.id = fl_all.film_id
+            WHERE fl1.user_id = ?
+              AND fl2.user_id = ?
+            GROUP BY f.id, f.name, f.description, f.release_date, f.mpa_id, f.duration_minutes
+            ORDER BY likes_count DESC, f.id
+            """;
+
     private static final String DELETE_FILM_QUERY = "DELETE FROM film WHERE id=?";
 
     private static final String GET_DIRECTOR_FILMS_QUERY = """
@@ -111,7 +134,8 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public boolean hasFilmId(Long id) {
-        if (id == null) return false;
+        if (id == null)
+            return false;
         return !jdbc.queryForList(GET_FILM_QUERY, id).isEmpty();
     }
 
@@ -129,14 +153,17 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public Map<Long, Set<Long>> getFilmsLikes(List<Long> filmIds) {
+        if (filmIds == null || filmIds.isEmpty()) {
+            return Collections.emptyMap();
+        }
+
         String inSql = String.join(",", Collections.nCopies(filmIds.size(), "?"));
 
         List<Pair<Long, Long>> entries = jdbc.query(
                 String.format(GET_LIKES_FOR_FILMS_QUERY, inSql),
                 filmIds.toArray(),
-                (rs, rowNum) ->
-                        new Pair<>(rs.getLong(FILM_ID_COLUMN_LABEL), rs.getLong(USER_ID_COLUMN_LABEL))
-        );
+                (rs, rowNum) -> new Pair<>(rs.getLong(FILM_ID_COLUMN_LABEL), rs.getLong(USER_ID_COLUMN_LABEL)));
+
         Map<Long, Set<Long>> result = new HashMap<>();
         entries.forEach(entry -> {
             if (!result.containsKey(entry.first)) {
@@ -152,7 +179,7 @@ public class FilmDbStorage implements FilmStorage {
     public Film addFilm(Film newFilm) {
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbc.update(connection -> {
-            PreparedStatement ps = connection.prepareStatement(ADD_FILM_QUERY, new String[]{ID_COLUMN_LABEL});
+            PreparedStatement ps = connection.prepareStatement(ADD_FILM_QUERY, new String[] { ID_COLUMN_LABEL });
             ps.setString(1, newFilm.getName());
             ps.setString(2, newFilm.getDescription());
             ps.setDate(3, Date.valueOf(newFilm.getReleaseDate()));
@@ -160,7 +187,8 @@ public class FilmDbStorage implements FilmStorage {
             ps.setLong(5, newFilm.getDurationMinutes());
             return ps;
         }, keyHolder);
-        if (keyHolder.getKey() == null) return null;
+        if (keyHolder.getKey() == null)
+            return null;
         long filmId = keyHolder.getKey().longValue();
         newFilm.setId(filmId);
         return newFilm;
@@ -171,7 +199,8 @@ public class FilmDbStorage implements FilmStorage {
     public Optional<Film> getFilm(Long id) {
         try {
             Film film = jdbc.queryForObject(GET_FILM_QUERY, mapper, id);
-            if (film == null) return Optional.empty();
+            if (film == null)
+                return Optional.empty();
             return Optional.of(film);
         } catch (EmptyResultDataAccessException e) {
             log.info(GET_FILM_FAILED_LOG, id);
@@ -220,8 +249,7 @@ public class FilmDbStorage implements FilmStorage {
                 mapper,
                 year, year,
                 genreId, genreId,
-                limit
-        );
+                limit);
     }
 
     @Override
@@ -255,5 +283,15 @@ public class FilmDbStorage implements FilmStorage {
         String sql = String.format(FILMS_SEARCH_QUERY, whereClause);
 
         return jdbc.query(sql, mapper, params.toArray());
+    }
+
+    @Override
+    public List<Film> getCommonFilms(Long userId, Long friendId) {
+        return jdbc.query(GET_COMMON_FILMS_QUERY, mapper, userId, friendId);
+    }
+
+    @Override
+    public List<Film> getRecommendations(Long userId) {
+        return jdbc.query(GET_RECOMMENDATIONS_QUERY, mapper, userId, userId, userId);
     }
 }

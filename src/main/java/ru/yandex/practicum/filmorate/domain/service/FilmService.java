@@ -49,7 +49,7 @@ public class FilmService {
     private static final String DIRECTOR_NOT_FOUND_ERR_MSG = "Can't find director with id = ";
     private static final String QUERY_SEARCH_ERR_MSG = "There isn't query search param";
     private static final String BY_SEARCH_ERR_MSG = "There isn't by search param";
-
+    private static final String GET_COMMON_FILMS_LOG_MSG = "Get common films for users {} and {}";
 
     private final FilmStorage filmStorage;
     private final UserStorage userStorage;
@@ -59,7 +59,8 @@ public class FilmService {
 
     private static final FilmToFilmDtoMapper filmMapper = new FilmToFilmDtoMapper();
 
-    public FilmService(@DbStorage FilmStorage filmStorage, @DbStorage UserStorage userStorage, GenreStorage genreStorage, MpaStorage mpaStorage, DirectorStorage directorStorage) {
+    public FilmService(@DbStorage FilmStorage filmStorage, @DbStorage UserStorage userStorage,
+            GenreStorage genreStorage, MpaStorage mpaStorage, DirectorStorage directorStorage) {
         this.filmStorage = filmStorage;
         this.userStorage = userStorage;
         this.genreStorage = genreStorage;
@@ -137,7 +138,8 @@ public class FilmService {
     public FilmDto deleteFilm(Long id) {
         log.info(DELETE_FILM_LOG_MSG, id);
         Film removed = filmStorage.removeFilm(id);
-        if (removed == null) throw new NotFoundException(FILM_NOT_FOUND_ERR_MSG + id);
+        if (removed == null)
+            throw new NotFoundException(FILM_NOT_FOUND_ERR_MSG + id);
         return filmMapper.toPresentation(removed, getFilmInfo(removed));
     }
 
@@ -148,10 +150,10 @@ public class FilmService {
         FilmsAdditionalInfo info = getFilmsInfo(films);
         Comparator<FilmDto> comparator = sortBy.equals(SortBy.YEAR)
                 ? Comparator
-                .comparing(FilmDto::getReleaseDate)
+                        .comparing(FilmDto::getReleaseDate)
                 : Comparator
-                .comparingInt((FilmDto f) -> f.getLikesIds().size())
-                .reversed();
+                        .comparingInt((FilmDto f) -> f.getLikesIds().size())
+                        .reversed();
 
         return films.stream()
                 .map(film -> filmMapper.toPresentation(film, extractFilmInfo(info, film)))
@@ -174,14 +176,29 @@ public class FilmService {
                 .toList();
     }
 
+    public Collection<FilmDto> getCommonFilms(Long userId, Long friendId) {
+        log.info(GET_COMMON_FILMS_LOG_MSG, userId, friendId);
+        checkUserIdExist(userId);
+        checkUserIdExist(friendId);
+
+        List<Film> films = filmStorage.getCommonFilms(userId, friendId);
+        FilmsAdditionalInfo info = getFilmsInfo(films);
+
+        return films.stream()
+                .map(film -> filmMapper.toPresentation(film, extractFilmInfo(info, film)))
+                .toList();
+    }
+
     private void tryUpdateGenres(Long filmId, FilmDto film) {
         if (film.getGenres() != null)
-            genreStorage.updateFilmGenres(filmId, film.getGenres().stream().map(GenreDto::getId).collect(Collectors.toSet()));
+            genreStorage.updateFilmGenres(filmId,
+                    film.getGenres().stream().map(GenreDto::getId).collect(Collectors.toSet()));
     }
 
     private void tryUpdateDirectors(Long filmId, FilmDto film) {
         if (film.getDirectors() != null)
-            directorStorage.updateFilmDirectors(filmId, film.getDirectors().stream().map(DirectorDto::getId).collect(Collectors.toSet()));
+            directorStorage.updateFilmDirectors(filmId,
+                    film.getDirectors().stream().map(DirectorDto::getId).collect(Collectors.toSet()));
     }
 
     private Film getFilmOrThrow(Long id) {
@@ -199,8 +216,7 @@ public class FilmService {
                 info.mpas().get(film.getMpaId()),
                 info.genres().get(film.getId()),
                 info.likes().get(film.getId()),
-                info.directors().get(film.getId())
-        );
+                info.directors().get(film.getId()));
     }
 
     private FilmAdditionalInfo getFilmInfo(Film film) {
@@ -208,16 +224,20 @@ public class FilmService {
     }
 
     private FilmsAdditionalInfo getFilmsInfo(List<Film> films) {
+        if (films == null || films.isEmpty()) {
+            return new FilmsAdditionalInfo(Map.of(), Map.of(), Map.of(), Map.of());
+        }
+
         return new FilmsAdditionalInfo(
                 mpaStorage.getMpasInfo(films.stream().map(Film::getMpaId).collect(Collectors.toSet())),
                 filmStorage.getFilmsLikes(films.stream().map(Film::getId).toList()),
                 genreStorage.getGenresForFilms(films.stream().map(Film::getId).toList()),
-                directorStorage.getDirectorsForFilms(films.stream().map(Film::getId).toList())
-        );
+                directorStorage.getDirectorsForFilms(films.stream().map(Film::getId).toList()));
     }
 
     private void checkGenresExists(Collection<GenreDto> genres) {
-        if (genres == null) return;
+        if (genres == null)
+            return;
         genres.forEach((genre) -> {
             if (genreStorage.getGenre(genre.getId()).isEmpty()) {
                 log.trace(GENRE_NOT_FOUND_TRACE_MSG, genre.getId());
@@ -227,7 +247,8 @@ public class FilmService {
     }
 
     private void checkMpaExists(Long id) {
-        if (id == null) return;
+        if (id == null)
+            return;
         if (mpaStorage.getMpa(id).isEmpty()) {
             log.trace(MPA_NOT_FOUND_TRACE_MSG, id);
             throw new NotFoundException(MPA_NOT_FOUND_ERR_MSG + id);
@@ -256,7 +277,8 @@ public class FilmService {
     }
 
     private void checkDirectorsExist(Collection<DirectorDto> directors) {
-        if (directors == null) return;
+        if (directors == null)
+            return;
         directors.forEach((director) -> {
             if (directorStorage.getDirector(director.getId()).isEmpty()) {
                 log.trace(DIRECTOR_NOT_FOUND_TRACE_MSG, director.getId());
@@ -266,7 +288,8 @@ public class FilmService {
     }
 
     private void checkDirectorExists(Long directorId) {
-        if (directorId == null) return;
+        if (directorId == null)
+            return;
         if (!directorStorage.hasDirectorId(directorId)) {
             log.trace(DIRECTOR_NOT_FOUND_TRACE_MSG, directorId);
             throw new NotFoundException(DIRECTOR_NOT_FOUND_ERR_MSG + directorId);
