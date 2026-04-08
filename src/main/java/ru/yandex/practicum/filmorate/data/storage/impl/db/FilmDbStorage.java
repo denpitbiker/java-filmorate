@@ -108,6 +108,40 @@ public class FilmDbStorage implements FilmStorage {
             ORDER BY likes_count DESC, f.id
             """;
 
+    private static final String GET_RECOMMENDATIONS_QUERY = """
+            WITH similar_users AS (
+                SELECT fl2.user_id AS user_id, COUNT(*) AS common_likes
+                FROM film_like fl1
+                JOIN film_like fl2 ON fl1.film_id = fl2.film_id
+                WHERE fl1.user_id = ? AND fl2.user_id <> ?
+                GROUP BY fl2.user_id
+            ),
+            most_similar_users AS (
+                SELECT user_id
+                FROM similar_users
+                WHERE common_likes = (SELECT MAX(common_likes) FROM similar_users)
+            )
+            SELECT f.id,
+                   f.name,
+                   f.description,
+                   f.release_date,
+                   f.mpa_id,
+                   f.duration_minutes,
+                   COUNT(DISTINCT fl_all.user_id) AS likes_count
+            FROM film f
+            JOIN film_like fl ON f.id = fl.film_id
+            JOIN most_similar_users msu ON msu.user_id = fl.user_id
+            LEFT JOIN film_like fl_all ON fl_all.film_id = f.id
+            WHERE NOT EXISTS (
+                SELECT 1
+                FROM film_like own_likes
+                WHERE own_likes.film_id = f.id
+                  AND own_likes.user_id = ?
+            )
+            GROUP BY f.id, f.name, f.description, f.release_date, f.mpa_id, f.duration_minutes
+            ORDER BY likes_count DESC, f.id
+            """;
+
     private static final String DELETE_FILM_QUERY = "DELETE FROM film WHERE id=?";
 
     private static final String GET_DIRECTOR_FILMS_QUERY = """
@@ -288,5 +322,10 @@ public class FilmDbStorage implements FilmStorage {
     @Override
     public List<Film> getCommonFilms(Long userId, Long friendId) {
         return jdbc.query(GET_COMMON_FILMS_QUERY, mapper, userId, friendId);
+    }
+
+    @Override
+    public List<Film> getRecommendations(Long userId) {
+        return jdbc.query(GET_RECOMMENDATIONS_QUERY, mapper, userId, userId, userId);
     }
 }

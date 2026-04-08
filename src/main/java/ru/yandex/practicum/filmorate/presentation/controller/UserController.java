@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.domain.service.EventService;
 import ru.yandex.practicum.filmorate.domain.service.UserService;
 import ru.yandex.practicum.filmorate.presentation.dto.EventDto;
+import ru.yandex.practicum.filmorate.presentation.dto.FilmDto;
 import ru.yandex.practicum.filmorate.presentation.dto.UserDto;
 
 @Slf4j
@@ -31,6 +32,7 @@ public class UserController {
     public static final String GET_COMMON_FRIENDS_SUBROUTE = "/{" + ID_PATH_VAR + "}/friends/common/{"
             + OTHER_ID_PATH_VAR + "}";
     public static final String GET_USER_FEED_SUBROUTE = "/{" + ID_PATH_VAR + "}/feed";
+    public static final String GET_RECOMMENDATIONS_SUBROUTE = "/{" + ID_PATH_VAR + "}/recommendations";
 
     private static final String GET_USER_LOG_MSG = "Get user {} request";
     private static final String DELETE_USER_LOG_MSG = "Delete user {} request";
@@ -42,6 +44,7 @@ public class UserController {
     private static final String ADD_USER_LOG_MSG = "Add new user request {}";
     private static final String UPDATE_USER_LOG_MSG = "Update user request {}";
     private static final String GET_USER_FEED_LOG_MSG = "Get feed for user {} request";
+    private static final String GET_RECOMMENDATIONS_LOG_MSG = "Get recommendations for user {} request";
 
     private final FilmService filmService;
     private final UserService userService;
@@ -111,6 +114,12 @@ public class UserController {
         userService.getUser(id);
         log.info(GET_USER_FEED_LOG_MSG, id);
         return eventService.getEventsForUser(id);
+    }
+
+    @GetMapping(GET_RECOMMENDATIONS_SUBROUTE)
+    public Collection<FilmDto> getRecommendations(@PathVariable(ID_PATH_VAR) Long id) {
+        log.info(GET_RECOMMENDATIONS_LOG_MSG, id);
+        return filmService.getRecommendations(id);
     }
 
     @GetMapping("/feed")
