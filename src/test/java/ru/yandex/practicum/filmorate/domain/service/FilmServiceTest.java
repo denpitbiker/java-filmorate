@@ -29,9 +29,7 @@ import static ru.yandex.practicum.filmorate.TestStubs.*;
 
 @AutoConfigureTestDatabase(connection = EmbeddedDatabaseConnection.H2)
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(
-        webEnvironment = SpringBootTest.WebEnvironment.MOCK,
-        classes = FilmorateApplication.class)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK, classes = FilmorateApplication.class)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 public class FilmServiceTest {
     private static final int TOP_ONE_COUNT = 1;
@@ -54,8 +52,7 @@ public class FilmServiceTest {
 
         Assertions.assertDoesNotThrow(
                 () -> filmService.likeFilm(film.getId(), user.getId()),
-                "Liking the film should not throw exceptions"
-        );
+                "Liking the film should not throw exceptions");
 
         FilmDto updatedFilm = filmService.getFilm(film.getId());
         Assertions.assertTrue(updatedFilm.getLikesIds().contains(user.getId()), "Film should contain the user's like");
@@ -68,8 +65,7 @@ public class FilmServiceTest {
         Assertions.assertThrows(
                 NotFoundException.class,
                 () -> filmService.likeFilm(film.getId(), NON_EXISTING_ID),
-                "NotFoundException should be thrown for unknown user"
-        );
+                "NotFoundException should be thrown for unknown user");
     }
 
     @Test
@@ -79,8 +75,7 @@ public class FilmServiceTest {
         Assertions.assertThrows(
                 NotFoundException.class,
                 () -> filmService.likeFilm(NON_EXISTING_ID, user.getId()),
-                NOT_FOUND_FILM_FAIL_MSG
-        );
+                NOT_FOUND_FILM_FAIL_MSG);
     }
 
     @Test
@@ -92,11 +87,11 @@ public class FilmServiceTest {
 
         Assertions.assertDoesNotThrow(
                 () -> filmService.unlikeFilm(film.getId(), user.getId()),
-                "Unliking the film should not throw exceptions"
-        );
+                "Unliking the film should not throw exceptions");
 
         FilmDto updatedFilm = filmService.getFilm(film.getId());
-        Assertions.assertFalse(updatedFilm.getLikesIds().contains(user.getId()), "Film should not contain the user's like");
+        Assertions.assertFalse(updatedFilm.getLikesIds().contains(user.getId()),
+                "Film should not contain the user's like");
     }
 
     @Test
@@ -106,8 +101,7 @@ public class FilmServiceTest {
         Assertions.assertThrows(
                 NotFoundException.class,
                 () -> filmService.unlikeFilm(film.getId(), NON_EXISTING_ID),
-                "NotFoundException should be thrown for unknown user"
-        );
+                "NotFoundException should be thrown for unknown user");
     }
 
     @Test
@@ -117,8 +111,7 @@ public class FilmServiceTest {
         Assertions.assertThrows(
                 NotFoundException.class,
                 () -> filmService.unlikeFilm(NON_EXISTING_ID, user.getId()),
-                NOT_FOUND_FILM_FAIL_MSG
-        );
+                NOT_FOUND_FILM_FAIL_MSG);
     }
 
     @Test
@@ -127,8 +120,7 @@ public class FilmServiceTest {
         Assertions.assertThrows(
                 ValidationException.class,
                 () -> filmService.getFilmsPopulars(-1, null, null),
-                "Negative count should throw ValidationException"
-        );
+                "Negative count should throw ValidationException");
     }
 
     @Test
@@ -140,14 +132,12 @@ public class FilmServiceTest {
         filmService.addFilm(VALID_FILM_DTO_2.clone());
         Assertions.assertDoesNotThrow(
                 () -> filmService.getFilmsPopulars(TOP_ONE_COUNT, null, null),
-                "Top 1 film should be returned without exceptions"
-        );
+                "Top 1 film should be returned without exceptions");
         Collection<FilmDto> films = filmService.getFilmsPopulars(TOP_ONE_COUNT, null, null);
         Assertions.assertEquals(
                 TOP_ONE_COUNT,
                 films.size(),
-                "Should return the correct number of top films"
-        );
+                "Should return the correct number of top films");
         Assertions.assertEquals(films.iterator().next().getId(), film.getId(), "Should return correct film");
     }
 
@@ -175,8 +165,7 @@ public class FilmServiceTest {
         Assertions.assertEquals(
                 addedFilm1.getId(),
                 films.iterator().next().getId(),
-                "Should return film with requested genre"
-        );
+                "Should return film with requested genre");
     }
 
     @Test
@@ -205,8 +194,7 @@ public class FilmServiceTest {
         Assertions.assertEquals(
                 addedFilm1.getId(),
                 films.iterator().next().getId(),
-                "Should return film with requested genre and year"
-        );
+                "Should return film with requested genre and year");
     }
 
     @Test
@@ -233,8 +221,7 @@ public class FilmServiceTest {
         Assertions.assertEquals(
                 addedFilm1.getId(),
                 films.iterator().next().getId(),
-                "Should return film with requested year"
-        );
+                "Should return film with requested year");
     }
 
     @Test
@@ -244,13 +231,11 @@ public class FilmServiceTest {
         filmService.addFilm(VALID_FILM_DTO_2.clone());
         Assertions.assertDoesNotThrow(
                 () -> filmService.getAllFilms(),
-                "Films should be returned without exceptions"
-        );
+                "Films should be returned without exceptions");
         Assertions.assertEquals(
                 EXPECTED_REPOSITORY_SIZE_TWO,
                 filmService.getAllFilms().size(),
-                "Should be exact two films"
-        );
+                "Should be exact two films");
     }
 
     @Test
@@ -259,8 +244,7 @@ public class FilmServiceTest {
         FilmDto added = filmService.addFilm(VALID_FILM_DTO_2.clone());
         Assertions.assertDoesNotThrow(
                 () -> filmService.getFilm(added.getId()),
-                "Film should be returned without exceptions"
-        );
+                "Film should be returned without exceptions");
     }
 
     @Test
@@ -269,8 +253,7 @@ public class FilmServiceTest {
         Assertions.assertThrows(
                 NotFoundException.class,
                 () -> filmService.getFilm(NON_EXISTING_ID),
-                NOT_FOUND_FILM_FAIL_MSG
-        );
+                NOT_FOUND_FILM_FAIL_MSG);
     }
 
     @Test
@@ -279,8 +262,7 @@ public class FilmServiceTest {
         FilmDto added = filmService.addFilm(VALID_FILM_DTO_2.clone());
         Assertions.assertDoesNotThrow(
                 () -> filmService.deleteFilm(added.getId()),
-                "Film should be returned without exceptions"
-        );
+                "Film should be returned without exceptions");
     }
 
     @Test
@@ -289,8 +271,7 @@ public class FilmServiceTest {
         Assertions.assertThrows(
                 NotFoundException.class,
                 () -> filmService.deleteFilm(NON_EXISTING_ID),
-                NOT_FOUND_FILM_FAIL_MSG
-        );
+                NOT_FOUND_FILM_FAIL_MSG);
     }
 
     @Test
@@ -298,8 +279,7 @@ public class FilmServiceTest {
     public void addFilm_addNewFilm_filmAddedNoExceptions() {
         Assertions.assertDoesNotThrow(
                 () -> filmService.addFilm(VALID_FILM_DTO_1.clone()),
-                "Film should be added without exceptions"
-        );
+                "Film should be added without exceptions");
     }
 
     @Test
@@ -309,8 +289,7 @@ public class FilmServiceTest {
         Assertions.assertThrows(
                 DuplicatedDataException.class,
                 () -> filmService.addFilm(film),
-                "DuplicatedDataException should be thrown for duplicate film"
-        );
+                "DuplicatedDataException should be thrown for duplicate film");
     }
 
     @Test
@@ -320,8 +299,7 @@ public class FilmServiceTest {
         filmToUpdate.setDescription(VALID_FILM_DESCRIPTION_2);
         Assertions.assertDoesNotThrow(
                 () -> filmService.updateFilm(filmToUpdate),
-                "Film should be updated without exceptions"
-        );
+                "Film should be updated without exceptions");
     }
 
     @Test
@@ -330,8 +308,7 @@ public class FilmServiceTest {
         Assertions.assertThrows(
                 NotFoundException.class,
                 () -> filmService.updateFilm(VALID_FILM_DTO_1.clone()),
-                NOT_FOUND_FILM_FAIL_MSG
-        );
+                NOT_FOUND_FILM_FAIL_MSG);
     }
 
     @Test
@@ -382,8 +359,7 @@ public class FilmServiceTest {
     public void getDirectorFilms_getFilmsOfNonExistingDirector_throwNotFoundException() {
         Assertions.assertThrows(
                 NotFoundException.class,
-                () -> filmService.getDirectorFilms(VALID_DIRECTOR_DTO_1.getId(), SortBy.YEAR)
-        );
+                () -> filmService.getDirectorFilms(VALID_DIRECTOR_DTO_1.getId(), SortBy.YEAR));
     }
 
     @Test
@@ -541,5 +517,64 @@ public class FilmServiceTest {
 
         Assertions.assertEquals(1, films.size());
         Assertions.assertEquals(film1.getId(), films.iterator().next().getId());
+    }
+
+    @Test
+    @DisplayName("Get common films sorted by popularity")
+    public void getCommonFilms_validUsers_returnedCommonFilmsSortedByPopularity() {
+        FilmDto film1 = filmService.addFilm(VALID_FILM_DTO_1.clone());
+        FilmDto film2 = filmService.addFilm(VALID_FILM_DTO_2.clone());
+
+        UserDto user1 = userService.addUser(VALID_USER_DTO_1.clone());
+        UserDto user2 = userService.addUser(VALID_USER_DTO_2.clone());
+        UserDto user3 = userService.addUser(VALID_USER_DTO_3.clone());
+
+        filmService.likeFilm(film1.getId(), user1.getId());
+        filmService.likeFilm(film1.getId(), user2.getId());
+
+        filmService.likeFilm(film2.getId(), user1.getId());
+        filmService.likeFilm(film2.getId(), user2.getId());
+        filmService.likeFilm(film2.getId(), user3.getId());
+
+        Collection<FilmDto> commonFilms = Assertions.assertDoesNotThrow(
+                () -> filmService.getCommonFilms(user1.getId(), user2.getId()),
+                "Common films should be returned without exceptions");
+
+        Assertions.assertEquals(EXPECTED_REPOSITORY_SIZE_TWO, commonFilms.size(),
+                "There should be two common films");
+
+        FilmDto firstFilm = commonFilms.iterator().next();
+        Assertions.assertEquals(film2.getId(), firstFilm.getId(),
+                "More popular common film should be first");
+    }
+
+    @Test
+    @DisplayName("Get common films with no intersection")
+    public void getCommonFilms_validUsersNoIntersection_returnedEmptyCollection() {
+        FilmDto film1 = filmService.addFilm(VALID_FILM_DTO_1.clone());
+        FilmDto film2 = filmService.addFilm(VALID_FILM_DTO_2.clone());
+
+        UserDto user1 = userService.addUser(VALID_USER_DTO_1.clone());
+        UserDto user2 = userService.addUser(VALID_USER_DTO_2.clone());
+
+        filmService.likeFilm(film1.getId(), user1.getId());
+        filmService.likeFilm(film2.getId(), user2.getId());
+
+        Collection<FilmDto> commonFilms = Assertions.assertDoesNotThrow(
+                () -> filmService.getCommonFilms(user1.getId(), user2.getId()),
+                "Empty common films list should be returned without exceptions");
+
+        Assertions.assertTrue(commonFilms.isEmpty(), "Common films list should be empty");
+    }
+
+    @Test
+    @DisplayName("Get common films with non-existing user")
+    public void getCommonFilms_nonExistingUser_throwNotFoundException() {
+        UserDto user = userService.addUser(VALID_USER_DTO_1.clone());
+
+        Assertions.assertThrows(
+                NotFoundException.class,
+                () -> filmService.getCommonFilms(NON_EXISTING_ID, user.getId()),
+                "NotFoundException should be thrown for unknown user");
     }
 }

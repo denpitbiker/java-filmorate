@@ -1,7 +1,7 @@
 package ru.yandex.practicum.filmorate.presentation.controller;
 
 import java.util.Collection;
-
+import ru.yandex.practicum.filmorate.domain.service.FilmService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,8 +28,9 @@ public class UserController {
     public static final String ADD_FRIEND_SUBROUTE = "/{" + ID_PATH_VAR + "}/friends/{" + FRIEND_ID_PATH_VAR + "}";
     public static final String REMOVE_FRIEND_SUBROUTE = "/{" + ID_PATH_VAR + "}/friends/{" + FRIEND_ID_PATH_VAR + "}";
     public static final String GET_FRIENDS_SUBROUTE = "/{" + ID_PATH_VAR + "}/friends";
-    public static final String GET_COMMON_FRIENDS_SUBROUTE =  "/{" + ID_PATH_VAR + "}/friends/common/{" + OTHER_ID_PATH_VAR + "}";
-    public static final String GET_USER_FEED_SUBROUTE =  "/{" + ID_PATH_VAR + "}/feed";
+    public static final String GET_COMMON_FRIENDS_SUBROUTE = "/{" + ID_PATH_VAR + "}/friends/common/{"
+            + OTHER_ID_PATH_VAR + "}";
+    public static final String GET_USER_FEED_SUBROUTE = "/{" + ID_PATH_VAR + "}/feed";
 
     private static final String GET_USER_LOG_MSG = "Get user {} request";
     private static final String DELETE_USER_LOG_MSG = "Delete user {} request";
@@ -42,6 +43,7 @@ public class UserController {
     private static final String UPDATE_USER_LOG_MSG = "Update user request {}";
     private static final String GET_USER_FEED_LOG_MSG = "Get feed for user {} request";
 
+    private final FilmService filmService;
     private final UserService userService;
     private final EventService eventService;
 
@@ -66,7 +68,8 @@ public class UserController {
     }
 
     @GetMapping(GET_COMMON_FRIENDS_SUBROUTE)
-    public Collection<UserDto> getCommonFriends(@PathVariable(ID_PATH_VAR) Long id, @PathVariable(OTHER_ID_PATH_VAR) Long otherId) {
+    public Collection<UserDto> getCommonFriends(@PathVariable(ID_PATH_VAR) Long id,
+            @PathVariable(OTHER_ID_PATH_VAR) Long otherId) {
         log.info(GET_COMMON_FRIENDS_LOG_MSG, id, otherId);
         return userService.getCommonFriends(id, otherId);
     }

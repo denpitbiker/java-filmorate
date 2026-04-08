@@ -27,6 +27,7 @@ public class FilmController {
     public static final String SORT_BY_PARAM = "sortBy";
     public static final String BY_PARAM = "by";
     public static final String QUERY_VAR = "query";
+    private static final String FRIEND_ID_PARAM = "friendId";
 
     public static final String CONTROLLER_ROUTE = "/films";
     public static final String GET_FILM_SUBROUTE = "/{" + ID_PATH_VAR + "}";
@@ -36,7 +37,7 @@ public class FilmController {
     public static final String GET_TOP_FILMS_SUBROUTE = "/popular";
     public static final String FILMS_SEARCH_SUBROUTE = "/search";
     public static final String GET_DIRECTOR_FILMS_SUBROUTE = "/director/{" + DIRECTOR_ID_VAR + "}";
-
+    public static final String GET_COMMON_FILMS_SUBROUTE = "/common";
 
     private static final String DEFAULT_TOP_FILMS_RETURN_COUNT = "10";
 
@@ -50,7 +51,7 @@ public class FilmController {
     private static final String DELETE_FILM_LOG_MSG = "Delete film with id {} request";
     private static final String GET_DIRECTOR_FILMS_MSG = "Get films of director with id {} request";
     private static final String SEARCH_FILMS_MSG = "Search films with query {} and by {} request";
-
+    private static final String GET_COMMON_FILMS_LOG_MSG = "Get common films for users {} and {} request";
     private final FilmService filmService;
     private final EventService eventService;
 
@@ -68,13 +69,11 @@ public class FilmController {
         eventService.createUnlikeFilmEvent(userId, id);
     }
 
-
     @GetMapping(GET_TOP_FILMS_SUBROUTE)
     public Collection<FilmDto> getPopularFilms(
             @RequestParam(value = COUNT_PARAM, defaultValue = DEFAULT_TOP_FILMS_RETURN_COUNT) Integer count,
             @RequestParam(value = GENRE_PARAM, required = false) Long genreId,
-            @RequestParam(value = YEAR_PARAM, required = false) Integer year
-    ) {
+            @RequestParam(value = YEAR_PARAM, required = false) Integer year) {
         log.info(GET_TOP_FILMS_LOG_MSG, count);
         return filmService.getFilmsPopulars(count, genreId, year);
     }
@@ -94,8 +93,7 @@ public class FilmController {
     @GetMapping(GET_DIRECTOR_FILMS_SUBROUTE)
     public Collection<FilmDto> getDirectorFilms(
             @PathVariable(DIRECTOR_ID_VAR) Long id,
-            @RequestParam(value = SORT_BY_PARAM, defaultValue = "year") SortBy sortBy
-    ) {
+            @RequestParam(value = SORT_BY_PARAM, defaultValue = "year") SortBy sortBy) {
         log.info(GET_DIRECTOR_FILMS_MSG, id);
         return filmService.getDirectorFilms(id, sortBy);
     }
@@ -122,9 +120,16 @@ public class FilmController {
     @GetMapping(FILMS_SEARCH_SUBROUTE)
     public Collection<FilmDto> searchFilms(
             @RequestParam(QUERY_VAR) String query,
-            @RequestParam(BY_PARAM) String by
-    ) {
+            @RequestParam(BY_PARAM) String by) {
         log.info(SEARCH_FILMS_MSG, query, by);
         return filmService.searchFilms(query, by);
+    }
+
+    @GetMapping(GET_COMMON_FILMS_SUBROUTE)
+    public Collection<FilmDto> getCommonFilms(
+            @RequestParam(USER_ID_PATH_VAR) Long userId,
+            @RequestParam(FRIEND_ID_PARAM) Long friendId) {
+        log.info(GET_COMMON_FILMS_LOG_MSG, userId, friendId);
+        return filmService.getCommonFilms(userId, friendId);
     }
 }
