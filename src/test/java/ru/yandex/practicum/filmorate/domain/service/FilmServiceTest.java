@@ -577,4 +577,73 @@ public class FilmServiceTest {
                 () -> filmService.getCommonFilms(NON_EXISTING_ID, user.getId()),
                 "NotFoundException should be thrown for unknown user");
     }
+
+    @Test
+    @DisplayName("Get recommendations for user")
+    public void getRecommendations_existingUser_returnedRecommendedFilms() {
+        FilmDto film1 = filmService.addFilm(VALID_FILM_DTO_1.clone());
+        FilmDto film2 = filmService.addFilm(VALID_FILM_DTO_2.clone());
+
+        UserDto user1 = userService.addUser(VALID_USER_DTO_1.clone());
+        UserDto user2 = userService.addUser(VALID_USER_DTO_2.clone());
+
+        filmService.likeFilm(film1.getId(), user1.getId());
+
+        filmService.likeFilm(film1.getId(), user2.getId());
+        filmService.likeFilm(film2.getId(), user2.getId());
+
+        Collection<FilmDto> recommendations = Assertions.assertDoesNotThrow(
+                () -> filmService.getRecommendations(user1.getId()),
+                "Recommendations should be returned without exceptions");
+
+        Assertions.assertEquals(EXPECTED_REPOSITORY_SIZE_ONE, recommendations.size(),
+                "There should be exactly one recommendation");
+
+        FilmDto recommendedFilm = recommendations.iterator().next();
+        Assertions.assertEquals(film2.getId(), recommendedFilm.getId(),
+                "Film liked only by similar user should be recommended");
+    }
+
+    @Test
+    @DisplayName("Get recommendations should not return already liked films")
+    public void getRecommendations_existingUser_doesNotReturnAlreadyLikedFilms() {
+        FilmDto film1 = filmService.addFilm(VALID_FILM_DTO_1.clone());
+        FilmDto film2 = filmService.addFilm(VALID_FILM_DTO_2.clone());
+
+        UserDto user1 = userService.addUser(VALID_USER_DTO_1.clone());
+        UserDto user2 = userService.addUser(VALID_USER_DTO_2.clone());
+
+        filmService.likeFilm(film1.getId(), user1.getId());
+
+        filmService.likeFilm(film1.getId(), user2.getId());
+        filmService.likeFilm(film2.getId(), user2.getId());
+
+        Collection<FilmDto> recommendations = filmService.getRecommendations(user1.getId());
+
+        Assertions.assertTrue(
+                recommendations.stream().noneMatch(film -> film.getId().equals(film1.getId())),
+                "Already liked film should not be recommended");
+    }
+
+    @Test
+    @DisplayName("Get recommendations when there is no similar user")
+    public void getRecommendations_noSimilarUser_returnedEmptyCollection() {
+        filmService.addFilm(VALID_FILM_DTO_1.clone());
+        UserDto user = userService.addUser(VALID_USER_DTO_1.clone());
+
+        Collection<FilmDto> recommendations = Assertions.assertDoesNotThrow(
+                () -> filmService.getRecommendations(user.getId()),
+                "Empty recommendations list should be returned without exceptions");
+
+        Assertions.assertTrue(recommendations.isEmpty(), "Recommendations should be empty");
+    }
+
+    @Test
+    @DisplayName("Get recommendations for non-existing user")
+    public void getRecommendations_nonExistingUser_throwNotFoundException() {
+        Assertions.assertThrows(
+                NotFoundException.class,
+                () -> filmService.getRecommendations(NON_EXISTING_ID),
+                "NotFoundException should be thrown for unknown user");
+    }
 }

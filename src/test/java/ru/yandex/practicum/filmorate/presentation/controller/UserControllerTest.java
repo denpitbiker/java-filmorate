@@ -317,4 +317,32 @@ public class UserControllerTest {
                 om.registerModule(new JavaTimeModule());
                 return om.readValue(userJson, UserDto.class);
         }
+
+        @Test
+        @DisplayName("Get recommendations for existing user")
+        public void get_recommendations_existingUser_success200() throws Exception {
+                Long filmId1 = extractFilmDto(addFilm(TestStubs.VALID_FILM_DTO_1.clone())).getId();
+                Long filmId2 = extractFilmDto(addFilm(TestStubs.VALID_FILM_DTO_2.clone())).getId();
+
+                Long userId1 = extractUserDto(addUser(TestStubs.VALID_USER_DTO_1.clone())).getId();
+                Long userId2 = extractUserDto(addUser(TestStubs.VALID_USER_DTO_2.clone())).getId();
+
+                mvc.perform(put(FilmController.CONTROLLER_ROUTE + FilmController.LIKE_FILM_SUBROUTE, filmId1, userId1));
+
+                mvc.perform(put(FilmController.CONTROLLER_ROUTE + FilmController.LIKE_FILM_SUBROUTE, filmId1, userId2));
+                mvc.perform(put(FilmController.CONTROLLER_ROUTE + FilmController.LIKE_FILM_SUBROUTE, filmId2, userId2));
+
+                mvc.perform(get(UserController.CONTROLLER_ROUTE + UserController.GET_RECOMMENDATIONS_SUBROUTE, userId1))
+                                .andExpect(status().isOk())
+                                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                                .andExpect(jsonPath("$[0].id").value(filmId2));
+        }
+
+        @Test
+        @DisplayName("Get recommendations for non-existing user")
+        public void get_recommendations_nonExistingUser_notFound404() throws Exception {
+                mvc.perform(get(UserController.CONTROLLER_ROUTE + UserController.GET_RECOMMENDATIONS_SUBROUTE,
+                                TestStubs.NON_EXISTING_ID))
+                                .andExpect(status().isNotFound());
+        }
 }

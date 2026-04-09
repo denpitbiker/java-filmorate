@@ -39,7 +39,6 @@ public class FilmService {
     private static final String GET_DIRECTOR_FILMS_MSG = "Get films of director with id: {}";
     private static final String SEARCH_FILMS_MSG = "Search films with query {} and by {} request";
     private static final String DIRECTOR_NOT_FOUND_TRACE_MSG = "Can't find director with id: {}";
-
     private static final String GENRE_NOT_FOUND_ERR_MSG = "Can't find genre with id = ";
     private static final String MPA_NOT_FOUND_ERR_MSG = "Can't find mpa with id = ";
     private static final String USER_NOT_FOUND_ERR_MSG = "Can't find user with id = ";
@@ -50,6 +49,7 @@ public class FilmService {
     private static final String QUERY_SEARCH_ERR_MSG = "There isn't query search param";
     private static final String BY_SEARCH_ERR_MSG = "There isn't by search param";
     private static final String GET_COMMON_FILMS_LOG_MSG = "Get common films for users {} and {}";
+    private static final String GET_RECOMMENDATIONS_LOG_MSG = "Get recommendations for user {}";
 
     private final FilmStorage filmStorage;
     private final UserStorage userStorage;
@@ -317,5 +317,17 @@ public class FilmService {
             log.trace(BY_SEARCH_ERR_MSG);
             throw new IllegalArgumentException(BY_SEARCH_ERR_MSG);
         }
+    }
+
+    public Collection<FilmDto> getRecommendations(Long userId) {
+        log.info(GET_RECOMMENDATIONS_LOG_MSG, userId);
+        checkUserIdExist(userId);
+
+        List<Film> films = filmStorage.getRecommendations(userId);
+        FilmsAdditionalInfo info = getFilmsInfo(films);
+
+        return films.stream()
+                .map(film -> filmMapper.toPresentation(film, extractFilmInfo(info, film)))
+                .toList();
     }
 }
