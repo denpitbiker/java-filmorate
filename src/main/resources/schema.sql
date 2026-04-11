@@ -16,6 +16,11 @@ CREATE TABLE IF NOT EXISTS genre (
     name VARCHAR(30) NOT NULL UNIQUE
 );
 
+CREATE TABLE IF NOT EXISTS director (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(50) NOT NULL UNIQUE
+);
+
 CREATE TABLE IF NOT EXISTS film (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
     name VARCHAR(100) NOT NULL,
@@ -24,6 +29,25 @@ CREATE TABLE IF NOT EXISTS film (
     mpa_id BIGINT,
     duration_minutes BIGINT NOT NULL CHECK (duration_minutes > 0),
     FOREIGN KEY (mpa_id) REFERENCES mpa(id)
+);
+
+CREATE TABLE IF NOT EXISTS review (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    content VARCHAR(2000) NOT NULL,
+    is_positive BOOLEAN NOT NULL,
+    user_id BIGINT,
+    film_id BIGINT,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (film_id) REFERENCES film(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS review_rate (
+    review_id BIGINT,
+    user_id BIGINT,
+    is_useful BOOLEAN,
+    PRIMARY KEY (review_id, user_id),
+    FOREIGN KEY (review_id) REFERENCES review(id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS film_like (
@@ -42,10 +66,28 @@ CREATE TABLE IF NOT EXISTS film_genre (
     FOREIGN KEY (genre_id) REFERENCES genre(id) ON DELETE CASCADE
 );
 
+CREATE TABLE IF NOT EXISTS film_director (
+    film_id BIGINT,
+    director_id BIGINT,
+    PRIMARY KEY (film_id, director_id),
+    FOREIGN KEY (film_id) REFERENCES film(id) ON DELETE CASCADE,
+    FOREIGN KEY (director_id) REFERENCES director(id) ON DELETE CASCADE
+);
+
 CREATE TABLE IF NOT EXISTS user_friend (
     user_id BIGINT,
     friend_id BIGINT,
     PRIMARY KEY (user_id, friend_id),
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (friend_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS events (
+    event_id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    user_id BIGINT,
+    entity_id BIGINT,
+    event_type INT,
+    operation INT,
+    timestamp TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );

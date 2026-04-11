@@ -18,6 +18,7 @@ import java.util.List;
 @Service
 public class UserService {
     private static final String GET_USER_LOG_MSG = "Get user {}";
+    private static final String DELETE_USER_LOG_MSG = "Delete user {}";
     private static final String ADD_FRIEND_LOG_MSG = "Add friend {} to user {}";
     private static final String REMOVE_FRIEND_LOG_MSG = "Remove friend {} from user {}";
     private static final String ADDED_FRIEND_LOG_MSG = "Is success add friend {} to user {}: {}";
@@ -82,6 +83,13 @@ public class UserService {
     public UserDto getUser(Long id) {
         log.info(GET_USER_LOG_MSG, id);
         return getUserDtoOrThrow(id);
+    }
+
+    public UserDto deleteUser(Long id) {
+        log.info(DELETE_USER_LOG_MSG, id);
+        User removed = userStorage.removeUser(id);
+        if (removed == null) throw new NotFoundException(USER_NOT_FOUND_ERR_MSG + id);
+        return userDtoToUserMapper.toPresentation(removed);
     }
 
     public Collection<UserDto> getAllUsers() {

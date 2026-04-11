@@ -7,6 +7,9 @@ public class UserToUserDtoMapper implements TwoWayDataMapper<User, UserDto> {
 
     @Override
     public User toData(UserDto value) {
+        if (value.getName() == null || value.getName().isEmpty()) {
+            value.setName(value.getLogin());
+        }
         return new User(
                 value.getId(),
                 value.getEmail(),

@@ -14,7 +14,6 @@ public class UserRowMapper implements RowMapper<User> {
     private static final String LOGIN_COLUMN_LABEL = "login";
     private static final String BIRTHDAY_COLUMN_LABEL = "birthday";
 
-
     @Override
     public User mapRow(ResultSet rs, int rowNum) throws SQLException {
         return new User(

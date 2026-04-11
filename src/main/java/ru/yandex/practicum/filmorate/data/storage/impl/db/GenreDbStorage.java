@@ -19,7 +19,7 @@ import java.util.*;
 @DbStorage
 @RequiredArgsConstructor
 public class GenreDbStorage implements GenreStorage {
-    private static final String GET_ALL_GENRES_QUERY = "SELECT * FROM genre";
+    private static final String GET_ALL_GENRES_QUERY = "SELECT * FROM genre ORDER BY id";
     private static final String GET_GENRE_QUERY = "SELECT * FROM genre WHERE id = ?";
     private static final String GET_GENRES_FOR_FILMS_QUERY = """
             SELECT fg.film_id AS film_id, fg.genre_id AS genre_id, g.name AS genre_name
@@ -72,10 +72,8 @@ public class GenreDbStorage implements GenreStorage {
                 )
         );
         Map<Long, LinkedHashSet<Genre>> result = new HashMap<>();
+        filmIds.forEach(filmId -> result.put(filmId, new LinkedHashSet<>()));
         entries.forEach(entry -> {
-            if (!result.containsKey(entry.first)) {
-                result.put(entry.first, new LinkedHashSet<>());
-            }
             result.get(entry.first).add(entry.second);
         });
         return result;

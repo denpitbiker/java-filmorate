@@ -4,16 +4,16 @@ import jakarta.validation.ValidationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.data.annotation.DbStorage;
-import ru.yandex.practicum.filmorate.data.storage.api.GenreStorage;
-import ru.yandex.practicum.filmorate.data.storage.api.MpaStorage;
+import ru.yandex.practicum.filmorate.data.model.enums.SearchCondition;
+import ru.yandex.practicum.filmorate.data.model.enums.SortBy;
+import ru.yandex.practicum.filmorate.data.storage.api.*;
 import ru.yandex.practicum.filmorate.domain.exception.DuplicatedDataException;
 import ru.yandex.practicum.filmorate.domain.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.data.model.Film;
-import ru.yandex.practicum.filmorate.data.storage.api.FilmStorage;
-import ru.yandex.practicum.filmorate.data.storage.api.UserStorage;
 import ru.yandex.practicum.filmorate.domain.mapper.FilmToFilmDtoMapper;
 import ru.yandex.practicum.filmorate.domain.model.FilmAdditionalInfo;
 import ru.yandex.practicum.filmorate.domain.model.FilmsAdditionalInfo;
+import ru.yandex.practicum.filmorate.presentation.dto.DirectorDto;
 import ru.yandex.practicum.filmorate.presentation.dto.FilmDto;
 import ru.yandex.practicum.filmorate.presentation.dto.GenreDto;
 
@@ -26,35 +26,46 @@ public class FilmService {
     private static final String GET_FILM_LOG_MSG = "Get film {}";
     private static final String LIKE_FILM_LOG_MSG = "Is success like film {} by user {}: {}";
     private static final String UNLIKE_FILM_LOG_MSG = "Is success unlike film {} by user {}: {}";
-    private static final String GET_TOP_FILMS_LOG_MSG = "Get top {} films";
+    private static final String GET_POPULAR_FILMS_LOG_MSG = "Get popular {} films in genreId {} {} year";
     private static final String GET_FILMS_LOG_MSG = "Get all films";
     private static final String ADD_FILM_LOG_MSG = "Add new film {}";
     private static final String UPDATE_FILM_LOG_MSG = "Update film {}";
+    private static final String DELETE_FILM_LOG_MSG = "Delete film with id {}";
     private static final String USER_NOT_FOUND_TRACE_MSG = "Can't find user with id: {}";
     private static final String MPA_NOT_FOUND_TRACE_MSG = "Can't find mpa with id: {}";
     private static final String GENRE_NOT_FOUND_TRACE_MSG = "Can't find genre with id: {}";
     private static final String DUPLICATE_FILM_FOUND_TRACE_MSG = "Already have film with id: {}";
     private static final String FILM_NOT_FOUND_TRACE_MSG = "Can't find film with id: {}";
-
+    private static final String GET_DIRECTOR_FILMS_MSG = "Get films of director with id: {}";
+    private static final String SEARCH_FILMS_MSG = "Search films with query {} and by {} request";
+    private static final String DIRECTOR_NOT_FOUND_TRACE_MSG = "Can't find director with id: {}";
     private static final String GENRE_NOT_FOUND_ERR_MSG = "Can't find genre with id = ";
     private static final String MPA_NOT_FOUND_ERR_MSG = "Can't find mpa with id = ";
     private static final String USER_NOT_FOUND_ERR_MSG = "Can't find user with id = ";
     private static final String DUPLICATE_FILM_ERR_MSG = "Film already exists with id = ";
     private static final String FILM_NOT_FOUND_ERR_MSG = "Can't find film with id = ";
     private static final String FILMS_COUNT_ERR_MSG = "Films count must be positive number!";
+    private static final String DIRECTOR_NOT_FOUND_ERR_MSG = "Can't find director with id = ";
+    private static final String QUERY_SEARCH_ERR_MSG = "There isn't query search param";
+    private static final String BY_SEARCH_ERR_MSG = "There isn't by search param";
+    private static final String GET_COMMON_FILMS_LOG_MSG = "Get common films for users {} and {}";
+    private static final String GET_RECOMMENDATIONS_LOG_MSG = "Get recommendations for user {}";
 
     private final FilmStorage filmStorage;
     private final UserStorage userStorage;
     private final GenreStorage genreStorage;
     private final MpaStorage mpaStorage;
+    private final DirectorStorage directorStorage;
 
     private static final FilmToFilmDtoMapper filmMapper = new FilmToFilmDtoMapper();
 
-    public FilmService(@DbStorage FilmStorage filmStorage, @DbStorage UserStorage userStorage, GenreStorage genreStorage, MpaStorage mpaStorage) {
+    public FilmService(@DbStorage FilmStorage filmStorage, @DbStorage UserStorage userStorage,
+            GenreStorage genreStorage, MpaStorage mpaStorage, DirectorStorage directorStorage) {
         this.filmStorage = filmStorage;
         this.userStorage = userStorage;
         this.genreStorage = genreStorage;
         this.mpaStorage = mpaStorage;
+        this.directorStorage = directorStorage;
     }
 
     public void likeFilm(Long id, Long userId) {
@@ -71,11 +82,16 @@ public class FilmService {
         log.info(UNLIKE_FILM_LOG_MSG, id, userId, isSuccess);
     }
 
-    public Collection<FilmDto> getFilmsTop(Integer count) {
-        log.info(GET_TOP_FILMS_LOG_MSG, count);
-        if (count <= 0) throw new ValidationException(FILMS_COUNT_ERR_MSG);
-        List<Film> films = filmStorage.getTopFilms(count);
+    public Collection<FilmDto> getFilmsPopulars(Integer count, Long genreId, Integer year) {
+        log.info(GET_POPULAR_FILMS_LOG_MSG, count, genreId, year);
+
+        if (count <= 0) {
+            throw new ValidationException(FILMS_COUNT_ERR_MSG);
+        }
+
+        List<Film> films = filmStorage.getPopularFilms(count, genreId, year);
         FilmsAdditionalInfo info = getFilmsInfo(films);
+
         return films.stream()
                 .map(film -> filmMapper.toPresentation(film, extractFilmInfo(info, film)))
                 .toList();
@@ -100,8 +116,10 @@ public class FilmService {
         checkFilmIdNotExist(newFilm.getId());
         checkGenresExists(newFilm.getGenres());
         checkMpaExists(newFilm.getMpa().getId());
+        checkDirectorsExist(newFilm.getDirectors());
         Film film = filmStorage.addFilm(filmMapper.toData(newFilm));
         tryUpdateGenres(film.getId(), newFilm);
+        tryUpdateDirectors(film.getId(), newFilm);
         return filmMapper.toPresentation(film, getFilmInfo(film));
     }
 
@@ -110,14 +128,77 @@ public class FilmService {
         checkFilmIdExist(updatedFilm.getId());
         checkGenresExists(updatedFilm.getGenres());
         checkMpaExists(updatedFilm.getMpa().getId());
+        checkDirectorsExist(updatedFilm.getDirectors());
         Film film = filmStorage.updateFilm(filmMapper.toData(updatedFilm));
         tryUpdateGenres(film.getId(), updatedFilm);
+        tryUpdateDirectors(film.getId(), updatedFilm);
         return filmMapper.toPresentation(film, getFilmInfo(film));
+    }
+
+    public FilmDto deleteFilm(Long id) {
+        log.info(DELETE_FILM_LOG_MSG, id);
+        Film removed = filmStorage.removeFilm(id);
+        if (removed == null)
+            throw new NotFoundException(FILM_NOT_FOUND_ERR_MSG + id);
+        return filmMapper.toPresentation(removed, getFilmInfo(removed));
+    }
+
+    public Collection<FilmDto> getDirectorFilms(Long id, SortBy sortBy) {
+        log.info(GET_DIRECTOR_FILMS_MSG, id);
+        checkDirectorExists(id);
+        List<Film> films = filmStorage.getAllFilms();
+        FilmsAdditionalInfo info = getFilmsInfo(films);
+        Comparator<FilmDto> comparator = sortBy.equals(SortBy.YEAR)
+                ? Comparator
+                        .comparing(FilmDto::getReleaseDate)
+                : Comparator
+                        .comparingInt((FilmDto f) -> f.getLikesIds().size())
+                        .reversed();
+
+        return films.stream()
+                .map(film -> filmMapper.toPresentation(film, extractFilmInfo(info, film)))
+                .filter(f -> f.getDirectors() != null)
+                .filter(f -> f.getDirectors().stream().map(DirectorDto::getId).toList().contains(id))
+                .sorted(comparator)
+                .toList();
+    }
+
+    public Collection<FilmDto> searchFilms(String query, String by) {
+        log.info(SEARCH_FILMS_MSG, query, by);
+
+        Set<SearchCondition> byParams = checkSearchParams(query, by);
+
+        List<Film> films = filmStorage.searchFilms(query, byParams);
+        FilmsAdditionalInfo info = getFilmsInfo(films);
+
+        return films.stream()
+                .map(film -> filmMapper.toPresentation(film, extractFilmInfo(info, film)))
+                .toList();
+    }
+
+    public Collection<FilmDto> getCommonFilms(Long userId, Long friendId) {
+        log.info(GET_COMMON_FILMS_LOG_MSG, userId, friendId);
+        checkUserIdExist(userId);
+        checkUserIdExist(friendId);
+
+        List<Film> films = filmStorage.getCommonFilms(userId, friendId);
+        FilmsAdditionalInfo info = getFilmsInfo(films);
+
+        return films.stream()
+                .map(film -> filmMapper.toPresentation(film, extractFilmInfo(info, film)))
+                .toList();
     }
 
     private void tryUpdateGenres(Long filmId, FilmDto film) {
         if (film.getGenres() != null)
-            genreStorage.updateFilmGenres(filmId, film.getGenres().stream().map(GenreDto::getId).collect(Collectors.toSet()));
+            genreStorage.updateFilmGenres(filmId,
+                    film.getGenres().stream().map(GenreDto::getId).collect(Collectors.toSet()));
+    }
+
+    private void tryUpdateDirectors(Long filmId, FilmDto film) {
+        if (film.getDirectors() != null)
+            directorStorage.updateFilmDirectors(filmId,
+                    film.getDirectors().stream().map(DirectorDto::getId).collect(Collectors.toSet()));
     }
 
     private Film getFilmOrThrow(Long id) {
@@ -134,8 +215,8 @@ public class FilmService {
         return new FilmAdditionalInfo(
                 info.mpas().get(film.getMpaId()),
                 info.genres().get(film.getId()),
-                info.likes().get(film.getId())
-        );
+                info.likes().get(film.getId()),
+                info.directors().get(film.getId()));
     }
 
     private FilmAdditionalInfo getFilmInfo(Film film) {
@@ -143,15 +224,20 @@ public class FilmService {
     }
 
     private FilmsAdditionalInfo getFilmsInfo(List<Film> films) {
+        if (films == null || films.isEmpty()) {
+            return new FilmsAdditionalInfo(Map.of(), Map.of(), Map.of(), Map.of());
+        }
+
         return new FilmsAdditionalInfo(
                 mpaStorage.getMpasInfo(films.stream().map(Film::getMpaId).collect(Collectors.toSet())),
                 filmStorage.getFilmsLikes(films.stream().map(Film::getId).toList()),
-                genreStorage.getGenresForFilms(films.stream().map(Film::getId).toList())
-        );
+                genreStorage.getGenresForFilms(films.stream().map(Film::getId).toList()),
+                directorStorage.getDirectorsForFilms(films.stream().map(Film::getId).toList()));
     }
 
     private void checkGenresExists(Collection<GenreDto> genres) {
-        if (genres == null) return;
+        if (genres == null)
+            return;
         genres.forEach((genre) -> {
             if (genreStorage.getGenre(genre.getId()).isEmpty()) {
                 log.trace(GENRE_NOT_FOUND_TRACE_MSG, genre.getId());
@@ -161,7 +247,8 @@ public class FilmService {
     }
 
     private void checkMpaExists(Long id) {
-        if (id == null) return;
+        if (id == null)
+            return;
         if (mpaStorage.getMpa(id).isEmpty()) {
             log.trace(MPA_NOT_FOUND_TRACE_MSG, id);
             throw new NotFoundException(MPA_NOT_FOUND_ERR_MSG + id);
@@ -187,5 +274,60 @@ public class FilmService {
             log.trace(DUPLICATE_FILM_FOUND_TRACE_MSG, id);
             throw new DuplicatedDataException(DUPLICATE_FILM_ERR_MSG + id);
         }
+    }
+
+    private void checkDirectorsExist(Collection<DirectorDto> directors) {
+        if (directors == null)
+            return;
+        directors.forEach((director) -> {
+            if (directorStorage.getDirector(director.getId()).isEmpty()) {
+                log.trace(DIRECTOR_NOT_FOUND_TRACE_MSG, director.getId());
+                throw new NotFoundException(DIRECTOR_NOT_FOUND_ERR_MSG + director.getId());
+            }
+        });
+    }
+
+    private void checkDirectorExists(Long directorId) {
+        if (directorId == null)
+            return;
+        if (!directorStorage.hasDirectorId(directorId)) {
+            log.trace(DIRECTOR_NOT_FOUND_TRACE_MSG, directorId);
+            throw new NotFoundException(DIRECTOR_NOT_FOUND_ERR_MSG + directorId);
+        }
+    }
+
+    private Set<SearchCondition> checkSearchParams(String query, String by) {
+        if (query == null || query.isBlank()) {
+            log.trace(QUERY_SEARCH_ERR_MSG);
+            throw new IllegalArgumentException(QUERY_SEARCH_ERR_MSG);
+        }
+
+        if (by == null || by.isBlank()) {
+            log.trace(BY_SEARCH_ERR_MSG);
+            throw new IllegalArgumentException(BY_SEARCH_ERR_MSG);
+        }
+
+        try {
+            return Arrays.stream(by.split(","))
+                    .map(String::trim)
+                    .map(String::toUpperCase)
+                    .map(SearchCondition::valueOf)
+                    .collect(Collectors.toSet());
+        } catch (IllegalArgumentException e) {
+            log.trace(BY_SEARCH_ERR_MSG);
+            throw new IllegalArgumentException(BY_SEARCH_ERR_MSG);
+        }
+    }
+
+    public Collection<FilmDto> getRecommendations(Long userId) {
+        log.info(GET_RECOMMENDATIONS_LOG_MSG, userId);
+        checkUserIdExist(userId);
+
+        List<Film> films = filmStorage.getRecommendations(userId);
+        FilmsAdditionalInfo info = getFilmsInfo(films);
+
+        return films.stream()
+                .map(film -> filmMapper.toPresentation(film, extractFilmInfo(info, film)))
+                .toList();
     }
 }

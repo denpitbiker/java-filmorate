@@ -1,14 +1,18 @@
 package ru.yandex.practicum.filmorate.presentation.controller;
 
+import java.util.Collection;
+import ru.yandex.practicum.filmorate.domain.service.FilmService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.domain.service.UserService;
-import ru.yandex.practicum.filmorate.presentation.dto.UserDto;
 
-import java.util.Collection;
+import ru.yandex.practicum.filmorate.domain.service.EventService;
+import ru.yandex.practicum.filmorate.domain.service.UserService;
+import ru.yandex.practicum.filmorate.presentation.dto.EventDto;
+import ru.yandex.practicum.filmorate.presentation.dto.FilmDto;
+import ru.yandex.practicum.filmorate.presentation.dto.UserDto;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -20,13 +24,18 @@ public class UserController {
     private static final String OTHER_ID_PATH_VAR = "otherId";
 
     public static final String CONTROLLER_ROUTE = "/users";
-    public static final String GET_USER_SUBROUTE = "/{id}";
+    public static final String GET_USER_SUBROUTE = "/{" + ID_PATH_VAR + "}";
+    public static final String DELETE_USER_SUBROUTE = "/{" + ID_PATH_VAR + "}";
     public static final String ADD_FRIEND_SUBROUTE = "/{" + ID_PATH_VAR + "}/friends/{" + FRIEND_ID_PATH_VAR + "}";
     public static final String REMOVE_FRIEND_SUBROUTE = "/{" + ID_PATH_VAR + "}/friends/{" + FRIEND_ID_PATH_VAR + "}";
     public static final String GET_FRIENDS_SUBROUTE = "/{" + ID_PATH_VAR + "}/friends";
-    public static final String GET_COMMON_FRIENDS_SUBROUTE =  "/{" + ID_PATH_VAR + "}/friends/common/{" + OTHER_ID_PATH_VAR + "}";
+    public static final String GET_COMMON_FRIENDS_SUBROUTE = "/{" + ID_PATH_VAR + "}/friends/common/{"
+            + OTHER_ID_PATH_VAR + "}";
+    public static final String GET_USER_FEED_SUBROUTE = "/{" + ID_PATH_VAR + "}/feed";
+    public static final String GET_RECOMMENDATIONS_SUBROUTE = "/{" + ID_PATH_VAR + "}/recommendations";
 
     private static final String GET_USER_LOG_MSG = "Get user {} request";
+    private static final String DELETE_USER_LOG_MSG = "Delete user {} request";
     private static final String ADD_FRIEND_LOG_MSG = "Add friend {} to user {} request";
     private static final String REMOVE_FRIEND_LOG_MSG = "Remove friend {} from user {} request";
     private static final String GET_USER_FRIENDS_LOG_MSG = "Get friends for user {} request";
@@ -34,19 +43,25 @@ public class UserController {
     private static final String GET_USERS_LOG_MSG = "Get all users request";
     private static final String ADD_USER_LOG_MSG = "Add new user request {}";
     private static final String UPDATE_USER_LOG_MSG = "Update user request {}";
+    private static final String GET_USER_FEED_LOG_MSG = "Get feed for user {} request";
+    private static final String GET_RECOMMENDATIONS_LOG_MSG = "Get recommendations for user {} request";
 
+    private final FilmService filmService;
     private final UserService userService;
+    private final EventService eventService;
 
     @PutMapping(ADD_FRIEND_SUBROUTE)
     public void addFriend(@PathVariable(ID_PATH_VAR) Long id, @PathVariable(FRIEND_ID_PATH_VAR) Long friendId) {
         log.info(ADD_FRIEND_LOG_MSG, friendId, id);
         userService.addFriend(id, friendId);
+        eventService.createAddFriendEvent(id, friendId);
     }
 
     @DeleteMapping(REMOVE_FRIEND_SUBROUTE)
     public void removeFriend(@PathVariable(ID_PATH_VAR) Long id, @PathVariable(FRIEND_ID_PATH_VAR) Long friendId) {
         log.info(REMOVE_FRIEND_LOG_MSG, friendId, id);
         userService.removeFriend(id, friendId);
+        eventService.createRemoveFriendEvent(id, friendId);
     }
 
     @GetMapping(GET_FRIENDS_SUBROUTE)
@@ -56,7 +71,8 @@ public class UserController {
     }
 
     @GetMapping(GET_COMMON_FRIENDS_SUBROUTE)
-    public Collection<UserDto> getCommonFriends(@PathVariable(ID_PATH_VAR) Long id, @PathVariable(OTHER_ID_PATH_VAR) Long otherId) {
+    public Collection<UserDto> getCommonFriends(@PathVariable(ID_PATH_VAR) Long id,
+            @PathVariable(OTHER_ID_PATH_VAR) Long otherId) {
         log.info(GET_COMMON_FRIENDS_LOG_MSG, id, otherId);
         return userService.getCommonFriends(id, otherId);
     }
@@ -65,6 +81,12 @@ public class UserController {
     public UserDto getUser(@PathVariable(ID_PATH_VAR) Long id) {
         log.info(GET_USER_LOG_MSG, id);
         return userService.getUser(id);
+    }
+
+    @DeleteMapping(DELETE_USER_SUBROUTE)
+    public UserDto deleteUser(@PathVariable(ID_PATH_VAR) Long id) {
+        log.info(DELETE_USER_LOG_MSG, id);
+        return userService.deleteUser(id);
     }
 
     @GetMapping
@@ -85,4 +107,19 @@ public class UserController {
         log.info(UPDATE_USER_LOG_MSG, updatedUser);
         return userService.updateUser(updatedUser);
     }
+
+    @GetMapping(GET_USER_FEED_SUBROUTE)
+    public Collection<EventDto> getUserFeeds(@PathVariable(ID_PATH_VAR) Long id) {
+        // Check for user exists
+        userService.getUser(id);
+        log.info(GET_USER_FEED_LOG_MSG, id);
+        return eventService.getEventsForUser(id);
+    }
+
+    @GetMapping(GET_RECOMMENDATIONS_SUBROUTE)
+    public Collection<FilmDto> getRecommendations(@PathVariable(ID_PATH_VAR) Long id) {
+        log.info(GET_RECOMMENDATIONS_LOG_MSG, id);
+        return filmService.getRecommendations(id);
+    }
+
 }

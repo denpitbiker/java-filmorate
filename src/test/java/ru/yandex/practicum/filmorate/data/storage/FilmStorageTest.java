@@ -4,7 +4,10 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.filmorate.data.model.Film;
+import ru.yandex.practicum.filmorate.data.model.enums.SearchCondition;
 import ru.yandex.practicum.filmorate.data.storage.api.FilmStorage;
+
+import java.util.Set;
 
 import static ru.yandex.practicum.filmorate.TestStubs.*;
 
@@ -92,5 +95,44 @@ public abstract class FilmStorageTest {
     @DisplayName("Check non-existing film id")
     public void hasFilmId_checkNonExistingFilmIdInStorage_returnedFalse() {
         Assertions.assertFalse(repository.hasFilmId(NON_EXISTING_ID), "Repository should not contain unknown film id");
+    }
+
+    @Test
+    @DisplayName("Search films by substring returns all matching films")
+    public void searchFilms_searchBySubstring_returnsMatchingFilms() {
+        Film film1 = VALID_FILM_1.clone();
+        film1.setName(VALID_FILM_NAME_4);
+
+        Film film2 = VALID_FILM_2.clone();
+        film2.setName(VALID_FILM_NAME_5);
+
+        Film film3 = VALID_FILM_1.clone();
+        film3.setName(VALID_FILM_NAME_6);
+
+        Film film4 = VALID_FILM_1.clone();
+        film4.setName(VALID_FILM_NAME_7);
+
+        repository.addFilm(film1);
+        repository.addFilm(film2);
+        repository.addFilm(film3);
+        repository.addFilm(film4);
+
+        var result = repository.searchFilms("крад", Set.of(SearchCondition.TITLE));
+
+        Assertions.assertEquals(2, result.size(), "Two films should match substring 'крад'");
+
+        var names = result.stream()
+                .map(Film::getName)
+                .toList();
+
+        Assertions.assertTrue(
+                names.contains(VALID_FILM_NAME_4),
+                "First matching film should be returned"
+        );
+
+        Assertions.assertTrue(
+                names.contains(VALID_FILM_NAME_5),
+                "Second matching film should be returned"
+        );
     }
 }
