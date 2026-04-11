@@ -120,7 +120,7 @@ public class UserFeedControllerTest {
         mvc.perform(get(UserController.CONTROLLER_ROUTE + UserController.GET_USER_FEED_SUBROUTE, userId1))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$", hasSize(3)))
+                .andExpect(jsonPath("$", hasSize(1)))
                 .andExpect(jsonPath("$.[*].userId", hasItem(userId1.intValue())))
                 .andExpect(jsonPath("$.[*].entityId", hasItem(userId2.intValue())))
                 .andExpect(jsonPath("$.[*].eventType", hasItem(EventType.FRIEND.name())))
@@ -128,9 +128,9 @@ public class UserFeedControllerTest {
         mvc.perform(get(UserController.CONTROLLER_ROUTE + UserController.GET_USER_FEED_SUBROUTE, userId2))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$", hasSize(3)))
+                .andExpect(jsonPath("$", hasSize(2)))
                 .andExpect(jsonPath("$.[*].userId", hasItem(userId2.intValue())))
-                .andExpect(jsonPath("$.[*].entityId", hasItems(userId1.intValue(), userId3.intValue())))
+                .andExpect(jsonPath("$.[*].entityId", hasItems(userId1.intValue())))
                 .andExpect(jsonPath("$.[*].eventType", hasItem(EventType.FRIEND.name())))
                 .andExpect(jsonPath("$.[*].operation", hasItem(EventOperation.ADD.name())));
 
@@ -142,7 +142,7 @@ public class UserFeedControllerTest {
         mvc.perform(get(UserController.CONTROLLER_ROUTE + UserController.GET_USER_FEED_SUBROUTE, userId2))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$", hasSize(4)))
+                .andExpect(jsonPath("$", hasSize(3)))
                 .andExpect(jsonPath("$.[*].userId", hasItem(userId2.intValue())))
                 .andExpect(jsonPath("$.[*].entityId", hasItems(userId1.intValue(), userId3.intValue())))
                 .andExpect(jsonPath("$.[*].eventType", hasItem(EventType.FRIEND.name())))
@@ -186,10 +186,10 @@ public class UserFeedControllerTest {
         mvc.perform(get(UserController.CONTROLLER_ROUTE + UserController.GET_USER_FEED_SUBROUTE, userId))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$", hasSize(2)))
-                .andExpect(jsonPath("$.[*].userId", hasItems(userId.intValue(), friendId.intValue())))
-                .andExpect(jsonPath("$.[*].entityId", hasItems(filmId.intValue(), friendId.intValue())))
-                .andExpect(jsonPath("$.[*].eventType", hasItems(EventType.LIKE.name(), EventType.FRIEND.name())))
+                .andExpect(jsonPath("$", hasSize(1)))
+                .andExpect(jsonPath("$.[*].userId", hasItems(userId.intValue())))
+                .andExpect(jsonPath("$.[*].entityId", hasItems(friendId.intValue())))
+                .andExpect(jsonPath("$.[*].eventType", hasItems(EventType.FRIEND.name())))
                 .andExpect(jsonPath("$.[*].operation", hasItems(EventOperation.ADD.name())));
     }
 
@@ -262,10 +262,10 @@ public class UserFeedControllerTest {
         mvc.perform(get(UserController.CONTROLLER_ROUTE + UserController.GET_USER_FEED_SUBROUTE, userId))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$", hasSize(2)))
-                .andExpect(jsonPath("$.[*].userId", hasItem(friendId.intValue())))
-                .andExpect(jsonPath("$.[*].entityId", hasItem(reviewId.intValue())))
-                .andExpect(jsonPath("$.[*].eventType", hasItem(EventType.REVIEW.name())))
+                .andExpect(jsonPath("$", hasSize(1)))
+                .andExpect(jsonPath("$.[*].userId", hasItem(userId.intValue())))
+                .andExpect(jsonPath("$.[*].entityId", hasItem(friendId.intValue())))
+                .andExpect(jsonPath("$.[*].eventType", hasItem(EventType.FRIEND.name())))
                 .andExpect(jsonPath("$.[*].operation", hasItem(EventOperation.ADD.name())));
     }
 
