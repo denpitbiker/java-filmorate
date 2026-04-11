@@ -122,8 +122,4 @@ public class UserController {
         return filmService.getRecommendations(id);
     }
 
-    @GetMapping("/feed")
-    public Collection<EventDto> getAllFeeds() {
-        return eventService.getAllEvents();
-    }
 }

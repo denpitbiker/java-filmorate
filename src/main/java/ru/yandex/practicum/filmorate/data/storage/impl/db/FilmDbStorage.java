@@ -156,8 +156,9 @@ public class FilmDbStorage implements FilmStorage {
     private static final String FILM_ID_COLUMN_LABEL = "film_id";
     private static final String USER_ID_COLUMN_LABEL = "user_id";
 
-    private static final String ADD_LIKE_QUERY = "INSERT INTO film_like (film_id, user_id) VALUES (?, ?)";
+    private static final String ADD_LIKE_QUERY = "INSERT INTO film_like (film_id, user_id) (SELECT ?, ? WHERE NOT EXISTS (SELECT 1 FROM film_like WHERE film_id = ? AND user_id = ?))";
     private static final String DELETE_LIKE_QUERY = "DELETE FROM film_like WHERE film_id = ? AND user_id = ?";
+    private static final String USER_HAS_LIKE_QUERY = "SELECT 1 FROM film_like WHERE film_id = ? AND user_id = ?";
 
     private static final String GET_FILMS_LOG = "Searching for films";
     private static final String GET_FILM_FAILED_LOG = "Failed to find film with id = {}";
@@ -175,7 +176,7 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public boolean addLike(Long filmId, Long userId) {
-        int rowsAffected = jdbc.update(ADD_LIKE_QUERY, filmId, userId);
+        int rowsAffected = jdbc.update(ADD_LIKE_QUERY, filmId, userId, filmId, userId);
         return rowsAffected > 0;
     }
 
