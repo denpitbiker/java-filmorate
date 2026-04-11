@@ -27,7 +27,7 @@ public class ReviewDbStorage implements ReviewStorage {
     private static final String GET_RATE_QUERY = "SELECT * FROM review_rate WHERE review_id = ? AND user_id = ? AND is_useful = ?";
     private static final String DELETE_RATE_QUERY = "DELETE FROM review_rate WHERE review_id = ? AND user_id = ? AND is_useful = ?";
     private static final String ADD_REVIEW_QUERY = "INSERT INTO review (content, is_positive, user_id, film_id) VALUES (?, ?, ?, ?)";
-    private static final String UPDATE_REVIEW_QUERY = "UPDATE review SET content = ?, is_positive = ?, user_id = ?, film_id = ? WHERE id = ?";
+    private static final String UPDATE_REVIEW_QUERY = "UPDATE review SET content = ?, is_positive = ? WHERE id = ?";
     private static final String DELETE_REVIEW_QUERY = "DELETE FROM review WHERE id=?";
 
     private static final String GET_REVIEW_QUERY = """
@@ -147,9 +147,7 @@ public class ReviewDbStorage implements ReviewStorage {
             PreparedStatement ps = connection.prepareStatement(UPDATE_REVIEW_QUERY);
             ps.setString(1, updatedReview.getContent());
             ps.setBoolean(2, updatedReview.getIsPositive());
-            ps.setLong(3, updatedReview.getUserId());
-            ps.setLong(4, updatedReview.getFilmId());
-            ps.setLong(5, userId);
+            ps.setLong(3, userId);
             return ps;
         });
         return jdbc.queryForObject(GET_REVIEW_QUERY, mapper, updatedReview.getId(), updatedReview.getId());

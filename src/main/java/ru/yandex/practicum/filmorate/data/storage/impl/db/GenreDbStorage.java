@@ -72,10 +72,8 @@ public class GenreDbStorage implements GenreStorage {
                 )
         );
         Map<Long, LinkedHashSet<Genre>> result = new HashMap<>();
+        filmIds.forEach(filmId -> result.put(filmId, new LinkedHashSet<>()));
         entries.forEach(entry -> {
-            if (!result.containsKey(entry.first)) {
-                result.put(entry.first, new LinkedHashSet<>());
-            }
             result.get(entry.first).add(entry.second);
         });
         return result;

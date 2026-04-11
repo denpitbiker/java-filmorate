@@ -24,18 +24,7 @@ public class EventDbStorage implements EventStorage {
     private static final String GET_USER_EVENTS_QUERY = """
         SELECT e.*
         FROM events e
-        INNER JOIN users u ON e.user_id = u.id
         WHERE e.user_id = ?
-           OR e.user_id IN (
-               SELECT friend_id
-               FROM user_friend
-               WHERE user_id = ?
-               UNION
-               SELECT user_id
-               FROM user_friend
-               WHERE friend_id = ?
-           )
-        ORDER BY e.timestamp ASC;
     """;
     private static final String ADD_EVENT_QUERY = "INSERT INTO events (user_id, entity_id, event_type, operation, timestamp)" +
             " VALUES (?, ?, ?, ?, ?) ";
@@ -57,7 +46,7 @@ public class EventDbStorage implements EventStorage {
     @Override
     public Collection<Event> getEventsByUserId(Long userId) {
         log.trace(GET_USER_EVENTS_LOG, userId);
-        return jdbc.query(GET_USER_EVENTS_QUERY, mapper, userId, userId, userId);
+        return jdbc.query(GET_USER_EVENTS_QUERY, mapper, userId);
     }
 
     @Override

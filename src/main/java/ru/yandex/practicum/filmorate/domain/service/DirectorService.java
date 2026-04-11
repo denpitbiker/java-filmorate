@@ -27,6 +27,9 @@ public class DirectorService {
     private static final String DUPLICATE_DIRECTOR_FOUND_EXCEPTION_MSG = "Direct already exists with id = ";
     private static final String DIRECTOR_NOT_FOUND_EXCEPTION_MSG = "Can't find director with id = ";
 
+    private static final String INVALID_DIRECTORY_EXCEPTION_MSG = "Invalid director name: ";
+    private static final String INVALID_DIRECTORY_EXCEPTION_LOG_MSG = "Invalid director name: {}";
+
 
     private final DirectorStorage directorStorage;
 
@@ -53,6 +56,7 @@ public class DirectorService {
     public DirectorDto addDirector(DirectorDto newDirector) {
         log.info(ADD_DIRECTOR_LOG_MSG);
         checkDirectorIdNotExist(newDirector.getId());
+        checkDirectorName(newDirector);
         Director director = directorStorage.addDirector(directorMapper.toData(newDirector));
         return directorMapper.toPresentation(director);
     }
@@ -60,6 +64,7 @@ public class DirectorService {
     public DirectorDto updateDirector(DirectorDto updatedDirector) {
         log.info(UPDATE_DIRECTOR_LOG_MSG, updatedDirector.getId());
         checkDirectorIdExists(updatedDirector.getId());
+        checkDirectorName(updatedDirector);
         Director director = directorStorage.updateDirector(directorMapper.toData(updatedDirector));
         return directorMapper.toPresentation(director);
     }
@@ -77,6 +82,13 @@ public class DirectorService {
         return directorStorage
                 .getDirector(id)
                 .orElseThrow(() -> new NotFoundException(DIRECTOR_NOT_FOUND_TRACE_MSG + id));
+    }
+
+    private void checkDirectorName(DirectorDto director) {
+        if (director.getName() == null || director.getName().isBlank()) {
+            log.error(INVALID_DIRECTORY_EXCEPTION_LOG_MSG, director.getName());
+            throw new IllegalArgumentException(INVALID_DIRECTORY_EXCEPTION_MSG + director.getName());
+        }
     }
 
     private void checkDirectorIdNotExist(Long id) {
